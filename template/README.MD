@@ -1,3 +1,9 @@
+The SOABM is a collection of travel modeling components.  The core components of the system are:
+  - OR-RAMP – ODOT’s version of the CT-RAMP family of ABMs for modeling resident travel.
+  - VISUM + Python – Zone and network data management, as well as network skimming and assignment procedures.
+  - Commercial vehicle model – ODOT’s trip-based commercial vehicle model implemented in R.
+  - External model – ODOT’s external travel model based on select link analysis flows from SWIM at each SOABM external station location.
+  - RunModel – A DOS batch program for running the overall model system.
 
 # Setting Up a New Scenario
 
