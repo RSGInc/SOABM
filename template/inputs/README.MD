@@ -1,4 +1,4 @@
-# Inputs
+The following inputs need to be placed in this folder:
 
 ## Synthetic population
   - households.csv
