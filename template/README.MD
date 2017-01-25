@@ -7,7 +7,7 @@ The SOABM is a collection of travel modeling components.  The core components of
 
 # Setting Up a New Scenario
 
-Unzip the template setup SOABM_<date>.zip file that includes the following folders and files.
+Download this template setup folder that includes the following folders and files.
   - RunModel.bat – overall model run script
   - application – DOS batch files, Java ORRAMP jar file, HDF5 DLLs for OMX
   - config – ORRAMP properties file, ORRAMP JPPF config files
@@ -15,7 +15,7 @@ Unzip the template setup SOABM_<date>.zip file that includes the following folde
   - visum – skimming procedure files
     - TAZ assignment using warm start path-based assignment
     - TAP assignment using headway-based optimal strategies search
-  - inputs – Popsyn input files, VISUM scenario version file, external model input files
+  - inputs – Popsyn input files, VISUM scenario version file, external model input files (THESE ARE NOT IN THIS REPO)
   - logs – ORRAMP output log files
   - outputs – all model outputs – skims, trip lists, matrices, etc.
   - scripts – VISUM skimming, OMX reader/writer, external model, CVM
