@@ -1,0 +1,13 @@
+,Car,SU Truck,MU Truck
+"Agriculture, Forestry",0.146,0.104,0.032
+Mining,0,0,0
+Construction,0.21,0.072,0.018
+Manufacturing,0.009,0.006,0.001
+"Transportation, Communications, Public Utilities",0.042,0.055,0.183
+Wholesale,0.087,0.037,0.033
+Retail,0.043,0.012,0.001
+Financial,0.045,0,0
+Service**,0.117,0.004,0.001
+Health,0.116,0,0
+Other Services,0.115,0.005,0.001
+Government,0.151,0.011,0.01
