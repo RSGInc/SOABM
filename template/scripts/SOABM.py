@@ -15,7 +15,7 @@
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 14/Exe/PythonModules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 16/Exe/PythonModules")
 import win32com.client as com
 import VisumPy.helpers, omx, numpy
 
@@ -23,7 +23,7 @@ import VisumPy.helpers, omx, numpy
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(14)
+  Visum = VisumPy.helpers.CreateVisum(16)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)): 
     Visum.SetPath(pathNo[i], os.getcwd())

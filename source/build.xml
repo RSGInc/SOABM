@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+
+<project name="odottm2" default="release" basedir=".">
+
+    <!-- Compile -->
+    <target name="build">
+        <javac srcdir="java"
+            destdir="build/classes" 
+            includes="**/*" 
+            debug="on"
+            optimize="off" 
+            deprecation="off">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+
+    <!-- Make a jar file with all classes and zip files combined -->
+    <target name="makejar" depends="build">
+    
+        <mkdir dir="release"/>
+        <delete file="release/${ant.project.name}.jar"/>
+    
+        <jar update="true" destfile="release/${ant.project.name}.jar">
+            <fileset dir="build/classes"/>
+            <zipgroupfileset dir="${basedir}" includes="lib/*.zip,lib/*.jar"/>
+        </jar>
+    </target>
+
+    <!-- ********************************************************* -->
+    <!-- Setup the classpath -->
+    <path id="compile.classpath">
+    	
+    	<fileset dir="${basedir}">
+    	  <include name="dependencies/cajo-bin.jar"/>
+    	  <include name="dependencies/common-base.jar"/>
+    	  <include name="dependencies/log4j-1.2.9.jar"/>
+    	  <include name="dependencies/jppf-admin.jar"/>
+    	  <include name="dependencies/jppf-client.jar"/>
+    	  <include name="dependencies/jppf-common.jar"/>
+    	  <include name="dependencies/jppf-common-node.jar"/>
+    	  <include name="dependencies/jxl.jar"/>
+    	  <include name="dependencies/log4j-1.2.9.jar"/>
+    	  <include name="dependencies/poi-3.7-20101029.jar"/>
+    	  <include name="dependencies/sawdust-util-1.0.jar"/>
+    	  <include name="dependencies/ssj.jar"/>
+    	</fileset>
+
+    </path>
+
+    <!-- ********************************************************* -->
+    <!-- Create a set of jar files for release -->
+    <target name="release" depends="makejar">
+    	
+        <!-- copy dependencies to release directory -->
+        <copy file="dependencies/cajo-bin.jar" todir="release"/>
+        <copy file="dependencies/common-base.jar" todir="release"/>
+        <copy file="dependencies/log4j-1.2.9.jar" todir="release"/>
+    	  <copy file="dependencies/jppf-admin.jar" todir="release"/>
+        <copy file="dependencies/jppf-client.jar" todir="release"/>
+        <copy file="dependencies/jppf-common.jar" todir="release"/>
+        <copy file="dependencies/jppf-common-node.jar" todir="release"/>
+        <copy file="dependencies/jxl.jar" todir="release"/>
+        <copy file="dependencies/log4j-1.2.9.jar" todir="release"/>
+        <copy file="dependencies/poi-3.7-20101029.jar" todir="release"/>
+        <copy file="dependencies/sawdust-util-1.0.jar" todir="release"/>
+        <copy file="dependencies/ssj.jar" todir="release"/>
+      
+        <zip destfile="release/odottm22.jar">
+          <zipgroupfileset dir="release" includes="odottm2.jar"/>
+          <zipgroupfileset dir="release" includes="cajo-bin.jar"/>
+          <zipgroupfileset dir="release" includes="common-base.jar"/>
+          <zipgroupfileset dir="release" includes="log4j-1.2.9.jar"/>
+          <zipgroupfileset dir="release" includes="jppf-admin.jar"/>
+          <zipgroupfileset dir="release" includes="jppf-client.jar"/>
+          <zipgroupfileset dir="release" includes="jppf-common.jar"/>
+          <zipgroupfileset dir="release" includes="jppf-common-node.jar"/>
+          <zipgroupfileset dir="release" includes="jxl.jar"/>
+          <zipgroupfileset dir="release" includes="log4j-1.2.9.jar"/>
+          <zipgroupfileset dir="release" includes="poi-3.7-20101029.jar"/>
+          <zipgroupfileset dir="release" includes="sawdust-util-1.0.jar"/>
+          <zipgroupfileset dir="release" includes="ssj.jar"/>
+        </zip>
+        <move file="release/odottm22.jar" tofile="release/odottm2.jar"/>
+
+    </target>
+
+</project>
