@@ -1,11 +1,11 @@
 ## ODOT Southern Oregon Activity Based Model (SOABM)
 
 The SOABM is a collection of travel modeling components.  The core components of the system are:
-  - OR-RAMP – ODOT’s version of the CT-RAMP family of ABMs for modeling resident travel.
-  - VISUM + Python – Zone and network data management, as well as network skimming and assignment procedures.
-  - Commercial vehicle model – ODOT’s trip-based commercial vehicle model implemented in R.
-  - External model – ODOT’s external travel model based on select link analysis flows from SWIM at each SOABM external station location.
-  - RunModel – A DOS batch program for running the overall model system.
+  - OR-RAMP â€“ ODOTâ€™s version of the CT-RAMP family of ABMs for modeling resident travel.
+  - VISUM + Python â€“ Zone and network data management, as well as network skimming and assignment procedures.
+  - Commercial vehicle model â€“ ODOTâ€™s trip-based commercial vehicle model implemented in R.
+  - External model â€“ ODOTâ€™s external travel model based on select link analysis flows from SWIM at each SOABM external station location.
+  - RunModel â€“ A DOS batch program for running the overall model system.
 
 ## Contents
 
@@ -39,20 +39,20 @@ The installed model has a general file structure as shown below (all paths relat
 
 ```
 root/dependencies/
-  jdk1.8.0_111/ – Java install
-  Python27/ – Python install
-  R-3.3.1/ – R install
+  jdk1.8.0_111/ â€“ Java install
+  Python27/ â€“ Python install
+  R-3.3.1/ â€“ R install
 root/scenario_name/
-  RunModel.bat – overall model run script
-  application/ – DOS batch files, Java ORRAMP jar file, HDF5 DLLs for OMX
-  config/ – ORRAMP properties file, ORRAMP JPPF config files
-    cvm/ – CVM model parameters
-    visum/ – skimming procedure files
-  inputs/ – Popsyn input files, VISUM scenario version file, external model input files
-  logs/ – ORRAMP output log files
-  outputs/ – all model outputs – skims, trip lists, matrices, etc.
-  scripts/ – VISUM skimming, OMX reader/writer, external model, CVM
-  uec/ – ORRAMP utility expression calculator (UEC) model parameter files
+  RunModel.bat â€“ overall model run script
+  application/ â€“ DOS batch files, Java ORRAMP jar file, HDF5 DLLs for OMX
+  config/ â€“ ORRAMP properties file, ORRAMP JPPF config files
+    cvm/ â€“ CVM model parameters
+    visum/ â€“ skimming procedure files
+  inputs/ â€“ Popsyn input files, VISUM scenario version file, external model input files
+  logs/ â€“ ORRAMP output log files
+  outputs/ â€“ all model outputs â€“ skims, trip lists, matrices, etc.
+  scripts/ â€“ VISUM skimming, OMX reader/writer, external model, CVM
+  uec/ â€“ ORRAMP utility expression calculator (UEC) model parameter files
 ```
 
 Every scenario is contained within its own folder, with a unique name. The folder 
@@ -61,4 +61,4 @@ scenario folder since it is referenced in the RunModel.bat via `..\dependencies`
 
 ## Running the Model
 
-Open a DOS command window in the scenario root folder and run RunModel.bat
+Open a DOS command window in the scenario folder and run RunModel.bat
