@@ -1,4 +1,4 @@
-Oregon Department of Transportation (ODOT) Southern Oregon Activity Based Model (SOABM)
+## Oregon Department of Transportation (ODOT) Southern Oregon Activity Based Model (SOABM)
 
 The SOABM is a collection of travel modeling components.  The core components of the system are:
   - OR-RAMP – ODOT’s version of the CT-RAMP family of ABMs for modeling resident travel.
