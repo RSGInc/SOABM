@@ -1,27 +1,47 @@
-@ECHO OFF
+
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-:: Run the entire SOABM travel model
+:: Run the complete SOABM travel model
 :: Ben Stabler, ben.stabler@rsginc.com, 081215
+:: Revised 05/22/17 ben.stabler@rsginc.com
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:: -------------------------------------------------------------------------------------------------
-:: Set properties
-:: -------------------------------------------------------------------------------------------------
-
-:: user specified for now; once model is stable, automatically calculate many of these
-SET HOST_IP_ADDRESS=172.28.0.100
-SET JAVA_PATH=C:\\Progra~1\\Java\\jdk1.8.0_45
-SET PROJECT_DRIVE=E:
-SET PROJECT_DIRECTORY_FORWARD=E:/projects/Clients/ODOT/SouthernOregonABM/BaseYear2010_Template
-SET PROJECT_DIRECTORY=E:\projects\Clients\ODOT\SouthernOregonABM\BaseYear2010_Template
-SET PYTHON="C:\Program Files\Python27\python.exe"
-SET R_SCRIPT="C:\Program Files\R\R-3.2.1\bin\Rscript"
-SET MAX_ITER=3
-SET SAMPLERATE_ITERATION1=0.5
+:: setup iteration sample rate
+SET MAX_ITER=5
+SET SAMPLERATE_ITERATION1=0.50
 SET SAMPLERATE_ITERATION2=0.75
 SET SAMPLERATE_ITERATION3=1.0
 SET SAMPLERATE_ITERATION4=1.0
 SET SAMPLERATE_ITERATION5=1.0
+
+:: -------------------------------------------------------------------------------------------------
+:: Setup folders, IP addresses, file references, etc.
+:: -------------------------------------------------------------------------------------------------
+
+@ECHO OFF
+
+:: get ip address of machine
+FOR /f "delims=[] tokens=2" %%a IN ('ping -4 -n 1 %ComputerName% ^| findstr [') DO SET HOST_IP_ADDRESS=%%a
+ECHO HOST_IP_ADDRESS: %HOST_IP_ADDRESS%
+
+:: setup dependencies, which are one folder up so they can be shared across scenarios
+SET JAVA_PATH=%~dp0..\dependencies\jdk1.8.0_111
+ECHO JAVA_PATH: %JAVA_PATH%
+
+SET PYTHON=%~dp0..\dependencies\Python27\python.exe
+ECHO PYTHON: %PYTHON%
+
+SET R_SCRIPT=%~dp0..\dependencies\R-3.3.1\bin\Rscript
+ECHO R_SCRIPT: %R_SCRIPT%
+
+:: setup folders
+SET PROJECT_DRIVE=%~d0
+ECHO PROJECT_DRIVE: %PROJECT_DRIVE%
+
+SET PROJECT_DIRECTORY=%~dp0
+ECHO PROJECT_DIRECTORY: %PROJECT_DIRECTORY%
+
+SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
+ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
 :: -------------------------------------------------------------------------------------------------
 :: Run VISUM MAZ, TAZ, and TAP skimming procedures
@@ -61,7 +81,7 @@ rem # run external model
 SET /A ITERATION=0
 :ITER_START
 SET /A ITERATION+=1
-ECHO ****MODEL ITERATION %ITERATION%
+ECHO MODEL ITERATION %ITERATION%
 
 IF %ITERATION% EQU 1 SET SAMPLERATE=%SAMPLERATE_ITERATION1%
 IF %ITERATION% EQU 2 SET SAMPLERATE=%SAMPLERATE_ITERATION2%
@@ -79,7 +99,15 @@ CALL application\runMtxMgr %PROJECT_DRIVE% %PROJECT_DIRECTORY% %HOST_IP_ADDRESS%
 rem # start hh manager server
 CALL application\runHhMgr %PROJECT_DRIVE% %PROJECT_DIRECTORY% %HOST_IP_ADDRESS% %JAVA_PATH%
 
-rem # run OR RAMP model
+rem # run OR RAMP model, but first set IP_ADDRESS dynamically
+ECHO # Properties File with IP Address Set by Model Runner > config\orramp_out.properties
+FOR /F "delims=*" %%i IN (config\orramp.properties) DO ( 
+    SET LINE=%%i
+    SETLOCAL EnableDelayedExpansion
+    SET LINE=!LINE:%%HOST_IP_ADDRESS%%=%HOST_IP_ADDRESS%!
+    ECHO !LINE!>>config\orramp_out.properties
+    ENDLOCAL
+) 
 CALL application\runORRAMP %PROJECT_DRIVE% %PROJECT_DIRECTORY_FORWARD% %SAMPLERATE% %ITERATION% %JAVA_PATH%
 
 rem # shutdown matrix manager and hh manager
@@ -106,4 +134,3 @@ IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
 :: -------------------------------------------------------------------------------------------------
 
 ECHO MODEL RUN COMPLETE
-
