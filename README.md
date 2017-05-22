@@ -56,7 +56,8 @@ root/scenario_name/
 ```
 
 Every scenario is contained within its own folder, with a unique name. The folder 
-name is the same as the scenario name.  
+name is the same as the scenario name.  The dependencies folder must be next to the 
+scenario folder since it is referenced in the RunModel.bat via `..\dependencies`.
 
 ## Running the Model
 
