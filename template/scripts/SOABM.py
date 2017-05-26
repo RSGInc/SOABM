@@ -1408,7 +1408,7 @@ if __name__== "__main__":
     for mode in ["Walk","Bike"]:
       loadVersion(Visum, "outputs/maz_skim_initial.ver")
       createMazToTap(Visum, mode, "outputs")
-      loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".par")
+      loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".xml")
       createNearbyMazsFile(Visum, mode, "outputs")
       saveVersion(Visum, "outputs/maz_skim_" + mode + ".ver")
     closeVisum(Visum)
@@ -1425,7 +1425,7 @@ if __name__== "__main__":
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/taz_skim_initial.ver")
       setLinkCapacityTODFactors(Visum)
-      loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.par")
+      loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
       saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
     loadVersion(Visum, "outputs/taz_skim_am_speed.ver")
     tazsToTapsForDriveAccess(Visum, "outputs/drive_taz_tap.csv", "outputs/tap_data.csv")
@@ -1435,7 +1435,7 @@ if __name__== "__main__":
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-      loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".par")
+      loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
       saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
     loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
     tazsToTapsForDriveAccess(Visum, "outputs/drive_taz_tap.csv", "outputs/tap_data.csv")
@@ -1459,8 +1459,8 @@ if __name__== "__main__":
       for setid in ['1','2','3']:
         loadVersion(Visum, "outputs/tap_skim_initial.ver")
         loadLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
-        loadProcedure(Visum, "config/visum/tap_skim_speed_" + tp + ".par")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".par")
+        loadProcedure(Visum, "config/visum/tap_skim_speed_" + tp + ".xml")
+        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
         saveVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
         updateFareSkim(Visum, "outputs/fare.omx", "fare", 
           "outputs/tap_skim_" + tp + "_set" + setid + ".omx", "6")
@@ -1476,8 +1476,8 @@ if __name__== "__main__":
       for setid in ['1','2','3']:
         loadVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
         loadLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + ".par")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".par")
+        loadProcedure(Visum, "config/visum/tap_skim_" + tp + ".xml")
+        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
         saveVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
         updateFareSkim(Visum, "outputs/fare.omx", "fare", 
           "outputs/tap_skim_" + tp + "_set" + setid + ".omx", "6")
