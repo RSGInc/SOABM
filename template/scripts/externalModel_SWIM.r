@@ -39,7 +39,7 @@ if(!("fun" %in% ls())) {
   fun = list()
   runModel = TRUE
   
-  omxScriptName = "scripts/omx.R"
+  library(omxr) #OMX matrices
   
   inputLoc = "inputs/"
   storeLoc = "outputs/"
@@ -699,26 +699,22 @@ fun$ipfExternalMatricesToCounts <- function(IPF,storeLoc) {
 	
 	# export the external information being used in the run 
 	save(ext.ZnZnTdMd, file=paste(storeLoc, "externalOD_ZnZnTdMd.RData", sep=""))
-	
-	if(file.exists(omxScriptName)) { 
 		
-		print("write OMX matrices")
-		
-		source(omxScriptName)
-	 	fName = paste(storeLoc, "externalOD.omx", sep="")
-		createFileOMX(fName, nrow(ext.ZnZnTdMd), nrow(ext.ZnZnTdMd))
-		writeLookupOMX(fName, dimnames(ext.ZnZnTdMd)[1][[1]], "NO")
+	print("write OMX matrices")
 	
-		timeperiods = dimnames(ext.ZnZnTdMd)[3][[1]]
-		purposes = dimnames(ext.ZnZnTdMd)[4][[1]]
+ 	fName = paste(storeLoc, "externalOD.omx", sep="")
+	create_omx(fName, nrow(ext.ZnZnTdMd), nrow(ext.ZnZnTdMd))
+	write_lookup(fName, dimnames(ext.ZnZnTdMd)[1][[1]], "NO")
+
+	timeperiods = dimnames(ext.ZnZnTdMd)[3][[1]]
+	purposes = dimnames(ext.ZnZnTdMd)[4][[1]]
+
+	for(i in 1:length(timeperiods)) {
+		for(j in 1:length(purposes)) {
 	
-		for(i in 1:length(timeperiods)) {
-			for(j in 1:length(purposes)) {
-		
-				mat = ext.ZnZnTdMd[,,timeperiods[i],purposes[j]]
-				matName = paste(timeperiods[i],purposes[j],sep="_")
-				writeMatrixOMX(fName, mat, matName)
-			}
+			mat = ext.ZnZnTdMd[,,timeperiods[i],purposes[j]]
+			matName = paste(timeperiods[i],purposes[j],sep="_")
+			write_omx(fName, mat, matName)
 		}
 	}
 	
