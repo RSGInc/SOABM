@@ -361,27 +361,32 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   DistMat = VisumPy.helpers.GetMatrix(Visum, 3) #SOV
   TollMat = VisumPy.helpers.GetMatrix(Visum, 8) #SOVToll
   
-  #get TAPs
+  #get TAPs that CANPNR
   tapIds = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"No")
   tapTsys = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\TSYSCODE")
   tapXs = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"Xcoord")
   tapYs = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"Ycoord")
+  tapCanPnr = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"CANPNR")
   tapTaz = [-1]*len(tapIds)
   
   #assign TAP to TAZ
   print("assign stop areas to tazs")  
   for i in range(len(tapIds)):
-    nodeids = getClosestN(tapXs[i], tapYs[i], zoneIds, zoneXs, zoneYs, 1)
-    tapTaz[i] = nodeids[0]
+    if tapCanPnr[i]==1:
+      nodeids = getClosestN(tapXs[i], tapYs[i], zoneIds, zoneXs, zoneYs, 1)
+      tapTaz[i] = nodeids[0]
+    else:
+      tapTaz[i] = -1
   
   #write TAP file
   print("write tap data file")
   f = open(tapFileName, 'wb')
   f.write("tap,taz,lotid,capacity\n")
   for j in range(len(tapIds)):
-    tap = tapIds[j]
-    taz = tapTaz[j]
-    f.write("%i,%i,%i,%i\n" % (tap,taz,tap,default_lot_capacity))
+    if tapCanPnr[j]==1:
+      tap = tapIds[j]
+      taz = tapTaz[j]
+      f.write("%i,%i,%i,%i\n" % (tap,taz,tap,default_lot_capacity))
   f.close()
   
   #write all near TAPs
@@ -390,29 +395,32 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   f.write("FTAZ,MODE,PERIOD,TTAP,TMAZ,TTAZ,DTIME,DDIST,DTOLL,WDIST\n")
   for i in range(len(zoneIds)):
     for j in range(len(tapIds)):
-      for k in range(len(tSysList)):
+      
+      if tapCanPnr[j]==1:
         
-        #get data
-        ftaz = zoneIds[i]
-        mode = tSysList[k]
-        period = 0 #anytime of the day
-        ttap = tapIds[j]
-        tmaz = 0 #doesn't matter?
-        ttaz = tapTaz[j]
+        for k in range(len(tSysList)):
         
-        #get skim data
-        tapsTazIndex = zoneIds.index(ttaz)
-        dtime = TimeMat[i][tapsTazIndex]
-        ddist = DistMat[i][tapsTazIndex]
-        dtoll = TollMat[i][tapsTazIndex]
-        wdist = 0 #doesn't matter
-        
-        #output if near; by modes served
-        maxDist = maxDistByTsysList[k]
-        modesServed = tapTsys[j].split(",")
-        if(ddist < maxDist and mode in modesServed):
-          dataItems = (ftaz,mode,period,ttap,tmaz,ttaz,dtime,ddist,dtoll,wdist)
-          f.write("%i,%s,%i,%i,%i,%i,%.2f,%.2f,%.2f,%.2f\n" % dataItems)
+          #get data
+          ftaz = zoneIds[i]
+          mode = tSysList[k]
+          period = 0 #anytime of the day
+          ttap = tapIds[j]
+          tmaz = 0 #doesn't matter?
+          ttaz = tapTaz[j]
+          
+          #get skim data
+          tapsTazIndex = zoneIds.index(ttaz)
+          dtime = TimeMat[i][tapsTazIndex]
+          ddist = DistMat[i][tapsTazIndex]
+          dtoll = TollMat[i][tapsTazIndex]
+          wdist = 0 #doesn't matter
+          
+          #output if near; by modes served
+          maxDist = maxDistByTsysList[k]
+          modesServed = tapTsys[j].split(",")
+          if(ddist < maxDist and mode in modesServed):
+            dataItems = (ftaz,mode,period,ttap,tmaz,ttaz,dtime,ddist,dtoll,wdist)
+            f.write("%i,%s,%i,%i,%i,%i,%.2f,%.2f,%.2f,%.2f\n" % dataItems)
           
   f.close()
 
@@ -594,7 +602,7 @@ def writeMazDataFile(Visum, fileName):
     "DPARKCOST","MSTALLSOTH","MSTALLSSAM","MPARKCOST","HHS","POP","HHP",
     "HH_GQ_CIV","HH_GQ_MIL","HH_GQ_UNIV","WRK_EXT_PR","SCHDIST_NA",
     "SCHDIST","HH_1","HH_2","HH_3","HH_4","DUDEN","EMPDEN","TOTINT",
-    "POPDEN","RETDEN","TERMTIME"]
+    "POPDEN","RETDEN","TERMTIME","PARKACRES"]
 
   #create header
   header = ",".join(fieldsToExport)
