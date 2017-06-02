@@ -361,7 +361,7 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   DistMat = VisumPy.helpers.GetMatrix(Visum, 3) #SOV
   TollMat = VisumPy.helpers.GetMatrix(Visum, 8) #SOVToll
   
-  #get TAPs that CANPNR
+  #get TAPs
   tapIds = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"No")
   tapTsys = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\TSYSCODE")
   tapXs = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"Xcoord")
@@ -372,31 +372,27 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   #assign TAP to TAZ
   print("assign stop areas to tazs")  
   for i in range(len(tapIds)):
-    if tapCanPnr[i]==1:
-      nodeids = getClosestN(tapXs[i], tapYs[i], zoneIds, zoneXs, zoneYs, 1)
-      tapTaz[i] = nodeids[0]
-    else:
-      tapTaz[i] = -1
+    nodeids = getClosestN(tapXs[i], tapYs[i], zoneIds, zoneXs, zoneYs, 1)
+    tapTaz[i] = nodeids[0]
   
   #write TAP file
   print("write tap data file")
   f = open(tapFileName, 'wb')
   f.write("tap,taz,lotid,capacity\n")
   for j in range(len(tapIds)):
-    if tapCanPnr[j]==1:
-      tap = tapIds[j]
-      taz = tapTaz[j]
-      f.write("%i,%i,%i,%i\n" % (tap,taz,tap,default_lot_capacity))
+    tap = tapIds[j]
+    taz = tapTaz[j]
+    f.write("%i,%i,%i,%i\n" % (tap,taz,tap,default_lot_capacity))
   f.close()
   
-  #write all near TAPs
+  #write all near TAPs that CANPNR
   print("write all near TAPs for drive access")  
   f = open(fileName, 'wb')
   f.write("FTAZ,MODE,PERIOD,TTAP,TMAZ,TTAZ,DTIME,DDIST,DTOLL,WDIST\n")
   for i in range(len(zoneIds)):
     for j in range(len(tapIds)):
       
-      if tapCanPnr[j]==1:
+      if tapCanPnr[j]==1: #CANPNR true or false
         
         for k in range(len(tSysList)):
         
@@ -1109,6 +1105,8 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
         sov[tod][o,d] = sov[tod][o,d] + expansionFactor
         
       else:
+        print otap
+        print tapIds.index(otap)
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(trips[i][omazColNum])
         o = tazIds[o]
