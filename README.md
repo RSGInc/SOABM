@@ -55,8 +55,7 @@ root/scenario_name/
   uec/ – ORRAMP utility expression calculator (UEC) model parameter files
 ```
 
-Every scenario is contained within its own folder, with a unique name. The folder 
-name is the same as the scenario name.  The dependencies folder must be next to the 
+Every scenario is contained within its own folder.  The dependencies folder must be next to the 
 scenario folder since it is referenced in the RunModel.bat via `..\dependencies`.
 
 ## Running the Model
