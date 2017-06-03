@@ -65,6 +65,9 @@ rem # generate maz skims
 rem # generate tap skims using tomtom speeds
 %PYTHON% scripts\SOABM.py tap_skim_speed
 
+rem # update hh mazs to match sequential mazs
+%PYTHON% scripts\zoneChecker.py
+
 :: -------------------------------------------------------------------------------------------------
 :: Run Commercial Vehicle Model and External Model
 :: -------------------------------------------------------------------------------------------------

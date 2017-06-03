@@ -27,5 +27,6 @@ result = hhs["maz_initial"].isin(mazs.NO).all()
 print("check that each hh's maz is in the maz file: " + str(result))
 
 #write households with sequential maz numbers
-print("write households with sequential maz numbers")
-hhs.to_csv(hhFilename.strip("/"), index=False)
+if "maz_initial" not in hhs.columns:
+  print("write households with sequential maz numbers")
+  hhs.to_csv(hhFilename.strip("/"), index=False)
