@@ -20,6 +20,7 @@ SET SAMPLERATE_ITERATION5=1.0
 @ECHO OFF
 
 :: get ip address of machine
+SET PATH=C:\Windows\System32
 FOR /f "delims=[] tokens=2" %%a IN ('ping -4 -n 1 %ComputerName% ^| findstr [') DO SET HOST_IP_ADDRESS=%%a
 ECHO HOST_IP_ADDRESS: %HOST_IP_ADDRESS%
 
