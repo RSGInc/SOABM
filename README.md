@@ -18,7 +18,7 @@ Check out the repository. This repository uses [`git-lfs`](https://git-lfs.githu
 
 ```sh
 # with git-lfs installed
-git clone https://username@github.com/rsginc/SOABM
+git clone https://username:password@github.com/rsginc/SOABM
 ```
 
 If you clone the repository before installing `git-lfs`, you can download the large file resources with
