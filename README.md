@@ -29,7 +29,7 @@ git lfs fetch
 
 On initial checkout, the user will need to:
 
-  1. Expand dependencies.zip: included versions of Java, Python, and R.
+  1. Expand dependencies.zip: included versions of Java, Python, and R.  This file should be hundreds of MBs.  If not, git lfs is probably not working correctly on your machine.  
   2. Ensure [Visum 16](http://vision-traffic.ptvgroup.com/en-us/products/ptv-visum/) is installed.  The user will need to install a licensed version of this software prior to running the model.
 
 The current version of the model requires a computer with a 64-bit Windows operating system. The computer should have 40 GB+ RAM, and at least 100 GB of free space on the model hard drive.
