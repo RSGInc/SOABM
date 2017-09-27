@@ -44,6 +44,10 @@ ECHO PROJECT_DIRECTORY: %PROJECT_DIRECTORY%
 SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
 ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
+:: empty outputs folder
+ECHO empty outputs folder
+DEL outputs\*.* /S /Q
+
 :: -------------------------------------------------------------------------------------------------
 :: Run VISUM MAZ, TAZ, and TAP skimming procedures
 :: -------------------------------------------------------------------------------------------------
