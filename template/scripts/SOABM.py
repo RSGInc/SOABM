@@ -635,37 +635,29 @@ def setLinkCapacityTODFactors(Visum):
   for i in range(len(tods)):
     Visum.Net.SetAttValue("TOD_FACTOR_" + tods[i], factors[i])
 
-def createTapFareMatrix(Visum, fileName):
+def createTapFareMatrix(Visum, faresFileName, fileName):
   
   print("create OD fare matrix")
   
-  #create fare matrix using transit district center points
-  fares = [100   , 200   ] #gp, rv fares in cents in 2010
-  xs    = [548578, 670480] 
-  ys    = [263859, 226394]
+  print("read fare input file")
+  odfare = []
+  with open(faresFileName, 'rb') as csvfile:
+    freader = csv.reader(csvfile, skipinitialspace=True)
+    for row in freader:
+      odfare.append(row)
+  odfare_col_names = odfare.pop(0)
   
-  #loop through TAPs and tag each with nearest fare point
-  taps = VisumPy.helpers.GetMulti(Visum.Net.Zones, "No")
-  tapXs = VisumPy.helpers.GetMulti(Visum.Net.Zones,"Xcoord")
-  tapYs = VisumPy.helpers.GetMulti(Visum.Net.Zones,"Ycoord")
-  fareIds = [-1]*len(taps)
-  fareDists = [999999]*len(taps)
+  #create dictionary for fare lookup
+  fare_lookup = dict()
+  for row in odfare:
+    fare_lookup[row[0] + "," + row[1]] = row[2]
   
-  #create empty matrix
-  mat = numpy.zeros((len(taps),len(taps)))
-  
-  for i in range(len(taps)):
-    for j in range(len(fares)):
-      dist = calcDist(tapXs[i],xs[j],tapYs[i],ys[j])
-      if dist < fareDists[i]:
-        fareIds[i] = j
-        fareDists[i] = dist
-  
-  #loop through TAP TAP ODs and set fare
-  for i in range(len(taps)):
-    for j in range(len(taps)):
-      if fareIds[i] == fareIds[j]: #within district only, else 0 
-        mat[i][j] = fares[fareIds[i]]
+  print("loop through TAP TAP ODs and set fare")
+  fzs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "FareZone")
+  mat = numpy.zeros((len(fzs),len(fzs)))  
+  for i in range(len(fzs)):
+    for j in range(len(fzs)):
+      mat[i][j] = float(fare_lookup[fzs[i] + "," + fzs[j]])
   
   #write fare matrix
   omxFile = omx.openFile(fileName,'w')
@@ -1454,7 +1446,7 @@ if __name__== "__main__":
     switchZoneSystem(Visum, "tap")
     saveVersion(Visum, "outputs/tap_skim_initial.ver")
     createTapLines(Visum, "outputs/tapLines.csv")
-    createTapFareMatrix(Visum, "outputs/fare.omx")
+    createTapFareMatrix(Visum, "inputs/fares.csv", "outputs/fare.omx")
     closeVisum(Visum)
 
   if runmode == 'tap_skim_speed':
