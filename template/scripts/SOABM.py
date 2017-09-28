@@ -659,8 +659,8 @@ def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
     ffspeed = VisumPy.helpers.GetMulti(Visum.Net.Links, "V0PRT")
     speed = VisumPy.helpers.GetMulti(Visum.Net.Links, tod+"_Speed")
     for i in range(len(fc)):
-      speed[i] = float(speeds_lookup[fc[i] + "," + ffspeed + "," + tod])
-  VisumPy.helpers.SetMulti(Visum.Net.Links, tod+"_Speed", speeds)
+      speed[i] = float(speeds_lookup[str(int(fc[i])) + "," + str(int(ffspeed[i])) + "," + tod])
+  VisumPy.helpers.SetMulti(Visum.Net.Links, tod+"_Speed", speed)
   
 def createTapFareMatrix(Visum, faresFileName, fileName):
   
