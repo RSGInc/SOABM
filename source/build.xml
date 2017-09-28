@@ -64,6 +64,7 @@
         <copy file="dependencies/poi-3.7-20101029.jar" todir="release"/>
         <copy file="dependencies/sawdust-util-1.0.jar" todir="release"/>
         <copy file="dependencies/ssj.jar" todir="release"/>
+        <copy file="dependencies/omx.jar" todir="release"/>
       
         <zip destfile="release/odottm22.jar">
           <zipgroupfileset dir="release" includes="odottm2.jar"/>
@@ -79,6 +80,7 @@
           <zipgroupfileset dir="release" includes="poi-3.7-20101029.jar"/>
           <zipgroupfileset dir="release" includes="sawdust-util-1.0.jar"/>
           <zipgroupfileset dir="release" includes="ssj.jar"/>
+          <zipgroupfileset dir="release" includes="omx.jar"/>
         </zip>
         <move file="release/odottm22.jar" tofile="release/odottm2.jar"/>
 

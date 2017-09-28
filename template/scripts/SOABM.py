@@ -634,7 +634,33 @@ def setLinkCapacityTODFactors(Visum):
   #set factors
   for i in range(len(tods)):
     Visum.Net.SetAttValue("TOD_FACTOR_" + tods[i], factors[i])
+    
+def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
+  print("set time period link speeds")
+
+  print("read link speeds input file")
+  speeds = []
+  with open(linkSpeedsFileName, 'rb') as csvfile:
+    freader = csv.reader(csvfile, skipinitialspace=True)
+    for row in freader:
+      speeds.append(row)
+  speeds_col_names = speeds.pop(0)
+  
+  #create dictionary for fare lookup
+  speeds_lookup = dict()
+  for row in speeds:
+    speeds_lookup[row[0] + "," + row[1]] = row[2]
+  
+  print("loop through links and set speed by TOD")
+  tods =    ["EA","AM","MD","PM","EV"]
+  for tod in tods:
+    fc = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+    speed = VisumPy.helpers.GetMulti(Visum.Net.Links, tod+"_Speed")
+    for i in range(len(fc)):
+      speed[i] = float(speeds_lookup[fc[i] + "," + tod])
+  VisumPy.helpers.SetMulti(Visum.Net.Links, tod+"_Speed", speeds)
+  
 def createTapFareMatrix(Visum, faresFileName, fileName):
   
   print("create OD fare matrix")
@@ -1423,6 +1449,7 @@ if __name__== "__main__":
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/taz_skim_initial.ver")
       setLinkCapacityTODFactors(Visum)
+      setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
       saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
     loadVersion(Visum, "outputs/taz_skim_am_speed.ver")
