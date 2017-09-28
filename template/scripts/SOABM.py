@@ -647,18 +647,19 @@ def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
       speeds.append(row)
   speeds_col_names = speeds.pop(0)
   
-  #create dictionary for fare lookup
+  #create dictionary for tod speed lookup - PLANNO,SPEED,TOD = TODSPEED
   speeds_lookup = dict()
   for row in speeds:
-    speeds_lookup[row[0] + "," + row[1]] = row[2]
+    speeds_lookup[row[0] + "," + row[1] + "," + row[2]] = row[3]
   
   print("loop through links and set speed by TOD")
-  tods =    ["EA","AM","MD","PM","EV"]
+  tods = ["EA","AM","MD","PM","EV"]
   for tod in tods:
     fc = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+    ffspeed = VisumPy.helpers.GetMulti(Visum.Net.Links, "V0PRT")
     speed = VisumPy.helpers.GetMulti(Visum.Net.Links, tod+"_Speed")
     for i in range(len(fc)):
-      speed[i] = float(speeds_lookup[fc[i] + "," + tod])
+      speed[i] = float(speeds_lookup[fc[i] + "," + ffspeed + "," + tod])
   VisumPy.helpers.SetMulti(Visum.Net.Links, tod+"_Speed", speeds)
   
 def createTapFareMatrix(Visum, faresFileName, fileName):
