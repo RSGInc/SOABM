@@ -281,8 +281,8 @@ def createMazToTap(Visum, mode, outFolder):
   #settings
   SearchCrit = 1 #1=time,3=distance
   if mode == "Walk":
-    MaxTime = 60.0 / 4.0 * 2.0 * 60.0 #4mph, 2 miles max, seconds
-    BackToMiles = 60.0 / 4.0 * 60.0
+    MaxTime = 60.0 / 3.0 * 2.0 * 60.0 #3mph, 2 miles max, seconds
+    BackToMiles = 60.0 / 3.0 * 60.0
   elif mode == "Bike":
     MaxTime = 60.0 / 10.0 * 5.0 * 60.0 #10mph, 5 miles max, seconds
     BackToMiles = 60.0 / 10.0 * 60.0
