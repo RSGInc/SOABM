@@ -68,7 +68,7 @@ def getClosestN(from_x,from_y,to_ids,to_xs,to_ys,n):
 def getCandidateNodesForConnectors(Visum, facTypeList):
   
   nodeNo       =  VisumPy.helpers.GetMulti(Visum.Net.Nodes, "No", False)
-  nodeFTs      =  VisumPy.helpers.GetMulti(Visum.Net.Nodes, "Concatenate:OutLinks\FACTYPE", False)
+  nodeFTs      =  VisumPy.helpers.GetMulti(Visum.Net.Nodes, "Concatenate:OutLinks\PLANNO", False)
   nodeX        =  VisumPy.helpers.GetMulti(Visum.Net.Nodes, "XCoord", False)
   nodeY        =  VisumPy.helpers.GetMulti(Visum.Net.Nodes, "YCoord", False)
   nodeCandidate=  [False] * len(nodeY) #will be calculated below
