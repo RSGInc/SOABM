@@ -585,7 +585,7 @@ def writeMazDataFile(Visum, fileName):
   
   print("write MAZ data file")
   
-  fieldsToExport = ["SEQMAZ","NO","TAZID","DISTNAME","COUNTY","HH","SF_HH","DUPLEX_HH",
+  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","COUNTY","HH","SF_HH","DUPLEX_HH",
     "MF_HH","MH_HH","EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT",
     "EMP_ACCFD","EMP_AGR","EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD",
     "EMP_METAL","EMP_TRANS","EMP_POSTAL","EMP_INFO","EMP_FINANC",
@@ -603,7 +603,6 @@ def writeMazDataFile(Visum, fileName):
   #create header
   header = ",".join(fieldsToExport)
   header = header.replace("SEQMAZ","MAZ") #required by CT-RAMP
-  header = header.replace("TAZID","TAZ")  #required by CT-RAMP
   
   #create rows
   row = []
@@ -897,7 +896,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   
   uniqTazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "NO")       #used by CT-RAMP
   mazIds = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "SEQMAZ") #used by CT-RAMP
-  tazs   = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "TAZID")  #used by CT-RAMP
+  tazs   = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "TAZ")    #used by CT-RAMP
   tapIds = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"NO")      #used by CT-RAMP
   
   #keep track of pnr trips to TAPs
