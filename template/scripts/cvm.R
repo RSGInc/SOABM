@@ -45,9 +45,9 @@ TOD_periodsFileName  <- "config/cvm/TOD_Periods.csv"
 
 ##Outputs Directory
 #Matrix output filename prefixes (suffixes by TOD period added later)
-carOut <- "outputs/trips/CAR"
-suOut <- "outputs/trips/SU"
-muOut <- "outputs/trips/MU"
+carOut <- "outputs/other/CAR"
+suOut <- "outputs/other/SU"
+muOut <- "outputs/other/MU"
 
 omxFileName = "outputs/trips/cvmTrips.omx"
 
