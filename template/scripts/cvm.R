@@ -31,7 +31,7 @@ nonWorkFrictionFileName <- "config/cvm/nonWorkFriction.csv"
 workFrictionFileName <- "config/cvm/workFriction.csv"
 
 #In vehicle time skim
-skimFileName <- "outputs/taz_skim_sov_pm.omx"
+skimFileName <- "outputs/skims/taz_skim_sov_pm.omx"
 timeSkimNum <- 2
 
 #Time of day filenames
@@ -45,11 +45,11 @@ TOD_periodsFileName  <- "config/cvm/TOD_Periods.csv"
 
 ##Outputs Directory
 #Matrix output filename prefixes (suffixes by TOD period added later)
-carOut <- "outputs/CAR"
-suOut <- "outputs/SU"
-muOut <- "outputs/MU"
+carOut <- "outputs/trips/CAR"
+suOut <- "outputs/trips/SU"
+muOut <- "outputs/trips/MU"
 
-omxFileName = "outputs/cvmTrips.omx"
+omxFileName = "outputs/trips/cvmTrips.omx"
 
 ###############################################
 ##################MAIN SCRIPT##################

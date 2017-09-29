@@ -692,7 +692,7 @@ def createTapFareMatrix(Visum, faresFileName, fileName):
 
 def updateFareSkim(Visum, inputFareOmxFile, inputMatName, updateFareOmxFile, updateMatName):
 
-  print("update skimmed fare matrix with district-based created earlier")
+  print("update skimmed fare matrix with OD-based created earlier")
 
   omxFile = omx.openFile(inputFareOmxFile,'a')
   fare = numpy.array(omxFile[inputMatName])
@@ -729,7 +729,7 @@ def reviseDuplicateSkims(Visum, omxFile1, omxFile2, omxFile3):
   omxFile2.close()
   omxFile3.close()
 
-def loadTripMatrices(Visum, timeperiod, type, setid=-1):
+def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
   
   print("load " + type + " trip matrices for " + timeperiod + ", set " + str(setid))
   
@@ -754,9 +754,9 @@ def loadTripMatrices(Visum, timeperiod, type, setid=-1):
     hov3toll = numpy.zeros((len(tazIds),len(tazIds)))
     
     #open matrices
-    cvmTrips = omx.openFile("outputs/cvmTrips.omx",'r')
-    externalTrips = omx.openFile("outputs/externalOD.omx",'r')
-    ctrampTazTrips = omx.openFile("outputs/ctrampTazTrips.omx",'r')
+    cvmTrips = omx.openFile(outputsFolder + "\\cvmTrips.omx",'r')
+    externalTrips = omx.openFile(outputsFolder + "\\externalOD.omx",'r')
+    ctrampTazTrips = omx.openFile(outputsFolder + "\\ctrampTazTrips.omx",'r')
     
     #add matrices together
     for aMatTP in matTP:
@@ -860,7 +860,7 @@ def loadTripMatrices(Visum, timeperiod, type, setid=-1):
     transit = numpy.zeros((len(tapIds),len(tapIds)))
     
     #open matrices 
-    ctrampTapTrips = omx.openFile("outputs/ctrampTapTrips.omx",'r')
+    ctrampTapTrips = omx.openFile(outputsFolder + "\\ctrampTapTrips.omx",'r')
   
     #add matrices together
     for aMatTP in matTP:
@@ -1422,18 +1422,18 @@ if __name__== "__main__":
     assignStopAreasToAccessNodes(Visum)
     switchZoneSystem(Visum, "maz")
     calculateDensityMeasures(Visum)
-    saveVersion(Visum, "outputs/maz_skim_initial.ver")
-    createAltFiles(Visum, "outputs")
+    saveVersion(Visum, "outputs/networks/maz_skim_initial.ver")
+    createAltFiles(Visum, "outputs/other")
     writeMazDataFile(Visum, "inputs/maz_data_export.csv")
     closeVisum(Visum)
   
   if runmode == 'maz_skim':
     Visum = startVisum()
     for mode in ["Walk","Bike"]:
-      loadVersion(Visum, "outputs/maz_skim_initial.ver")
-      createMazToTap(Visum, mode, "outputs")
+      loadVersion(Visum, "outputs/networks/maz_skim_initial.ver")
+      createMazToTap(Visum, mode, "outputs/skims")
       loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".xml")
-      createNearbyMazsFile(Visum, mode, "outputs")
+      createNearbyMazsFile(Visum, mode, "outputs/skims")
       saveVersion(Visum, "outputs/maz_skim_" + mode + ".ver")
     closeVisum(Visum)
     
@@ -1441,29 +1441,29 @@ if __name__== "__main__":
     Visum = startVisum()
     loadVersion(Visum, "inputs/SOABM.ver")
     #codeTAZConnectors(Visum) #TAZ connectors input in master version file
-    saveVersion(Visum, "outputs/taz_skim_initial.ver")
+    saveVersion(Visum, "outputs/networks/taz_skim_initial.ver")
     closeVisum(Visum)
     
   if runmode == 'taz_skim_speed': #tomtom speeds
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/taz_skim_initial.ver")
+      loadVersion(Visum, "outputs/networks/taz_skim_initial.ver")
       setLinkCapacityTODFactors(Visum)
       setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
-      saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-    loadVersion(Visum, "outputs/taz_skim_am_speed.ver")
-    tazsToTapsForDriveAccess(Visum, "outputs/drive_taz_tap.csv", "outputs/tap_data.csv")
+      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+    loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
+    tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
     closeVisum(Visum)
 
   if runmode == 'taz_skim': #using modeled speeds and assign
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
-      saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-    loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-    tazsToTapsForDriveAccess(Visum, "outputs/drive_taz_tap.csv", "outputs/tap_data.csv")
+      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+    loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+    tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
     closeVisum(Visum)
         
   if runmode == 'tap_initial':
@@ -1471,43 +1471,43 @@ if __name__== "__main__":
     loadVersion(Visum, "inputs/SOABM.ver")
     assignStopAreasToAccessNodes(Visum)
     switchZoneSystem(Visum, "tap")
-    saveVersion(Visum, "outputs/tap_skim_initial.ver")
-    createTapLines(Visum, "outputs/tapLines.csv")
-    createTapFareMatrix(Visum, "inputs/fares.csv", "outputs/fare.omx")
+    saveVersion(Visum, "outputs/networks/tap_skim_initial.ver")
+    createTapLines(Visum, "outputs/skims/tapLines.csv")
+    createTapFareMatrix(Visum, "inputs/fares.csv", "outputs/skims/fare.omx")
     closeVisum(Visum)
 
   if runmode == 'tap_skim_speed':
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-      saveLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
       for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/tap_skim_initial.ver")
-        loadLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
+        loadVersion(Visum, "outputs/networks/tap_skim_initial.ver")
+        loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
         loadProcedure(Visum, "config/visum/tap_skim_speed_" + tp + ".xml")
         loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
-        saveVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        updateFareSkim(Visum, "outputs/fare.omx", "fare", 
-          "outputs/tap_skim_" + tp + "_set" + setid + ".omx", "6")
-      reviseDuplicateSkims(Visum, "outputs/tap_skim_" + tp + "_set1.omx", 
-        "outputs/tap_skim_" + tp + "_set2.omx", "outputs/tap_skim_" + tp + "_set3.omx")
+        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+        updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
+          "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
+      reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
+        "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
     closeVisum(Visum)
 
   if runmode == 'tap_skim': #using modeled speeds and assign
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-      saveLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
       for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        loadLinkSpeeds(Visum, "outputs/taz_skim_" + tp + "_speed_linkspeeds.csv")
+        loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+        loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
         loadProcedure(Visum, "config/visum/tap_skim_" + tp + ".xml")
         loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
-        saveVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        updateFareSkim(Visum, "outputs/fare.omx", "fare", 
-          "outputs/tap_skim_" + tp + "_set" + setid + ".omx", "6")
-      reviseDuplicateSkims(Visum, "outputs/tap_skim_" + tp + "_set1.omx", 
-        "outputs/tap_skim_" + tp + "_set2.omx", "outputs/tap_skim_" + tp + "_set3.omx")
+        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+        updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
+          "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
+      reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
+        "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
     closeVisum(Visum)
         
   if runmode == 'build_trip_matrices':
@@ -1516,28 +1516,28 @@ if __name__== "__main__":
     hhsamplerate = float(sys.argv[2].lower())
     iteration = int(sys.argv[3].lower())
     
-    #buld ct-ramp trip matrices
-    tripFileName = "outputs/indivTripData_" + str(iteration) + ".csv"
-    jtripFileName = "outputs/jointTripData_" + str(iteration) + ".csv"
+    #build ct-ramp trip matrices
+    tripFileName = "outputs/other/indivTripData_" + str(iteration) + ".csv"
+    jtripFileName = "outputs/other/jointTripData_" + str(iteration) + ".csv"
     
     Visum = startVisum()
-    loadVersion(Visum, "outputs/taz_skim_am_speed.ver")
-    buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/tap_data.csv", 
-      "outputs/ctrampTazTrips.omx", "outputs/ctrampTapTrips.omx", "outputs/tapParks.csv")
+    loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
+    buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv", 
+      "outputs/trips/ctrampTazTrips.omx", "outputs/trips/ctrampTapTrips.omx", "outputs/trips/tapParks.csv")
     closeVisum(Visum)
     
     #load trip matrices
     for tp in ['ea','am','md','pm','ev']:
       #taz
-      loadVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
-      loadTripMatrices(Visum, tp, "taz")
-      saveVersion(Visum, "outputs/taz_skim_" + tp + "_speed.ver")
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      loadTripMatrices(Visum, "outputs/trips", tp, "taz")
+      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
       
       #tap set
       for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        loadTripMatrices(Visum, tp, "tap", setid)
-        saveVersion(Visum, "outputs/tap_skim_" + tp + "_speed_set" + setid + ".ver")  
+        loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+        loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
+        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")  
     closeVisum(Visum)
     
   print("end model run: " + time.ctime())
