@@ -42,8 +42,8 @@ if(!("fun" %in% ls())) {
   library(omxr) #OMX matrices
   
   inputLoc = "inputs/"
-  storeLoc = "outputs/other"
-  storeLocTrips = "outputs/trips"
+  storeLoc = "outputs/other/"
+  storeLocTrips = "outputs/trips/"
   
   SWIM_SL_Filename_Pattern <- "_outputs"
   externalDisaggregateMethodNumber <- 1

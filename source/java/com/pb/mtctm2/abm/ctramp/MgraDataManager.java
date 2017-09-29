@@ -1163,9 +1163,9 @@ private void calculateMgraAvgParkingCosts( HashMap<String,String> propertyMap ) 
 
         if ( LOG_MGRA > 0 ) {
             try {
-                outM = new PrintWriter( new BufferedWriter( new FileWriter( new File( projectPath + "/mgraAvgParkingCost_" + LOG_MGRA + "_Debug_M.csv" ) ) ) );
-                outD = new PrintWriter( new BufferedWriter( new FileWriter( new File( projectPath + "/mgraAvgParkingCost_" + LOG_MGRA + "_Debug_D.csv" ) ) ) );
-                outH = new PrintWriter( new BufferedWriter( new FileWriter( new File( projectPath + "/mgraAvgParkingCost_" + LOG_MGRA + "_Debug_H.csv" ) ) ) );
+                outM = new PrintWriter( new BufferedWriter( new FileWriter( new File( outFile.replace(".csv", "") + LOG_MGRA + "_Debug_M.csv" ) ) ) );
+                outD = new PrintWriter( new BufferedWriter( new FileWriter( new File( outFile.replace(".csv", "") + LOG_MGRA + "_Debug_D.csv" ) ) ) );
+                outH = new PrintWriter( new BufferedWriter( new FileWriter( new File( outFile.replace(".csv", "") + LOG_MGRA + "_Debug_H.csv" ) ) ) );
             }
             catch (IOException e) {
                 // TODO Auto-generated catch block
