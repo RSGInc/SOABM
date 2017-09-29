@@ -1434,7 +1434,7 @@ if __name__== "__main__":
       createMazToTap(Visum, mode, "outputs/skims")
       loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".xml")
       createNearbyMazsFile(Visum, mode, "outputs/skims")
-      saveVersion(Visum, "outputs/maz_skim_" + mode + ".ver")
+      saveVersion(Visum, "outputs/networks/maz_skim_" + mode + ".ver")
     closeVisum(Visum)
     
   if runmode == 'taz_initial':
