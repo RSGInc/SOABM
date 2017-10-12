@@ -20,7 +20,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL1"
         ONLYACTIVE = "0"
-        FORMULA = "Floor((([TCUR_PRTSYS(HOV3TOLL)] / 0.9) * [FACTYPE]=1)  * 60&#xA;&#xA;+&#xA;&#xA;(([TCUR_PRTSYS(HOV3TOLL)] / 0.75) * [FACTYPE]!=1) * 60&#xA;)"
+        FORMULA = "Floor((([TCUR_PRTSYS(HOV3TOLL)] / 0.9) * [PLANNO]=1)  * 60&#xA;&#xA;+&#xA;&#xA;(([TCUR_PRTSYS(HOV3TOLL)] / 0.75) * [PLANNO]!=1) * 60&#xA;)"
       />      
     </OPERATION>
     <OPERATION
