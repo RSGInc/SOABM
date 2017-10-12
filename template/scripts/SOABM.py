@@ -581,24 +581,32 @@ def calculateDensityMeasures(Visum):
   VisumPy.helpers.SetMulti(Visum.Net.Zones, "POPDEN", popden)
   VisumPy.helpers.SetMulti(Visum.Net.Zones, "RETDEN", retden)
 
+  
+def setSeqMaz(Visum):
+  
+  print("set SEQMAZ for CT-RAMP")
+  
+  zoneNum = VisumPy.helpers.GetMulti(Visum.Net.Zones,"NO")
+  seqMaz = VisumPy.helpers.GetMulti(Visum.Net.Zones,"SEQMAZ")
+  for i in range(len(zoneNum)):
+    seqMaz[i] = i+1
+  VisumPy.helpers.SetMulti(Visum.Net.Zones, "SEQMAZ", seqMaz)
+  
 def writeMazDataFile(Visum, fileName):
   
   print("write MAZ data file")
   
-  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","COUNTY","HH","SF_HH","DUPLEX_HH",
-    "MF_HH","MH_HH","EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT",
-    "EMP_ACCFD","EMP_AGR","EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD",
-    "EMP_METAL","EMP_TRANS","EMP_POSTAL","EMP_INFO","EMP_FINANC",
-    "EMP_REALES","EMP_PROF","EMP_MGMT","EMP_ADMIN","EMP_EDUC",
-    "EMP_HEALTH","EMP_ARTS","EMP_OTHER","EMP_PUBADM","EMP_TOTAL",
-    "ENROLLK_8","ENROLL9_12","ENROLLCOLL","ENROLLCOOT","ENROLLADSC",
+  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","COUNTY","HH","POP","HHP",
+    "EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT","EMP_ACCFD","EMP_AGR",
+    "EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD","EMP_METAL","EMP_TRANS",
+    "EMP_POSTAL","EMP_INFO","EMP_FINANC","EMP_REALES","EMP_PROF","EMP_MGMT",
+    "EMP_ADMIN","EMP_EDUC","EMP_HEALTH","EMP_ARTS","EMP_OTHER","EMP_PUBADM",
+    "EMP_TOTAL","ENROLLK_8","ENROLL9_12","ENROLLCOLL","ENROLLCOOT","ENROLLADSC",
     "universitySqFtClass","universitySqFtOffice","universitySqFtRec",
     "ECH_DIST","HCH_DIST","HOTELRMTOT","PARKAREA","HSTALLSOTH",
     "HSTALLSSAM","HPARKCOST","NUMFREEHRS","DSTALLSOTH","DSTALLSSAM",
-    "DPARKCOST","MSTALLSOTH","MSTALLSSAM","MPARKCOST","HHS","POP","HHP",
-    "HH_GQ_CIV","HH_GQ_MIL","HH_GQ_UNIV","WRK_EXT_PR","SCHDIST_NA",
-    "SCHDIST","HH_1","HH_2","HH_3","HH_4","DUDEN","EMPDEN","TOTINT",
-    "POPDEN","RETDEN","TERMTIME","PARKACRES"]
+    "DPARKCOST","MSTALLSOTH","MSTALLSSAM","MPARKCOST","WRK_EXT_PR","SCHDIST_NA",
+    "SCHDIST","DUDEN","EMPDEN","TOTINT","POPDEN","RETDEN","TERMTIME","PARKACRES"]
 
   #create header
   header = ",".join(fieldsToExport)
@@ -1422,6 +1430,7 @@ if __name__== "__main__":
     assignStopAreasToAccessNodes(Visum)
     switchZoneSystem(Visum, "maz")
     calculateDensityMeasures(Visum)
+    setSeqMaz(Visum)
     saveVersion(Visum, "outputs/networks/maz_skim_initial.ver")
     createAltFiles(Visum, "outputs/other")
     writeMazDataFile(Visum, "inputs/maz_data_export.csv")
