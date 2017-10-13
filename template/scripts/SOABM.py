@@ -903,7 +903,6 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   hov3occ = 3.33
   
   uniqTazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "NO")       #used by CT-RAMP
-  mazIds = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "SEQMAZ") #used by CT-RAMP
   tazs   = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "TAZ")    #used by CT-RAMP
   tapIds = VisumPy.helpers.GetMulti(Visum.Net.StopAreas,"NO")      #used by CT-RAMP
   
@@ -915,9 +914,9 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   timePeriodStarts = numpy.array(timePeriodStarts)
   
   #build taz lookup for quick access later
-  tazIds = [-1]*int(max(mazIds)+1)
-  for i in range(len(mazIds)):
-    tazIds[int(mazIds[i])] = uniqTazs.index(tazs[i])
+  tazIds = [-1]*(len(tazs)+1) 
+  for i in range(len(tazs)):
+    tazIds[i] = uniqTazs.index(tazs[i]) #seq maz ids
   
   #create empty matrices
   sov = numpy.zeros((len(timePeriods),len(uniqTazs),len(uniqTazs)))
@@ -1131,8 +1130,6 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
         sov[tod][o,d] = sov[tod][o,d] + expansionFactor
         
       else:
-        print otap
-        print tapIds.index(otap)
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(trips[i][omazColNum])
         o = tazIds[o]
