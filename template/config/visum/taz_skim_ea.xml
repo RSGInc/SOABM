@@ -64,7 +64,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "V0PRT"
         ONLYACTIVE = "0"
-        FORMULA = "[SPEED]"
+        FORMULA = "[FFSPEED]"
       />      
     </OPERATION>
     <OPERATION
