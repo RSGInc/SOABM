@@ -1454,7 +1454,7 @@ if __name__== "__main__":
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/networks/taz_skim_initial.ver")
-      setLinkCapacityTODFactors(Visum)
+      #setLinkCapacityTODFactors(Visum)
       setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
       saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
