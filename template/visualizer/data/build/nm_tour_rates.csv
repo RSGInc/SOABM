@@ -1,0 +1,64 @@
+"pertype","tour_purp","tour_rate"
+"FT Worker","Escorting",0.115423786352835
+"PT Worker","Escorting",0.287965565081285
+"Univ Stud","Escorting",0.408458920758386
+"Non Worker","Escorting",0.467284960901982
+"Retiree","Escorting",0.0303170618770258
+"Driv Stud","Escorting",0.0154667247576517
+"NonDriv Stud","Escorting",0.024470394929875
+"Pre-School","Escorting",0.292933618843683
+"All","Escorting",0.200813680715314
+"FT Worker","Shopping",0.048941948625099
+"PT Worker","Shopping",0.137348368965885
+"Univ Stud","Shopping",0.119397180359747
+"Non Worker","Shopping",0.241662120385525
+"Retiree","Shopping",0.26325152925694
+"Driv Stud","Shopping",0.00206949134081255
+"NonDriv Stud","Shopping",0.0020245290769321
+"Pre-School","Shopping",0.000122361578464362
+"All","Shopping",0.123638671365918
+"FT Worker","Maintenance",0.0700605409075478
+"PT Worker","Maintenance",0.117996513820213
+"Univ Stud","Maintenance",0.0910063198833252
+"Non Worker","Maintenance",0.225222767775959
+"Retiree","Maintenance",0.328516072429508
+"Driv Stud","Maintenance",0.0221108811676288
+"NonDriv Stud","Maintenance",0.00563347221407194
+"Pre-School","Maintenance",0.0830223309880697
+"All","Maintenance",0.139100115970278
+"FT Worker","EatingOut",0.000876994455131832
+"PT Worker","EatingOut",0.00608302799615809
+"Univ Stud","EatingOut",0.000291686922702966
+"Non Worker","EatingOut",0.00456446626659393
+"Retiree","EatingOut",0.071747130358492
+"Driv Stud","EatingOut",0.000217841193769742
+"NonDriv Stud","EatingOut",0
+"Pre-School","EatingOut",0.0127256041602937
+"All","EatingOut",0.0137539994635902
+"FT Worker","Visiting",0.0272716985402286
+"PT Worker","Visiting",0.0241898189320906
+"Univ Stud","Visiting",0.0596985901798736
+"Non Worker","Visiting",0.0551554828150573
+"Retiree","Visiting",0.0785221650866376
+"Driv Stud","Visiting",0.0555495044112842
+"NonDriv Stud","Visiting",0.0339181972888915
+"Pre-School","Visiting",0.0483328234934231
+"All","Visiting",0.0450773072230218
+"FT Worker","Discretionary",0.0550809098110218
+"PT Worker","Discretionary",0.138771299491302
+"Univ Stud","Discretionary",0.044725328147788
+"Non Worker","Discretionary",0.0848336061102019
+"Retiree","Discretionary",0.0760119903492311
+"Driv Stud","Discretionary",0.0916022219801765
+"NonDriv Stud","Discretionary",0.0154920485886978
+"Pre-School","Discretionary",0.0468033037626185
+"All","Discretionary",0.0686491162460383
+"FT Worker","All",0.317655878691864
+"PT Worker","All",0.712354594286934
+"Univ Stud","All",0.723578026251823
+"Non Worker","All",1.07872340425532
+"Retiree","All",0.848365949357834
+"Driv Stud","All",0.187016664851323
+"NonDriv Stud","All",0.0815386420984684
+"Pre-School","All",0.483940042826552
+"All","All",0.591032890984161

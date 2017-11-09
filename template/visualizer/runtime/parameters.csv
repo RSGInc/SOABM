@@ -1,0 +1,14 @@
+Key,Value 
+PROJECT_DIR,E:/projects/clients/odot/SouthernOregonABM/Calibration_Template/ 
+WORKING_DIR,E:/projects/clients/odot/SouthernOregonABM/Calibration_Template/\visualizer 
+BASE_SUMMARY_DIR,E:/projects/clients/odot/SouthernOregonABM/Calibration_Template/\inputs\OHAS_Census_Summaries 
+BUILD_SUMMARY_DIR,E:/projects/clients/odot/SouthernOregonABM/Calibration_Template/\outputs\other\ABM_Summaries 
+BASE_SCENARIO_NAME,OHAS 
+BUILD_SCENARIO_NAME,SOABM 
+BASE_SAMPLE_RATE,1.0 
+BUILD_SAMPLE_RATE,1.0 
+R_LIBRARY,E:/projects/clients/odot/SouthernOregonABM/Calibration_Template/..\dependencies\R-3.4.1\library 
+OUTPUT_HTML_NAME,SOABM_Dashboard 
+SHP_FILE_NAME,zones_zone.shp 
+IS_BASE_SURVEY,Yes 
+MAX_ITER,1 
