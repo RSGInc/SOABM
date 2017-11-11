@@ -728,7 +728,7 @@ bscols(widths=c(12),
 ```
 
 
-Flows & Trip Lengths{data-navmenu="Long Term"}
+Flows & Tour Lengths{data-navmenu="Long Term"}
 ============================================
 
 Description {.sidebar data-width=225}
@@ -759,7 +759,7 @@ t1
 
 ### {data-height=280}
 ```{r Table1_MandTripLengths}
-cat("Average Mandatory Trip Lengths")
+cat("Average Mandatory Tour Lengths")
 
 base_df <- base_data[[which(base_csv_names=="mandTripLengths")]]
 df <- base_df
@@ -789,7 +789,7 @@ t2
 
 ###{data-height=280}
 ```{r Table2_MandTripLengths}
-cat("Average Mandatory Trip Lengths")
+cat("Average Mandatory Tour Lengths")
 
 build_df <- build_data[[which(build_csv_names=="mandTripLengths")]]
 df <- build_df
@@ -1332,7 +1332,7 @@ Description {.sidebar data-width=225}
 
 ********
 
-**Non-Mandatory Trip Length Distribution**
+**Non-Mandatory Tour Length Distribution**
 
 Results of non-mandatory tour destination choice models. 
 
