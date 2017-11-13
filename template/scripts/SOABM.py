@@ -1471,7 +1471,71 @@ if __name__== "__main__":
     loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
     tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
     closeVisum(Visum)
-        
+
+  if runmode == 'generate_html_inputs': #BMP 10/31/17, write out link volumes on count locations,links and total vmt
+    Visum = startVisum()
+    loadVersion(Visum, "inputs/SOABM.ver")
+    dst_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "Length")
+    link_planno = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+    linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
+    fromNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "FromNodeNo")
+    toNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeNo")
+    countLocs = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "No")
+    planno = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\PLANNO")
+    am_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "AM_COUNT")
+    md_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "MD_COUNT")
+    pm_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "PM_COUNT")
+    day_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "DAY_COUNT_FINAL")
+    f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'wb')
+    f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
+    for i in range(len(countLocs)):
+        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],am_count[i],md_count[i],pm_count[i],day_count[i]))
+    f.close()
+    vol_list = [[0]*len(countLocs) for i in range(6)]
+    all_vol_list = [[0]*len(dst_list) for i in range(6)]
+    vmt_list = [[0]*5 for i in range(6)]
+    tod_cnt = 0
+    for tp in ['ea','am','md','pm','ev']:
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\VolVehPrT(AP)")
+      all_vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVehPrT(AP)")
+      sov_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(SOV,AP)")
+      hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
+      hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
+      trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
+      for i in range(len(countLocs)):
+        vol_list[5][i] = vol_list[5][i] + vol_list[tod_cnt][i]
+        all_vol_list[5][i] = all_vol_list[5][i] + all_vol_list[tod_cnt][i]
+      vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
+      vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
+      vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)
+      vmt_list[tod_cnt][3] = numpy.dot(dst_list, trk_list)
+      vmt_list[tod_cnt][4] = vmt_list[tod_cnt][0] + vmt_list[tod_cnt][1] + vmt_list[tod_cnt][2] + vmt_list[tod_cnt][3]
+      vmt_list[5][0] = vmt_list[5][0] + vmt_list[tod_cnt][0]
+      vmt_list[5][1] = vmt_list[5][1] + vmt_list[tod_cnt][1]
+      vmt_list[5][2] = vmt_list[5][2] + vmt_list[tod_cnt][2]
+      vmt_list[5][3] = vmt_list[5][3] + vmt_list[tod_cnt][3]
+      vmt_list[5][4] = vmt_list[5][4] + vmt_list[tod_cnt][4]
+      tod_cnt = tod_cnt + 1
+    f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
+    f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
+    for i in range(len(countLocs)):
+        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[2][i],vol_list[3][i],vol_list[4][i],vol_list[5][i]))
+    f.close()
+    f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'wb')
+    f.write("id,From_Node,To_Node,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
+    for i in range(len(countLocs)):
+        f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[4][i],all_vol_list[5][i]))
+    f.close()
+    f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'wb')
+    f.write("TOD,SOV,HOV2,HOV3,Truck,Total\n")
+    tod_cnt = 0
+    for tp in ['EA','AM','MD','PM','EV','Daily']:
+        f.write("%s,%i,%.3f,%.3f,%.3f,%.3f\n" % (tp,vmt_list[tod_cnt][0],vmt_list[tod_cnt][1],vmt_list[tod_cnt][2],vmt_list[tod_cnt][3],vmt_list[tod_cnt][4]))
+        tod_cnt = tod_cnt + 1
+    f.close()
+    closeVisum(Visum)
+    	
   if runmode == 'tap_initial':
     Visum = startVisum()
     loadVersion(Visum, "inputs/SOABM.ver")
