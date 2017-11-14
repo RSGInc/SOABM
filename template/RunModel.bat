@@ -6,9 +6,9 @@
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: setup iteration sample rate
-SET MAX_ITER=5
-SET SAMPLERATE_ITERATION1=0.50
-SET SAMPLERATE_ITERATION2=0.75
+SET MAX_ITER=1
+SET SAMPLERATE_ITERATION1=0.1
+SET SAMPLERATE_ITERATION2=1.0
 SET SAMPLERATE_ITERATION3=1.0
 SET SAMPLERATE_ITERATION4=1.0
 SET SAMPLERATE_ITERATION5=1.0
@@ -31,8 +31,14 @@ ECHO JAVA_PATH: %JAVA_PATH%
 SET PYTHON=%~dp0..\dependencies\Python27\python.exe
 ECHO PYTHON: %PYTHON%
 
-SET R_SCRIPT=%~dp0..\dependencies\R-3.3.1\bin\Rscript
+SET R_SCRIPT=%~dp0..\dependencies\R-3.4.1\bin\Rscript
 ECHO R_SCRIPT: %R_SCRIPT%
+
+SET R_LIBRARY=%~dp0..\dependencies\R-3.4.1\library
+ECHO R_LIBRARY: %R_SCRIPT%
+
+SET RSTUDIO_PANDOC=%~dp0..\dependencies\Pandoc
+ECHO RSTUDIO_PANDOC: %R_SCRIPT%
 
 :: setup folders
 SET PROJECT_DRIVE=%~d0
@@ -129,6 +135,8 @@ CALL application\killjava
 
 %PYTHON% scripts\SOABM.py taz_skim
 
+%PYTHON% scripts\SOABM.py generate_html_inputs
+
 %PYTHON% scripts\SOABM.py tap_skim
 
 :: -------------------------------------------------------------------------------------------------
@@ -136,6 +144,29 @@ CALL application\killjava
 :: -------------------------------------------------------------------------------------------------
 
 IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
+
+:: -------------------------------------------------------------------------------------------------
+:: Process ABM Outputs and generate HTML dashboard
+:: -------------------------------------------------------------------------------------------------
+ECHO Processing ABM outputs and generating HTML dashborad...
+:: Visualizer configuration
+SET BASE_SUMMARY_DIR=%PROJECT_DIRECTORY%\inputs\OHAS_Census_Summaries
+SET BUILD_SUMMARY_DIR=%PROJECT_DIRECTORY%\outputs\other\ABM_Summaries
+
+SET BASE_SCENARIO_NAME=OHAS
+SET BUILD_SCENARIO_NAME=SOABM
+:: for survey base legend names are different [Yes/No]
+:: assignment summaries are for all links
+SET IS_BASE_SURVEY=Yes
+SET BASE_SAMPLE_RATE=1.0
+
+IF %MAX_ITER% EQU 1 SET BUILD_SAMPLE_RATE=%SAMPLERATE_ITERATION1%
+IF %MAX_ITER% EQU 2 SET BUILD_SAMPLE_RATE=%SAMPLERATE_ITERATION2%
+IF %MAX_ITER% EQU 3 SET BUILD_SAMPLE_RATE=%SAMPLERATE_ITERATION3%
+IF %MAX_ITER% EQU 4 SET BUILD_SAMPLE_RATE=%SAMPLERATE_ITERATION4%
+IF %MAX_ITER% EQU 5 SET BUILD_SAMPLE_RATE=%SAMPLERATE_ITERATION5%
+
+CALL %PROJECT_DIRECTORY%\visualizer\generateDashboard %PROJECT_DIRECTORY% %BASE_SUMMARY_DIR% %BUILD_SUMMARY_DIR% %BASE_SCENARIO_NAME% %BUILD_SCENARIO_NAME% %IS_BASE_SURVEY% %BASE_SAMPLE_RATE% %BUILD_SAMPLE_RATE% %MAX_ITER%
 
 :: -------------------------------------------------------------------------------------------------
 :: All done
