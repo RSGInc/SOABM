@@ -916,7 +916,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   #build taz lookup for quick access later
   tazIds = [-1]*(len(tazs)+1) 
   for i in range(len(tazs)):
-    tazIds[i] = uniqTazs.index(tazs[i]) #seq maz ids
+    tazIds[i] = uniqTazs.index(tazs[i])-1 #assumes seq maz ids
   
   #create empty matrices
   sov = numpy.zeros((len(timePeriods),len(uniqTazs),len(uniqTazs)))
