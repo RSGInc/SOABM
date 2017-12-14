@@ -84,8 +84,8 @@ double Calc (int tsysind, char tsysisopen,
 	}
 	double mid_link_bpr = t0 * (1 + para_a * pow( (pcuvol / mid_link_cap), para_b ));
 	
-	//uncongested signal delay
-	double unc_sig_delay = uval2;
+	//uncongested signal delay scaled by 100 since AddVal2 must be an integer
+	double unc_sig_delay = uval2 / 100.0;
 
 	//intersection congestion adjustment
 	double int_cap = uval3;
