@@ -6,50 +6,6 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "lanes by period"
-      EXECUTED = "0"
-      STARTTIME = ""
-      ENDTIME = ""
-      DURATION = ""
-      MESSAGES = ""
-      RESULTMESSAGE = ""
-      SUCCESS = "0"
-      COMPUTENODE = "">
-      <ATTRIBUTEFORMULAPARA
-        NETOBJECTTYPE = "LINK"
-        INCLUDESUBCATEGORIES = "0"
-        RESULTATTRNAME = "LANES_EV"
-        ONLYACTIVE = "0"
-        FORMULA = "[NUMLANES]"
-      />      
-    </OPERATION>
-    <OPERATION
-      NO = "2"
-      CODE = ""
-      OPERATIONTYPE = "EditAttribute"
-      ACTIVE = "1"
-      COMMENT = "EV period link capacity"
-      EXECUTED = "0"
-      STARTTIME = ""
-      ENDTIME = ""
-      DURATION = ""
-      MESSAGES = ""
-      RESULTMESSAGE = ""
-      SUCCESS = "0"
-      COMPUTENODE = "">
-      <ATTRIBUTEFORMULAPARA
-        NETOBJECTTYPE = "LINK"
-        INCLUDESUBCATEGORIES = "0"
-        RESULTATTRNAME = "CAPPRT"
-        ONLYACTIVE = "0"
-        FORMULA = "Floor([LANES_EV] * [LANECAP] * [NETWORK\TOD_FACTOR_EV])"
-      />      
-    </OPERATION>
-    <OPERATION
-      NO = "3"
-      CODE = ""
-      OPERATIONTYPE = "EditAttribute"
-      ACTIVE = "1"
       COMMENT = "Save speed"
       EXECUTED = "0"
       STARTTIME = ""
@@ -68,7 +24,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "4"
+      NO = "2"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -90,7 +46,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "5"
+      NO = "3"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -141,7 +97,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "6"
+      NO = "4"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -163,7 +119,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "7"
+      NO = "5"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -226,7 +182,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "8"
+      NO = "6"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -248,7 +204,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "9"
+      NO = "7"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -305,7 +261,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "10"
+      NO = "8"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -327,7 +283,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "11"
+      NO = "9"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -349,7 +305,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "12"
+      NO = "10"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -418,7 +374,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "13"
+      NO = "11"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -440,7 +396,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "14"
+      NO = "12"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -497,7 +453,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "15"
+      NO = "13"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -519,7 +475,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "16"
+      NO = "14"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -541,7 +497,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "17"
+      NO = "15"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -610,7 +566,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "18"
+      NO = "16"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -661,7 +617,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "19"
+      NO = "17"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -683,7 +639,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "20"
+      NO = "18"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -746,7 +702,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "21"
+      NO = "19"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -762,7 +718,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_sov_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;SOV&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "22"
+      NO = "20"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -778,7 +734,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_sovtoll_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;SOVToll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "23"
+      NO = "21"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -794,7 +750,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov2_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV2&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "24"
+      NO = "22"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -810,7 +766,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov2toll_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV2Toll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "25"
+      NO = "23"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -826,7 +782,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov3_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV3&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "26"
+      NO = "24"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -842,7 +798,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov3toll_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV3Toll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "27"
+      NO = "25"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -858,7 +814,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_truck_ev.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;Truck&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "28"
+      NO = "26"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -1840,7 +1796,7 @@
       <LINKVDFUNCTIONSPARAMETERS>
         <VDFUNCTION
           VDFUNCTIONNUMBER = "1"
-          VDFUNCTIONTYPE = "BPR"
+          VDFUNCTIONTYPE = "@ODOTVDF"
           BLOCKED = "0"
           HARDBLOCKING = "0"
           CAPACITYFACTOR = "1"
@@ -1894,12 +1850,408 @@
           AKCELIK2_A = "1"
           AKCELIK2_B = "1"
           AKCELIK2_D = "1"
-          USER_A1 = "1"
-          USER_B1 = "1"
+          USER_A1 = "0.3"
+          USER_B1 = "6"
           USER_D1 = "1"
           USER_F1 = "1"
-          USER_A2 = "1"
-          USER_B2 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "3"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "4"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "5"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "6"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "7"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
+          USER_D2 = "1"
+          USER_F2 = "1"
+          USER_SATCRIT = "1"
+        />        
+        <VDFUNCTION
+          VDFUNCTIONNUMBER = "30"
+          VDFUNCTIONTYPE = "@ODOTVDF"
+          BLOCKED = "0"
+          HARDBLOCKING = "0"
+          CAPACITYFACTOR = "1"
+          BPR_A = "1"
+          BPR_B = "2"
+          BPR_BISREAL = "0"
+          BPR2_A = "1"
+          BPR2_B1 = "2"
+          BPR2_B2 = "2"
+          BPR3_A = "1"
+          BPR3_B = "2"
+          BPR3_D = "0"
+          INRETS_A = "1"
+          CONICAL_A = "4"
+          CONICAL_MARGINAL_A = "4"
+          QUADRATIC_A = "1"
+          QUADRATIC_B = "1"
+          QUADRATIC_D = "1"
+          LOGISTIC_A = "1"
+          LOGISTIC_B = "1"
+          LOGISTIC_D = "1"
+          LOGISTIC_F = "1"
+          SIGMOIDAL_MMF_A = "1"
+          SIGMOIDAL_MMF_B = "1"
+          SIGMOIDAL_MMF_D = "1"
+          SIGMOIDAL_MMF_F = "1"
+          TMODEL_A1 = "0"
+          TMODEL_A2 = "0"
+          TMODEL_B1 = "2"
+          TMODEL_B2 = "2"
+          TMODEL_D1 = "1"
+          TMODEL_D2 = "1"
+          TMODEL_F1 = "0"
+          TMODEL_F2 = "0"
+          TMODEL_SATCRIT = "1"
+          AKCELIK_A = "1"
+          AKCELIK_B = "1"
+          AKCELIK_D = "1800"
+          LOHSE_A = "1"
+          LOHSE_B = "3"
+          LOHSE_SATCRIT = "1"
+          SCHILLER_A = "3"
+          SCHILLER_B = "1"
+          SCHILLER_D = "0.001"
+          SCHILLER_F = "10"
+          SCHILLER_SATCRIT = "1"
+          EXPONENTIAL_A = "1"
+          EXPONENTIAL_B = "1"
+          EXPONENTIAL_D = "1"
+          EXPONENTIAL_SATCRIT = "1"
+          AKCELIK2_A = "1"
+          AKCELIK2_B = "1"
+          AKCELIK2_D = "1"
+          USER_A1 = "0.15"
+          USER_B1 = "4"
+          USER_D1 = "1"
+          USER_F1 = "1"
+          USER_A2 = "2"
+          USER_B2 = "2"
           USER_D2 = "1"
           USER_F2 = "1"
           USER_SATCRIT = "1"
@@ -1910,11 +2262,11 @@
           <ATTRITEM            SUBATTR1 = "0"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "1"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "2"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "3"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "4"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "5"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "6"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "7"            VALUE = "1"          />          
+          <ATTRITEM            SUBATTR1 = "3"            VALUE = "3"          />          
+          <ATTRITEM            SUBATTR1 = "4"            VALUE = "4"          />          
+          <ATTRITEM            SUBATTR1 = "5"            VALUE = "5"          />          
+          <ATTRITEM            SUBATTR1 = "6"            VALUE = "6"          />          
+          <ATTRITEM            SUBATTR1 = "7"            VALUE = "7"          />          
           <ATTRITEM            SUBATTR1 = "8"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "9"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "10"            VALUE = "1"          />          
@@ -1937,7 +2289,7 @@
           <ATTRITEM            SUBATTR1 = "27"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "28"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "29"            VALUE = "1"          />          
-          <ATTRITEM            SUBATTR1 = "30"            VALUE = "1"          />          
+          <ATTRITEM            SUBATTR1 = "30"            VALUE = "30"          />          
           <ATTRITEM            SUBATTR1 = "31"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "32"            VALUE = "1"          />          
           <ATTRITEM            SUBATTR1 = "33"            VALUE = "1"          />          
