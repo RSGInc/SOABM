@@ -28,6 +28,72 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
+      COMMENT = "MID_LINK_CAP"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL1"
+        ONLYACTIVE = "0"
+        FORMULA = "[MID_LINK_CAP]"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "3"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "UNC_SIG_DELAY"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL2"
+        ONLYACTIVE = "0"
+        FORMULA = "[UNC_SIG_DELAY]"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "4"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "INT_CAP"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL3"
+        ONLYACTIVE = "0"
+        FORMULA = "[INT_CAP]"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "5"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
       COMMENT = "TomTom EA speed"
       EXECUTED = "0"
       STARTTIME = ""
@@ -46,7 +112,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "3"
+      NO = "6"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -97,7 +163,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "4"
+      NO = "7"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -119,7 +185,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "5"
+      NO = "8"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -182,7 +248,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "6"
+      NO = "9"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -204,7 +270,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "7"
+      NO = "10"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -261,7 +327,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "8"
+      NO = "11"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -283,7 +349,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "9"
+      NO = "12"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -305,7 +371,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "10"
+      NO = "13"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -374,7 +440,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "11"
+      NO = "14"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -396,7 +462,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "12"
+      NO = "15"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -453,7 +519,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "13"
+      NO = "16"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -475,7 +541,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "14"
+      NO = "17"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -497,7 +563,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "15"
+      NO = "18"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -566,7 +632,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "16"
+      NO = "19"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -617,7 +683,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "17"
+      NO = "20"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
@@ -639,7 +705,7 @@
       />      
     </OPERATION>
     <OPERATION
-      NO = "18"
+      NO = "21"
       CODE = ""
       OPERATIONTYPE = "PrTSkimMatrixCalculation"
       ACTIVE = "1"
@@ -702,7 +768,7 @@
       </PRTSKIMMATRIXPARA>
     </OPERATION>
     <OPERATION
-      NO = "19"
+      NO = "22"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -718,7 +784,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_sov_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;SOV&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "20"
+      NO = "23"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -734,7 +800,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_sovtoll_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;SOVToll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "21"
+      NO = "24"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -750,7 +816,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov2_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV2&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "22"
+      NO = "25"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -766,7 +832,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov2toll_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV2Toll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "23"
+      NO = "26"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -782,7 +848,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov3_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV3&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "24"
+      NO = "27"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -798,7 +864,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_hov3toll_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;HOV3Toll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "25"
+      NO = "28"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -814,7 +880,7 @@
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_truck_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;Truck&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
     </OPERATION>
     <OPERATION
-      NO = "26"
+      NO = "29"
       CODE = ""
       OPERATIONTYPE = "AddIn"
       ACTIVE = "1"
@@ -828,6 +894,72 @@
       SUCCESS = "0"
       COMPUTENODE = "">
       <ADDINPARA        ADDINID = "OMXExport"        ADDINPARAMETER = "(dp1&#xA;S&apos;LookupTableAttributes&apos;&#xA;p2&#xA;(lp3&#xA;S&apos;NO&apos;&#xA;p4&#xA;asS&apos;ObjectReferenceType&apos;&#xA;p5&#xA;I0&#xA;sS&apos;FilePath&apos;&#xA;p6&#xA;Voutputs/skims/taz_skim_trucktoll_ea.omx&#xA;p7&#xA;sS&apos;MatrixAttributes&apos;&#xA;p8&#xA;(lp9&#xA;g4&#xA;aS&apos;CODE&apos;&#xA;p10&#xA;aS&apos;NAME&apos;&#xA;p11&#xA;aS&apos;MATRIXTYPE&apos;&#xA;p12&#xA;aS&apos;DSEGCODE&apos;&#xA;p13&#xA;aS&apos;MODECODE&apos;&#xA;p14&#xA;aS&apos;FORMULA&apos;&#xA;p15&#xA;asS&apos;OnlyActiveObjects&apos;&#xA;p16&#xA;I00&#xA;sS&apos;MatrixReferenceExpression&apos;&#xA;p17&#xA;VMatrix([DModelCode] = &quot;&quot; &amp; [DSegCode] = &quot;TruckToll&quot; &amp; [ModeCode] = &quot;&quot;)&#xA;p18&#xA;s."      />      
+    </OPERATION>
+    <OPERATION
+      NO = "30"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "MID_LINK_CAP"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL1"
+        ONLYACTIVE = "0"
+        FORMULA = "[MID_LINK_CAP]"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "31"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "UNC_SIG_DELAY"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL2"
+        ONLYACTIVE = "0"
+        FORMULA = "[UNC_SIG_DELAY]"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "32"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "INT_CAP"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODE = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL3"
+        ONLYACTIVE = "0"
+        FORMULA = "[INT_CAP]"
+      /> 
     </OPERATION>
   </OPERATIONS>
   <FUNCTIONS>

@@ -1616,10 +1616,6 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   VisumPy.helpers.SetMulti(Visum.Net.Links, "unc_sig_delay", unc_sig_delay)
   VisumPy.helpers.SetMulti(Visum.Net.Links, "int_cap", int_cap)
   
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "ADDVAL1", mid_link_cap)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "ADDVAL2", unc_sig_delay)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "ADDVAL3", int_cap)
-  
   print("set results in version file")
   
   #set TYPENO = PLANNO for VDF parameter lookup in procedures
@@ -1682,7 +1678,6 @@ if __name__== "__main__":
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      prepVDFData(Visum, tp, "inputs/vdf_lookup_table.csv") #need to calculate AddVal1,2,3 again
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
       saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
     loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
