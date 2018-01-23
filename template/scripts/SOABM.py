@@ -275,7 +275,8 @@ def createTapLines(Visum, fileName):
   f.write("TAP,LINES\n")  
   for i in range(len(tapIds)):
     tap = tapIds[i][1]
-    lines = tapLines[i][1].replace(","," ")
+    if tapLines[i][1] != "":
+      lines = tapLines[i][1].replace(","," ")
     f.write("%s,%s\n" % (tap,lines))
   f.close()
 
