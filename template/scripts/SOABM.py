@@ -270,7 +270,8 @@ def createTapLines(Visum, fileName):
   f.write("TAP,LINES\n")  
   for i in range(len(tapIds)):
     tap = tapIds[i][1]
-    lines = tapLines[i][1].replace(","," ")
+    if tapLines[i][1] != "":
+      lines = tapLines[i][1].replace(","," ")
     f.write("%s,%s\n" % (tap,lines))
   f.close()
 
@@ -1486,6 +1487,8 @@ if __name__== "__main__":
     md_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "MD_COUNT")
     pm_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "PM_COUNT")
     day_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "DAY_COUNT_FINAL")
+    loadVersion(Visum, "outputs/networks/tap_skim_am_speed_set1.ver")
+    lineRoutes = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "LineName")
     f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'wb')
     f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
     for i in range(len(countLocs)):
@@ -1493,7 +1496,12 @@ if __name__== "__main__":
     f.close()
     vol_list = [[0]*len(countLocs) for i in range(6)]
     all_vol_list = [[0]*len(dst_list) for i in range(6)]
+    auto_vol_list = [[0]*len(dst_list) for i in range(6)]
+    truck_vol_list = [[0]*len(dst_list) for i in range(6)]
     vmt_list = [[0]*5 for i in range(6)]
+    numRoutes = len(lineRoutes) + 1
+    #print("Number of Routes: " + str(numRoutes))
+    lineUTrips = [[0]*numRoutes for i in range(6)]
     tod_cnt = 0
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
@@ -1503,9 +1511,19 @@ if __name__== "__main__":
       hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
       hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
       trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
+      loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set1.ver")
+      line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
+      for rt in range(numRoutes-1):
+        lineUTrips[tod_cnt][rt] = line_utrips[rt]
+      lineUTrips[tod_cnt][numRoutes-1] = sum(line_utrips)
       for i in range(len(countLocs)):
         vol_list[5][i] = vol_list[5][i] + vol_list[tod_cnt][i]
+      for i in range(len(linkID)):
         all_vol_list[5][i] = all_vol_list[5][i] + all_vol_list[tod_cnt][i]
+        auto_vol_list[tod_cnt][i] = sov_list[i] + hv2_list[i] + hv3_list[i]
+        auto_vol_list[5][i] = auto_vol_list[5][i] + auto_vol_list[tod_cnt][i]
+        truck_vol_list[tod_cnt][i] = trk_list[i]
+        truck_vol_list[5][i] = truck_vol_list[5][i] + truck_vol_list[tod_cnt][i]
       vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
       vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
       vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)
@@ -1516,24 +1534,57 @@ if __name__== "__main__":
       vmt_list[5][2] = vmt_list[5][2] + vmt_list[tod_cnt][2]
       vmt_list[5][3] = vmt_list[5][3] + vmt_list[tod_cnt][3]
       vmt_list[5][4] = vmt_list[5][4] + vmt_list[tod_cnt][4]
+      for rt in range(numRoutes):
+        lineUTrips[5][rt] = lineUTrips[5][rt] + lineUTrips[tod_cnt][rt]	  
       tod_cnt = tod_cnt + 1
     f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
     f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
     for i in range(len(countLocs)):
-        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[2][i],vol_list[3][i],vol_list[4][i],vol_list[5][i]))
+        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[1][i],vol_list[2][i],vol_list[3][i],vol_list[5][i]))
     f.close()
     f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'wb')
     f.write("id,From_Node,To_Node,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
-    for i in range(len(countLocs)):
-        f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[4][i],all_vol_list[5][i]))
+    for i in range(len(linkID)):
+        f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[1][i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[5][i]))
     f.close()
     f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'wb')
     f.write("TOD,SOV,HOV2,HOV3,Truck,Total\n")
     tod_cnt = 0
     for tp in ['EA','AM','MD','PM','EV','Daily']:
-        f.write("%s,%i,%.3f,%.3f,%.3f,%.3f\n" % (tp,vmt_list[tod_cnt][0],vmt_list[tod_cnt][1],vmt_list[tod_cnt][2],vmt_list[tod_cnt][3],vmt_list[tod_cnt][4]))
+        f.write("%s,%.3f,%.3f,%.3f,%.3f,%.3f\n" % (tp,vmt_list[tod_cnt][0],vmt_list[tod_cnt][1],vmt_list[tod_cnt][2],vmt_list[tod_cnt][3],vmt_list[tod_cnt][4]))
         tod_cnt = tod_cnt + 1
     f.close()
+    f = open("outputs/other/ABM_Summaries/transitBoardingSummary.csv", 'wb')
+    f.write("TOD,")
+    for rt in range(numRoutes-1):
+       f.write("%s," % (lineRoutes[rt]))
+    f.write("Total\n")
+    for tp in ['Daily']:
+        f.write("%s," % (tp)) 
+        for rt in range(numRoutes-1):
+           f.write("%.3f," % (lineUTrips[5][rt]))
+        f.write("%.3f\n" % (lineUTrips[5][numRoutes-1]))
+    f.close()
+    # write out final volumes to each period version files
+    for tp in ['ea','am','md','pm','ev']:
+      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      mode_count = 0
+      for mode_var in ['AUTO','TRUCK','TOTAL']:
+        if mode_var=="AUTO":
+          set_list = auto_vol_list
+        elif mode_var=="TRUCK":
+          set_list = truck_vol_list
+        else:
+          set_list = all_vol_list
+        tod_cnt = 0
+        for tod_var in ['EA','AM','MD','PM','EV','DAILY']:
+          field_name = tod_var + "_Vol_" + mode_var
+          print(field_name)
+          Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+          VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
+          tod_cnt = tod_cnt + 1
+        mode_count = mode_count + 1	
+        saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")		
     closeVisum(Visum)
     	
   if runmode == 'tap_initial':

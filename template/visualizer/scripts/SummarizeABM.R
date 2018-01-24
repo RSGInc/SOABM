@@ -6,8 +6,9 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
+#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Calibration_Round2/template/visualizer/runtime/parameters.csv"
 
-SYSTEM_REPORT_PKGS <- c("reshape", "plyr", "weights", "omxr", "data.table")
+SYSTEM_REPORT_PKGS <- c("reshape", "omxr", "data.table", "plyr", "weights")
 lib_sink <- suppressWarnings(suppressMessages(lapply(SYSTEM_REPORT_PKGS, library, character.only = TRUE))) 
 
 ### Read parameters from Parameters_File
@@ -18,13 +19,13 @@ MAX_ITER            <- trimws(paste(parameters$Value[parameters$Key=="MAX_ITER"]
 BUILD_SAMPLE_RATE   <- as.numeric(trimws(paste(parameters$Value[parameters$Key=="BUILD_SAMPLE_RATE"])))
 
 # User Inputs
-WD  <- file.path(PROJECT_DIR, "outputs/other/ABM_Summaries")
+WD            <- file.path(PROJECT_DIR, "outputs/other/ABM_Summaries")
 ABMOutputDir  <- file.path(PROJECT_DIR, "outputs/other")
-geogXWalkDir   <- file.path(PROJECT_DIR, "inputs")
-TripDir  <- file.path(PROJECT_DIR, "outputs/trips")
+geogXWalkDir  <- file.path(PROJECT_DIR, "inputs")
+TripDir       <- file.path(PROJECT_DIR, "outputs/trips")
 cvmFile       <- paste(TripDir, "cvmTrips.omx", sep = "/")
 extFile       <- paste(TripDir, "externalOD.omx", sep = "/")
-SkimDir  <- file.path(PROJECT_DIR, "outputs/skims")
+SkimDir       <- file.path(PROJECT_DIR, "outputs/skims")
 SkimFile      <- paste(SkimDir, "taz_skim_sov_am.omx", sep = "/")
 
 setwd(ABMOutputDir)
@@ -59,11 +60,14 @@ cvm_mode <- c("car","car","car","car","car","car",
               "su" ,"su" ,"su" ,"su" ,"su" ,"su" ,
               "mu" ,"mu" ,"mu" ,"mu" ,"mu" ,"mu" )
 cvm_trips <- c()
+cvm_vmt   <- c()
 
 for(mtx in cvm_mtx){
   #cat(mtx,"\n")
-  cvmTrips <- read_omx(cvmFile, mtx, ,)
+  cvmTrips  <- read_omx(cvmFile, mtx, ,)
+  cvmVMT    <- cvmTrips * skimMat3
   cvm_trips <- c(cvm_trips, sum(cvmTrips))
+  cvm_vmt   <- c(cvm_vmt, sum(cvmVMT))
 }
 cvm_df <- data.frame(tod = cvm_tod, mode = cvm_mode, trips = cvm_trips)
 cvm_df <- cast(cvm_df, tod~mode, value = "trips", sum)
@@ -72,8 +76,16 @@ colnames(rw) <- colnames(cvm_df)
 cvm_df <- rbind(cvm_df, rw)
 cvm_df$Total <- rowSums(cvm_df[,!colnames(cvm_df) %in% c("tod")])
 cvm_df[is.na(cvm_df)] <- 0
-
 write.csv(cvm_df, paste(WD, "cvm_summary.csv", sep = "/"), row.names = F)
+
+cvm_vmt_df <- data.frame(tod = cvm_tod, mode = cvm_mode, vmt = cvm_vmt)
+cvm_vmt_df <- cast(cvm_vmt_df, tod~mode, value = "vmt", sum)
+rw <- data.frame("Daily", sum(cvm_vmt_df$car), sum(cvm_vmt_df$mu), sum(cvm_vmt_df$su))
+colnames(rw) <- colnames(cvm_vmt_df)
+cvm_vmt_df <- rbind(cvm_vmt_df, rw)
+cvm_vmt_df$Total <- rowSums(cvm_vmt_df[,!colnames(cvm_vmt_df) %in% c("tod")])
+cvm_vmt_df[is.na(cvm_vmt_df)] <- 0
+write.csv(cvm_vmt_df, paste(WD, "cvm_vmt_summary.csv", sep = "/"), row.names = F)
 
 
 ## Ext trips
@@ -105,11 +117,14 @@ ext_purp <- c("hbw",    "hbw",    "hbw",    "hbw",    "hbw",    "hbw",
               "nhbw",   "nhbw",   "nhbw",   "nhbw",   "nhbw",   "nhbw",
               "truck",  "truck",  "truck",  "truck",  "truck",  "truck")
 ext_trips <- c()
+ext_vmt   <- c()
 
 for(mtx in ext_mtx){
   #cat(mtx,"\n")
-  extTrips <- read_omx(extFile, mtx, ,)
+  extTrips  <- read_omx(extFile, mtx, ,)
+  extVMT    <- extTrips * skimMat3
   ext_trips <- c(ext_trips, sum(extTrips))
+  ext_vmt   <- c(ext_vmt, sum(extVMT))
 }
 ext_df <- data.frame(tod = ext_tod, purp = ext_purp, trips = ext_trips)
 ext_df <- cast(ext_df, tod~purp, value = "trips", sum)
@@ -119,8 +134,18 @@ colnames(rw) <- colnames(ext_df)
 ext_df <- rbind(ext_df, rw)
 ext_df$Total <- rowSums(ext_df[,!colnames(ext_df) %in% c("tod")])
 ext_df[is.na(ext_df)] <- 0
-
 write.csv(ext_df, paste(WD, "ext_summary.csv", sep = "/"), row.names = F)
+
+ext_vmt_df <- data.frame(tod = ext_tod, purp = ext_purp, vmt = ext_vmt)
+ext_vmt_df <- cast(ext_vmt_df, tod~purp, value = "vmt", sum)
+rw <- data.frame("Daily", sum(ext_vmt_df$hbcoll), sum(ext_vmt_df$hbo), sum(ext_vmt_df$hbr), sum(ext_vmt_df$hbs), sum(ext_vmt_df$hbsch), 
+                 sum(ext_vmt_df$hbw), sum(ext_vmt_df$nhbnw), sum(ext_vmt_df$nhbw), sum(ext_vmt_df$truck))
+colnames(rw) <- colnames(ext_vmt_df)
+ext_vmt_df <- rbind(ext_vmt_df, rw)
+ext_vmt_df$Total <- rowSums(ext_vmt_df[,!colnames(ext_vmt_df) %in% c("tod")])
+ext_vmt_df[is.na(ext_vmt_df)] <- 0
+write.csv(ext_vmt_df, paste(WD, "ext_vmt_summary.csv", sep = "/"), row.names = F)
+
 
 detach("package:omxr", unload=TRUE)
 
@@ -329,6 +354,14 @@ tours$TOURMODE[tours$tour_mode>=3 & tours$tour_mode<=5] <- 2
 tours$TOURMODE[tours$tour_mode>=6 & tours$tour_mode<=8] <- 3
 tours$TOURMODE[tours$tour_mode>=9] <- tours$tour_mode[tours$tour_mode>=9]-5
 
+# Code tours with out/inbound pure escort as pure school escort purpose [13]
+tours$TOURPURP[(tours$escort_type_out==2 | tours$escort_type_in==2) & tours$TOURPURP==4] <- 13
+
+# exclude  school escorting stop from ride sharing mandatory tours
+tours$num_ob_stops[tours$escort_type_out==1 & (tours$TOURPURP==1 | tours$TOURPURP==2)] <- tours$num_ob_stops[tours$escort_type_out==1 & (tours$TOURPURP==1 | tours$TOURPURP==2)] - 1
+tours$num_ib_stops[tours$escort_type_in==1 & (tours$TOURPURP==1 | tours$TOURPURP==2)] <- tours$num_ib_stops[tours$escort_type_in==1 & (tours$TOURPURP==1 | tours$TOURPURP==2)] - 1
+
+
 unique_joint_tours$JOINT_PURP[unique_joint_tours$tour_purpose=='Shop'] <- 5
 unique_joint_tours$JOINT_PURP[unique_joint_tours$tour_purpose=='Maintenance'] <- 6
 unique_joint_tours$JOINT_PURP[unique_joint_tours$tour_purpose=='Eating Out'] <- 7
@@ -415,6 +448,35 @@ unique_joint_tours$TOURMODE[unique_joint_tours$tour_mode<=2] <- 1
 unique_joint_tours$TOURMODE[unique_joint_tours$tour_mode>=3 & unique_joint_tours$tour_mode<=5] <- 2
 unique_joint_tours$TOURMODE[unique_joint_tours$tour_mode>=6 & unique_joint_tours$tour_mode<=8] <- 3
 unique_joint_tours$TOURMODE[unique_joint_tours$tour_mode>=9] <- unique_joint_tours$tour_mode[unique_joint_tours$tour_mode>=9]-5
+
+# create a combined temp tour file for creating stop freq model summary
+temp_tour1 <- tours[,c("TOURPURP","num_ob_stops","num_ib_stops")]
+temp_tour2 <- unique_joint_tours[,c("JOINT_PURP","num_ob_stops","num_ib_stops")]
+colnames(temp_tour2) <- colnames(temp_tour1)
+temp_tour <- rbind(temp_tour1,temp_tour2)
+
+# code stop frequency model alternatives
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==0 & temp_tour$num_ib_stops==0] <- 1
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==0 & temp_tour$num_ib_stops==1] <- 2
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==0 & temp_tour$num_ib_stops==2] <- 3
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==0 & temp_tour$num_ib_stops>=3] <- 4
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==1 & temp_tour$num_ib_stops==0] <- 5
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==1 & temp_tour$num_ib_stops==1] <- 6
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==1 & temp_tour$num_ib_stops==2] <- 7
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==1 & temp_tour$num_ib_stops>=3] <- 8
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==2 & temp_tour$num_ib_stops==0] <- 9
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==2 & temp_tour$num_ib_stops==1] <- 10
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==2 & temp_tour$num_ib_stops==2] <- 11
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops==2 & temp_tour$num_ib_stops>=3] <- 12
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops>=3 & temp_tour$num_ib_stops==0] <- 13
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops>=3 & temp_tour$num_ib_stops==1] <- 14
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops>=3 & temp_tour$num_ib_stops==2] <- 15
+temp_tour$STOP_FREQ_ALT[temp_tour$num_ob_stops>=3 & temp_tour$num_ib_stops>=3] <- 16
+temp_tour$STOP_FREQ_ALT[is.na(temp_tour$STOP_FREQ_ALT)] <- 0
+
+stopFreqModel_summary <- xtabs(~STOP_FREQ_ALT+TOURPURP, data = temp_tour[temp_tour$TOURPURP<=10,])
+write.csv(stopFreqModel_summary, "stopFreqModel_summary.csv", row.names = T)
+
 
 # Process Trip file
 #------------------
@@ -511,7 +573,18 @@ stops$od_dist<-skimMat3[cbind(stops$tripoindex, stops$finaldindex)]
 stops$os_dist<-skimMat3[cbind(stops$tripoindex, stops$tripdindex)]										
 stops$sd_dist<-skimMat3[cbind(stops$tripdindex, stops$finaldindex)]		
                                                 
-stops$out_dir_dist <- stops$os_dist + stops$sd_dist - stops$od_dist									
+stops$out_dir_dist <- stops$os_dist + stops$sd_dist - stops$od_dist	
+
+# Copy school escorting fields from tour to trip file
+trips$escort_type_out <- tours$escort_type_out[match(trips$hh_id*1000+trips$person_num*100+trips$TOURCAT*10+trips$tour_id, 
+                                                     tours$hh_id*1000+tours$person_num*100+tours$TOURCAT*10+tours$tour_id)]
+trips$escort_type_in <- tours$escort_type_in[match(trips$hh_id*1000+trips$person_num*100+trips$TOURCAT*10+trips$tour_id, 
+                                                   tours$hh_id*1000+tours$person_num*100+tours$TOURCAT*10+tours$tour_id)]
+
+# change the purpose on school escorting stops on ride sharing tours
+trips$DPURP[trips$escort_type_out==1 & trips$dest_escort_stoptype %in% c(0,1)] <- 13
+trips$DPURP[trips$escort_type_in==1 & trips$dest_escort_stoptype %in% c(0,1)] <- 13
+
 
 #joint trip
 jtrips$TOURMODE[jtrips$tour_mode<=2] <- 1
@@ -611,6 +684,14 @@ jstops$out_dir_dist <- jstops$os_dist + jstops$sd_dist - jstops$od_dist
 workCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 1") #[excluding at work subtours]
 schlCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 2 | TOURPURP == 3")
 inmCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP>=4 & TOURPURP<=9")
+
+i4tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 4")
+i5tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 5")
+i6tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 6")
+i7tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 7")
+i8tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 8")
+i9tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP == 9")
+
 tourCounts <- count(tours, c("hh_id", "person_num"), "TOURPURP <= 9")  #number of tours per person [excluding at work subtours]
 joint5 <- count(unique_joint_tours, c("hh_id"), "JOINT_PURP==5")
 joint6 <- count(unique_joint_tours, c("hh_id"), "JOINT_PURP==6")
@@ -670,6 +751,19 @@ per$inmTours <- inmCounts$freq[match(per$hh_id*10+per$person_num, inmCounts$hh_i
 per$inmTours[is.na(per$inmTours)] <- 0
 per$numTours <- tourCounts$freq[match(per$hh_id*10+per$person_num, tourCounts$hh_id*10+tourCounts$person_num)]
 per$numTours[is.na(per$numTours)] <- 0
+per$i4numTours <- i4tourCounts$freq[match(per$hh_id*10+per$person_num, i4tourCounts$hh_id*10+i4tourCounts$person_num)]
+per$i4numTours[is.na(per$i4numTours)] <- 0
+per$i5numTours <- i5tourCounts$freq[match(per$hh_id*10+per$person_num, i5tourCounts$hh_id*10+i5tourCounts$person_num)]
+per$i5numTours[is.na(per$i5numTours)] <- 0
+per$i6numTours <- i6tourCounts$freq[match(per$hh_id*10+per$person_num, i6tourCounts$hh_id*10+i6tourCounts$person_num)]
+per$i6numTours[is.na(per$i6numTours)] <- 0
+per$i7numTours <- i7tourCounts$freq[match(per$hh_id*10+per$person_num, i7tourCounts$hh_id*10+i7tourCounts$person_num)]
+per$i7numTours[is.na(per$i7numTours)] <- 0
+per$i8numTours <- i8tourCounts$freq[match(per$hh_id*10+per$person_num, i8tourCounts$hh_id*10+i8tourCounts$person_num)]
+per$i8numTours[is.na(per$i8numTours)] <- 0
+per$i9numTours <- i9tourCounts$freq[match(per$hh_id*10+per$person_num, i9tourCounts$hh_id*10+i9tourCounts$person_num)]
+per$i9numTours[is.na(per$i9numTours)] <- 0
+
 
 # Total tours by person type
 per$numTours[is.na(per$numTours)] <- 0
@@ -686,10 +780,44 @@ totaltoursPertypeDistbn <- toursPertypeDistbn
 totaltoursPertypeDistbn$freq <- totaltoursPertypeDistbn$freq + jtoursPertypeDistbn$freq
 write.csv(totaltoursPertypeDistbn, "total_tours_by_pertype_vis.csv", row.names = F)
 
+# code indi NM tour category
+per$i4numTours[per$i4numTours>=2] <- 2
+per$i5numTours[per$i5numTours>=2] <- 2
+per$i6numTours[per$i6numTours>=2] <- 2
+per$i7numTours[per$i7numTours>=1] <- 1
+per$i8numTours[per$i8numTours>=1] <- 1
+per$i9numTours[per$i9numTours>=2] <- 2
+
 
 # Total indi NM tours by person type and purpose
 tours_pertype_purpose <- count(tours[tours$TOURPURP>=4 & tours$TOURPURP<=9,], c("PERTYPE", "TOURPURP"))
 write.csv(tours_pertype_purpose, "tours_pertype_purpose.csv", row.names = TRUE)
+
+tours_pertype_esco <- count(per, c("PERTYPE", "i4numTours"))
+tours_pertype_shop <- count(per, c("PERTYPE", "i5numTours"))
+tours_pertype_main <- count(per, c("PERTYPE", "i6numTours"))
+tours_pertype_eati <- count(per, c("PERTYPE", "i7numTours"))
+tours_pertype_visi <- count(per, c("PERTYPE", "i8numTours"))
+tours_pertype_disc <- count(per, c("PERTYPE", "i9numTours"))
+
+
+colnames(tours_pertype_esco) <- c("PERTYPE","inumTours","freq")
+colnames(tours_pertype_shop) <- c("PERTYPE","inumTours","freq")
+colnames(tours_pertype_main) <- c("PERTYPE","inumTours","freq")
+colnames(tours_pertype_eati) <- c("PERTYPE","inumTours","freq")
+colnames(tours_pertype_visi) <- c("PERTYPE","inumTours","freq")
+colnames(tours_pertype_disc) <- c("PERTYPE","inumTours","freq")
+
+tours_pertype_esco$purpose <- 4
+tours_pertype_shop$purpose <- 5
+tours_pertype_main$purpose <- 6
+tours_pertype_eati$purpose <- 7
+tours_pertype_visi$purpose <- 8
+tours_pertype_disc$purpose <- 9
+
+indi_nm_tours_pertype <- rbind(tours_pertype_esco,tours_pertype_shop,tours_pertype_main,tours_pertype_eati,tours_pertype_visi,tours_pertype_disc)
+write.csv(indi_nm_tours_pertype, "inmtours_pertype_purpose.csv", row.names = F)
+
 
 tours_pertype_purpose <- xtabs(freq~PERTYPE+TOURPURP, tours_pertype_purpose)
 tours_pertype_purpose[is.na(tours_pertype_purpose)] <- 0
@@ -1357,9 +1485,10 @@ avgDistances <- c(mean(stops$out_dir_dist[stops$TOURPURP==1], na.rm = TRUE),
                      mean(stops$out_dir_dist[stops$TOURPURP>=7 & stops$TOURPURP<=9], na.rm = TRUE),
                      mean(jstops$out_dir_dist[jstops$TOURPURP>=5 & jstops$TOURPURP<=6], na.rm = TRUE),
                      mean(jstops$out_dir_dist[jstops$TOURPURP>=7 & jstops$TOURPURP<=9], na.rm = TRUE),
-                     mean(stops$out_dir_dist[stops$TOURPURP==10], na.rm = TRUE))
+                     mean(stops$out_dir_dist[stops$TOURPURP==10], na.rm = TRUE),
+                  mean(stops$out_dir_dist, na.rm = TRUE))
 
-purp <- c("work", "univ", "sch", "esco","imain", "idisc", "jmain", "jdisc", "atwork")
+purp <- c("work", "univ", "sch", "esco","imain", "idisc", "jmain", "jdisc", "atwork", "total")
 
 avgStopOutofDirectionDist <- data.frame(purpose = purp, avgDist = avgDistances)
 

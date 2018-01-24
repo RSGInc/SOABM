@@ -1,1 +1,0 @@
-Template full model setup

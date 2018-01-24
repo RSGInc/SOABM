@@ -848,7 +848,7 @@ p1 <- ggplot(counts_df, aes(x=x, y=y, color=OCCTYPE)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = 100, y = y_pos,label=V1),  parse = TRUE) + 
   geom_text(x = 1250, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="Employment", y="Workers")
+  labs(x="Workers", y="Employment")
 p1 <- plotly_build(p1)
 p1
 
@@ -1494,7 +1494,7 @@ Chart Column 1{data-width=150}
 
 ### Tour Mode Choice
 ```{r tourMode}
-base_df <- base_data[[which(base_csv_names=="tmodeProfile_vis")]]
+base_df <- base_data[[which(base_csv_names=="tmodeProfile_vis_OBS")]]
 base_df$purpose <- as.character(base_df$purpose)
 base_df$purpose <- purpose_type_df$name[match(base_df$purpose, purpose_type_df$code)]
 build_df <- build_data[[which(build_csv_names=="tmodeProfile_vis")]]
@@ -1820,7 +1820,7 @@ Distribution of trips by trip mode and tour mode, which constrains the availabil
 
 ### Trip Mode Choice
 ```{r tripMode}
-base_df <- base_data[[which(base_csv_names=="tripModeProfile_vis")]]
+base_df <- base_data[[which(base_csv_names=="tripModeProfile_vis_OBS")]]
 build_df <- build_data[[which(build_csv_names=="tripModeProfile_vis")]]
 colnames(build_df) <- colnames(base_df)
 
@@ -2049,7 +2049,7 @@ Comparison of observed counts and assigned volumes on each link with a counted v
 Chart Column 2{.tabset}
 --------------------------------------------
 
-### Count vs Volume by Facility Type{data-height=575}
+### AM Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol4}
 if(IS_BASE_SURVEY=="Yes"){
   # both count and volume summaries for count_locations are in base summary folder
@@ -2077,9 +2077,9 @@ p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) +
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 50, y = y_pos,label=V1),  parse = TRUE) + 
+  geom_text(data = eq, aes(x = 250, y = y_pos,label=V1),  parse = TRUE) + 
   geom_text(x = 1500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="AM Counts", y="AM Volume")
 p1 <- plotly_build(p1)
 p1
 
@@ -2089,7 +2089,7 @@ p2 <- ggplot(counts_df, aes(x=x, y=y)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(x = 250, y = 2200,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
   geom_text(x = 1500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="AM Counts", y="AM Volume")
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2179,12 +2179,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ```
 
-### Count vs Volume - All Links{data-height=575}
+### AM Count vs Volume - All Links{data-height=575}
 ```{r count_vol5}
 p2
 ```
 
-### Gap Statistics{data-height=575}
+### AM Gap Statistics{data-height=575}
 ```{r count_vol6}
 summary <- rbind(gap_summary, gap_summary2)
 colnames(summary) <- c("GapRange", "Interstate", "Ramp", "HOV_Toll", "Arterial", "Collector", "Total", 
@@ -2229,7 +2229,7 @@ Comparison of observed counts and assigned volumes on each link with a counted v
 Chart Column 2{.tabset}
 --------------------------------------------
 
-### Count vs Volume by Facility Type{data-height=575}
+### MD Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol7}
 if(IS_BASE_SURVEY=="Yes"){
   # both count and volume summaries for count_locations are in base summary folder
@@ -2259,7 +2259,7 @@ p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = 1000, y = y_pos,label=V1),  parse = TRUE) + 
   geom_text(x = 10000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="MD Counts", y="MD Volume")
 p1 <- plotly_build(p1)
 p1
 
@@ -2269,7 +2269,7 @@ p2 <- ggplot(counts_df, aes(x=x, y=y)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(x = 1000, y = 6000,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
   geom_text(x = 10000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="MD Counts", y="MD Volume")
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2359,12 +2359,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ```
 
-### Count vs Volume - All Links{data-height=575}
+### MD Count vs Volume - All Links{data-height=575}
 ```{r count_vol8}
 p2
 ```
 
-### Gap Statistics{data-height=575}
+### MD Gap Statistics{data-height=575}
 ```{r count_vol9}
 summary <- rbind(gap_summary, gap_summary2)
 colnames(summary) <- c("GapRange", "Interstate", "Ramp", "HOV_Toll", "Arterial", "Collector", "Total", 
@@ -2409,7 +2409,7 @@ Comparison of observed counts and assigned volumes on each link with a counted v
 Chart Column 2{.tabset}
 --------------------------------------------
 
-### Count vs Volume by Facility Type{data-height=575}
+### PM Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol10}
 if(IS_BASE_SURVEY=="Yes"){
   # both count and volume summaries for count_locations are in base summary folder
@@ -2439,7 +2439,7 @@ p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = 250, y = y_pos,label=V1),  parse = TRUE) + 
   geom_text(x = 3000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="PM Counts", y="PM Volume")
 p1 <- plotly_build(p1)
 p1
 
@@ -2449,7 +2449,7 @@ p2 <- ggplot(counts_df, aes(x=x, y=y)) +
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(x = 500, y = 2000,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
   geom_text(x = 3000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x="PM Counts", y="PM Volume")
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2539,12 +2539,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ```
 
-### Count vs Volume - All Links{data-height=575}
+### PM Count vs Volume - All Links{data-height=575}
 ```{r count_vol11}
 p2
 ```
 
-### Gap Statistics{data-height=575}
+### PM Gap Statistics{data-height=575}
 ```{r count_vol12}
 summary <- rbind(gap_summary, gap_summary2)
 colnames(summary) <- c("GapRange", "Interstate", "Ramp", "HOV_Toll", "Arterial", "Collector", "Total", 
@@ -2593,6 +2593,8 @@ if(IS_BASE_SURVEY!="Yes"){
   base_df <- base_data[[which(base_csv_names=="vmtSummary")]]
   df <- base_df
   colnames(df) <- c("TOD", "SOV","HOV2","HOV3", "Truck", "Total")
+  df_per <- df
+  df_per[,sapply(df,is.numeric)] <- df_per[,sapply(df,is.numeric)]/df_per[,c("Total")]*100
   
   eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'r', format.args = list(big.mark = ',')) %>%
     kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
@@ -2603,25 +2605,102 @@ if(IS_BASE_SURVEY!="Yes"){
 
 ```
 
+### {data-height=280}
+```{r Table2_VMT}
+if(IS_BASE_SURVEY!="Yes"){
+  cat("Vehicle Miles Traveled: ", BASE_SCENARIO_NAME, " - Percentages")
+
+  eval_expr <- paste("t2 <- kable(df_per, format = 'html', digits = 1, row.names = F, align = 'r', format.args = list(big.mark = ',')) %>%
+    kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+    add_header_above(c(' ' = 1, '", BASE_SCENARIO_NAME, "' = 5))", sep = "")
+  eval(parse(text = eval_expr))
+  t2
+}
+
+```
+
+
 Chart Column 1
 --------------------------------------------
 
 ### {data-height=280}
-```{r Table2_VMT}
+```{r Table3_VMT}
 cat("Vehicle Miles Traveled: ", BUILD_SCENARIO_NAME)
 
 build_df <- build_data[[which(build_csv_names=="vmtSummary")]]
 df <- build_df
 colnames(df) <- c("TOD", "SOV","HOV2","HOV3", "Truck", "Total")
+df_per <- df
+df_per[,sapply(df,is.numeric)] <- df_per[,sapply(df,is.numeric)]/df_per[,c("Total")]*100
 
-eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'r', format.args = list(big.mark = ',')) %>%
+eval_expr <- paste("t3 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'r', format.args = list(big.mark = ',')) %>%
   kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
   add_header_above(c(' ' = 1, '", BUILD_SCENARIO_NAME, "' = 5))", sep = "")
+eval(parse(text = eval_expr))
+t3
+```
+
+### {data-height=280}
+```{r Table4_VMT}
+cat("Vehicle Miles Traveled: ", BUILD_SCENARIO_NAME, " - Percentages")
+
+eval_expr <- paste("t4 <- kable(df_per, format = 'html', digits = 1, row.names = F, align = 'r', format.args = list(big.mark = ',')) %>%
+  kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+  add_header_above(c(' ' = 1, '", BUILD_SCENARIO_NAME, "' = 5))", sep = "")
+eval(parse(text = eval_expr))
+t4
+```
+
+
+Transit Boardings{data-navmenu="Assignment"}
+============================================
+
+Description {.sidebar data-width=225}
+--------------------------------------------
+
+**Transit Boardings **
+
+Daily transit boardings by route
+
+
+
+Chart Column 1
+--------------------------------------------
+
+### 
+```{r Table1_transit}
+
+cat("Transit Boardings:", BASE_SCENARIO_NAME)
+base_df <- base_data[[which(base_csv_names=="transitBoardingSummary")]]
+df <- base_df
+
+eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+  kable_styling('striped', font_size = 10, full_width=F, position='center') %>%
+  add_header_above(c(' ' = 1, '", BASE_SCENARIO_NAME, "' = ", ncol(df)-1,"))", sep = "")
+eval(parse(text = eval_expr))
+t1
+
+
+```
+
+
+### 
+```{r Table2_transit}
+cat("Transit Boardings:", BUILD_SCENARIO_NAME)
+
+build_df <- build_data[[which(build_csv_names=="transitBoardingSummary")]]
+df <- build_df
+
+eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+  kable_styling('striped', font_size = 10, full_width=F, position='center') %>%
+  add_header_above(c(' ' = 1, '", BUILD_SCENARIO_NAME, "' = ", ncol(df)-1, "))", sep = "")
 eval(parse(text = eval_expr))
 t1
 ```
 
-CVM{data-navmenu="Aggregate"}
+
+
+CVM Trips{data-navmenu="Aggregate"}
 ============================================
 
 Description {.sidebar data-width=225}
@@ -2676,7 +2755,63 @@ eval(parse(text = eval_expr))
 t1
 ```
 
-External{data-navmenu="Aggregate"}
+CVM VMT{data-navmenu="Aggregate"}
+============================================
+
+Description {.sidebar data-width=225}
+--------------------------------------------
+
+**CVM VMT**
+
+Total VMT by time of day and mode, computed using SOV-AM distance skim
+
+
+
+Chart Column 1
+--------------------------------------------
+
+### {data-height=280}
+```{r Table3_cvm}
+if(IS_BASE_SURVEY!="Yes"){
+  cat("CVM VMT:", BASE_SCENARIO_NAME)
+
+  base_df <- base_data[[which(base_csv_names=="cvm_vmt_summary")]]
+  df <- base_df
+  colnames(df) <- c("TOD", "Car","Multi-Unit Truck","Single-Unit Truck", "Total")
+  df$TOD <- factor(df$TOD, levels = aggTimePeriods)
+  df <- df[order(df$TOD),]
+  
+  eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+    kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+    add_header_above(c(' ' = 1, '", BASE_SCENARIO_NAME, "' = 4))", sep = "")
+  eval(parse(text = eval_expr))
+  t1
+}
+
+```
+
+Chart Column 1
+--------------------------------------------
+
+### {data-height=280}
+```{r Table4_cvm}
+cat("CVM VMT:", BUILD_SCENARIO_NAME)
+
+build_df <- build_data[[which(build_csv_names=="cvm_vmt_summary")]]
+df <- build_df
+colnames(df) <- c("TOD", "Car","Multi-Unit Truck","Single-Unit Truck", "Total")
+df$TOD <- factor(df$TOD, levels = aggTimePeriods)
+df <- df[order(df$TOD),]
+
+eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+  kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+  add_header_above(c(' ' = 1, '", BUILD_SCENARIO_NAME, "' = 4))", sep = "")
+eval(parse(text = eval_expr))
+t1
+```
+
+
+External Trips{data-navmenu="Aggregate"}
 ============================================
 
 Description {.sidebar data-width=225}
@@ -2717,6 +2852,59 @@ if(IS_BASE_SURVEY!="Yes"){
 cat("External Trips:", BUILD_SCENARIO_NAME)
 
 build_df <- build_data[[which(build_csv_names=="ext_summary")]]
+df <- build_df
+colnames(df) <- c("TOD", "HBCOLL","HBO","HBR", "HBS", "HBSCH", "HBW", "NHBNW", "NHBW", "Truck", "Total")
+df$TOD <- factor(df$TOD, levels = aggTimePeriods)
+df <- df[order(df$TOD),]
+
+eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+  kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+  add_header_above(c(' ' = 1, '", BUILD_SCENARIO_NAME, "' = 10))", sep = "")
+eval(parse(text = eval_expr))
+t1
+```
+
+External VMT{data-navmenu="Aggregate"}
+============================================
+
+Description {.sidebar data-width=225}
+--------------------------------------------
+
+**External VMT**
+
+Total VMT by time of day and purpose, computed using SOV-AM distance skim
+
+
+
+Chart Column 1
+--------------------------------------------
+
+### {data-height=280}
+```{r Table3_ext}
+if(IS_BASE_SURVEY!="Yes"){
+  cat("External VMT:", BASE_SCENARIO_NAME)
+
+  base_df <- base_data[[which(base_csv_names=="ext_vmt_summary")]]
+  df <- base_df
+  colnames(df) <- c("TOD", "HBCOLL","HBO","HBR", "HBS", "HBSCH", "HBW", "NHBNW", "NHBW", "Truck", "Total")
+  df$TOD <- factor(df$TOD, levels = aggTimePeriods)
+  df <- df[order(df$TOD),]
+  
+  eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
+    kable_styling('striped', font_size = 12, full_width=F, position='center') %>%
+    add_header_above(c(' ' = 1, '", BASE_SCENARIO_NAME, "' = 10))", sep = "")
+  eval(parse(text = eval_expr))
+  t1
+}
+
+```
+
+
+### {data-height=280}
+```{r Table4_ext}
+cat("External VMT:", BUILD_SCENARIO_NAME)
+
+build_df <- build_data[[which(build_csv_names=="ext_vmt_summary")]]
 df <- build_df
 colnames(df) <- c("TOD", "HBCOLL","HBO","HBR", "HBS", "HBSCH", "HBW", "NHBNW", "NHBW", "Truck", "Total")
 df$TOD <- factor(df$TOD, levels = aggTimePeriods)
