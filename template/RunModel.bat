@@ -135,9 +135,9 @@ CALL application\killjava
 
 %PYTHON% scripts\SOABM.py taz_skim
 
-%PYTHON% scripts\SOABM.py generate_html_inputs
-
 %PYTHON% scripts\SOABM.py tap_skim
+
+%PYTHON% scripts\SOABM.py generate_html_inputs
 
 :: -------------------------------------------------------------------------------------------------
 :: Loop again if needed

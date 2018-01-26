@@ -82,7 +82,7 @@ df2 <- melt(df2, id = c("MAZ"))
 colnames(df2) <- c("MAZ", "occp", "value")
 
 df <- cbind(df1, df2$value)
-colnames(df) <- c("MAZ", "occp", "jobs", "workers")
+colnames(df) <- c("MAZ", "occp", "workers", "jobs")
 
 
 ### Write outputs
