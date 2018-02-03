@@ -345,15 +345,9 @@ public class DcUtilitiesTaskJppf extends JPPFTask implements Callable<List<Objec
                 // determine the best transit path, which also stores the best utilities array and the best mode
                 bestPathCalculator.findBestWalkTransitWalkTaps(walkDmu, TransitWalkAccessUEC.MD, iMgra, jMgra, false, logger);
                 
-                // sum the exponentiated utilities over modes
-                double opWTExpUtility = 0;
-                double[] walkTransitWalkUtilities = bestPathCalculator.getBestUtilities();
-                for (int k=0; k < walkTransitWalkUtilities.length; k++){
-                    if ( walkTransitWalkUtilities[k] > MIN_EXP_FUNCTION_ARGUMENT )
-                        opWTExpUtility += Math.exp(walkTransitWalkUtilities[k]);
-                }
-
-
+                // get the sum the exponentiated utilities over modes
+                double opWTExpUtility = bestPathCalculator.getSumExpUtilities();
+                
                 double pkSovExpUtility = 0;
                 double pkHovExpUtility = 0;
                 try
@@ -373,13 +367,8 @@ public class DcUtilitiesTaskJppf extends JPPFTask implements Callable<List<Objec
                 bestPathCalculator.findBestWalkTransitWalkTaps(walkDmu, TransitWalkAccessUEC.AM, iMgra, jMgra, false, logger);
                 
                 // sum the exponentiated utilities over modes
-                double pkWTExpUtility = 0;
-                walkTransitWalkUtilities = bestPathCalculator.getBestUtilities();
-                for (int k=0; k < walkTransitWalkUtilities.length; k++){
-                    if ( walkTransitWalkUtilities[k] > MIN_EXP_FUNCTION_ARGUMENT )
-                        pkWTExpUtility += Math.exp(walkTransitWalkUtilities[k]);
-                }
-
+                double pkWTExpUtility = bestPathCalculator.getSumExpUtilities();
+               
                 double nmExpUtility = 0;
                 try
                 {

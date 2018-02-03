@@ -1158,12 +1158,8 @@ public class ParkingLotChoiceModel {
     	double[][] bestTaps = bestPathCalculator.getBestTapPairs(walkDmu, null, bestPathCalculator.WTW, lotTaz, destinationTaz, TransitWalkAccessUEC.MD, household.getDebugChoiceModels(), logger);
     	
     	// sum the exponentiated utilities over modes
-    	double opWTExpUtility = 0;
-    	double[] walkTransitWalkUtilities = bestPathCalculator.getBestUtilities();
-    	for (int k=0; k < walkTransitWalkUtilities.length; k++){
-    		if ( walkTransitWalkUtilities[k] > -500 )
-             opWTExpUtility += Math.exp(walkTransitWalkUtilities[k]);
-    	}
+    	double opWTExpUtility = bestPathCalculator.getSumExpUtilities();
+
     	double lotToDestinationTransitExpUtility = Math.exp(transitConstant) * opWTExpUtility;
 		double lotToDestinationWalkExpUtility = ntUtilities.getNMotorExpUtility(lotTaz,destinationTaz, ntUtilities.OFFPEAK_PERIOD_INDEX);
 	
