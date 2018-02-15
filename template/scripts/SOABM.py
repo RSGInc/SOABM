@@ -2,6 +2,7 @@
 #Southern Oregon ABM VISUM Functions
 #Ben Stabler, ben.stabler@rsginc.com, 04/06/15
 #Requires the OMX Import/Export Add-In to be installed
+
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py taz_initial
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py maz_initial
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py tap_initial
@@ -11,6 +12,8 @@
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py build_trip_matrices 1.0 1
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py taz_skim
 #"C:\Program Files\Python27\python.exe" scripts\SOABM.py tap_skim
+#"C:\Program Files\Python27\python.exe" scripts\SOABM.py generate_html_inputs
+
 ############################################################
 
 #import libraries
@@ -18,6 +21,8 @@ import os, shutil, sys, time, csv
 sys.path.append("C:/Program Files/PTV Vision/PTV Visum 16/Exe/PythonModules")
 import win32com.client as com
 import VisumPy.helpers, omx, numpy
+import VisumPy.csvHelpers
+import traceback
 
 ############################################################
 
@@ -641,7 +646,10 @@ def setLinkCapacityTODFactors(Visum):
   
   #set factors
   for i in range(len(tods)):
-    Visum.Net.SetAttValue("TOD_FACTOR_" + tods[i], factors[i])
+    attName = "TOD_FACTOR_" + tods[i]
+    if attName not in map(lambda x: x.Code,Visum.Net.Attributes.GetAll):
+      Visum.Net.AddUserDefinedAttribute(attName,attName,attName,2)
+    Visum.Net.SetAttValue(attName, factors[i])
     
 def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
@@ -1412,7 +1420,303 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     parks = tapParks[i]
     f.write("%i,%i\n" % (tap,parks))
   f.close()
+
+def prepVDFData(Visum, tp, vdfLookupTableFileName):
+
+  #through capacity per lane by fc
+  thru_cap_per_lane = dict()
+  thru_cap_per_lane["1"] = 1950
+  thru_cap_per_lane["3"] = 1800
+  thru_cap_per_lane["4"] = 1800
+  thru_cap_per_lane["5"] = 1400
+  thru_cap_per_lane["6"] = 1400
+  thru_cap_per_lane["7"] = 1400
+  thru_cap_per_lane["30"] = 1400
   
+  freeway_cap_per_auxlane = 1200
+  progression_factor = 1.0
+  
+  #turn capacity by fc
+  turn_cap_per_lane = dict()
+  turn_cap_per_lane["1"] = 250
+  turn_cap_per_lane["3"] = 250
+  turn_cap_per_lane["4"] = 150
+  turn_cap_per_lane["5"] = 100
+  turn_cap_per_lane["6"] = 100
+  turn_cap_per_lane["7"] = 100
+  turn_cap_per_lane["30"] = 100
+  
+  int_app_cap_per_lane = 1800
+  
+  #intersection vdf lookup table
+  #PLANNO,VALUE,1,3,4,5,6,7,30
+  #1,gc4leg,0.35,0.39,0.5,0.56,0.56,0.63,0.47
+  vdf_lookup_table = VisumPy.csvHelpers.readCSV(vdfLookupTableFileName)
+  vdf_lookup = dict()
+  for i in range(1,len(vdf_lookup_table)):
+    for j in range(2,len(vdf_lookup_table[0])):
+      key = vdf_lookup_table[i][0] + ";" + vdf_lookup_table[i][1] + ";" + vdf_lookup_table[0][j]
+      vdf_lookup[key] = float(vdf_lookup_table[i][j])
+  
+  #get time period hourly factor
+  tp_factor = Visum.Net.AttValue("TOD_FACTOR_" + tp)
+
+  print("get link and node data")
+  
+  fn = VisumPy.helpers.GetMulti(Visum.Net.Links, "FROMNODENO")
+  tn = VisumPy.helpers.GetMulti(Visum.Net.Links, "TONODENO")
+  planNo = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+  
+  lanes = VisumPy.helpers.GetMulti(Visum.Net.Links, "NUMLANES")
+  al = numpy.nan_to_num(numpy.array(VisumPy.helpers.GetMulti(Visum.Net.Links, "AUX_LANES"), dtype=float))
+  m = VisumPy.helpers.GetMulti(Visum.Net.Links, "MEDIAN")
+  
+  toMainNo = map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation"))
+    
+  #regular node
+  rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\NumLegs")
+  rn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\ControlType")
+  rn_tnOrient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeOrientation")
+  rn_tnMajFlw1 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\MajorFlowOri1")
+  rn_tnMajFlw2 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\MajorFlowOri2")
+  
+  rn_tnode_fcs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\Concatenate:InLinks\PlanNo")
+  rn_tnode_orient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\Concatenate:InLinks\ToNodeOrientation")
+  rn_tnode_fnorient = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutTurns\ToLink\FromNodeOrientation")
+  rn_tnode_turnorient = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutTurns\Orientation")
+  rn_tnode_laneturn_orients = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutTurns\Concatenate:LaneTurns\ToOrientation")
+  rn_tnode_laneturn_laneno = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutTurns\Concatenate:LaneTurns\FromLaneNo")
+  
+  #main node
+  mn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\NumLegs")
+  mn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\ControlType")
+  mn_tnOrient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeOrientation") #Not main node since these don't always make sense
+  mn_tnMajFlw1 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\MajorFlowOri1")
+  mn_tnMajFlw2 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\MajorFlowOri2")
+  
+  mn_tnode_fcs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\Concatenate:InLinks\PlanNo")
+  mn_tnode_orient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\Concatenate:InLinks\ToNodeOrientation") #Not main node since these don't always make sense
+  mn_tnode_fnorient = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutMainTurns\ToLink\FromMainNodeOrientation")
+  mn_tnode_turnorient = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutMainTurns\Orientation")
+  mn_tnode_laneturn_orients = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutMainTurns\Concatenate:LaneTurns\ToOrientation")
+  mn_tnode_laneturn_laneno = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutMainTurns\Concatenate:LaneTurns\FromLaneNo")
+ 
+  #regular or main node temp fields
+  numlegs = [0]*len(planNo)
+  cType = [0]*len(planNo)
+  tnOrient = [0]*len(planNo)
+  tnMajFlw1  = [0]*len(planNo)
+  tnMajFlw2 = [0]*len(planNo)
+  tnode_fcs = [0]*len(planNo)
+  tnode_orient = [0]*len(planNo)
+  tnode_fnorient = [0]*len(planNo)
+  tnode_turnorient = [0]*len(planNo)
+  tnode_laneturn_orients = [0]*len(planNo)
+  tnode_laneturn_laneno = [0]*len(planNo)
+
+  #calculated fields
+  int_fc = [0]*len(planNo) #intersecting facility type
+  rl = [0]*len(planNo) #out exclusive right lanes
+  tl = [0]*len(planNo) #out shared or exclusive thru lanes
+  ll = [0]*len(planNo) #out exclusive left lanes
+  mid_link_cap = [0]*len(planNo) #mid link capacity
+  unc_sig_delay = [0]*len(planNo) #uncongested signal delay
+  int_cap = [0]*len(planNo) #intersection capacity
+  
+  #additional output fields
+  if "int_fc" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("int_fc","int_fc","int_fc",2)
+  if "rl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("rl","rl","rl",2)
+  if "tl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("tl","tl","tl",2)
+  if "ll" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("ll","ll","ll",2)
+  if "mid_link_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("mid_link_cap","mid_link_cap","mid_link_cap",2)
+  if "unc_sig_delay" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("unc_sig_delay","unc_sig_delay","unc_sig_delay",2)
+  if "int_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("int_cap","int_cap","int_cap",2)
+  
+  print("loop through links")
+  
+  try:
+    
+    for i in range(len(planNo)):
+      
+      if toMainNo[i]:  #main node
+        
+        numlegs[i] = mn_numlegs[i]
+        cType[i] = mn_cType[i]
+        tnOrient[i] = mn_tnOrient[i]
+        tnMajFlw1[i] = mn_tnMajFlw1[i]
+        tnMajFlw2[i] = mn_tnMajFlw2[i]
+        
+        tnode_fcs[i] = mn_tnode_fcs[i]
+        tnode_orient[i] = mn_tnode_orient[i]
+        tnode_fnorient[i] = mn_tnode_fnorient[i]
+        tnode_turnorient[i] = mn_tnode_turnorient[i]
+        tnode_laneturn_orients[i] = mn_tnode_laneturn_orients[i]
+        tnode_laneturn_laneno[i] = mn_tnode_laneturn_laneno[i]
+      
+      else: #regular node
+      
+        numlegs[i] = rn_numlegs[i]
+        cType[i] = rn_cType[i]
+        tnOrient[i] = rn_tnOrient[i]
+        tnMajFlw1[i] = rn_tnMajFlw1[i]
+        tnMajFlw2[i] = rn_tnMajFlw2[i]
+        
+        tnode_fcs[i] = rn_tnode_fcs[i]
+        tnode_orient[i] = rn_tnode_orient[i]
+        tnode_fnorient[i] = rn_tnode_fnorient[i]
+        tnode_turnorient[i] = rn_tnode_turnorient[i]
+        tnode_laneturn_orients[i] = rn_tnode_laneturn_orients[i]
+        tnode_laneturn_laneno[i] = rn_tnode_laneturn_laneno[i]
+
+      #skip if link closed
+      if tnOrient[i] == 0 or planNo[i] == 998:
+        continue
+        
+      mlc = thru_cap_per_lane[str(int(planNo[i]))]
+      if planNo[i] == 1: #interstate
+        mid_link_cap[i] = lanes[i] * mlc + al[i] * freeway_cap_per_auxlane
+      else:
+        mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
+      mid_link_cap[i] = mid_link_cap[i] * tp_factor #convert from hourly to time period
+                
+      if numlegs[i] >= 3:
+        
+        #get to node incoming link orientations and facility types
+        int_fcs = tnode_fcs[i].split(",")
+        int_orients = tnode_orient[i].split(",")
+
+        #skip if not a real intersection
+        while '998' in int_fcs:
+          index = int_fcs.index('998')
+          int_fcs.pop(index)
+          int_orients.pop(index)
+          if len(int_fcs) < 3:
+            continue
+            
+        #if all same or just one different
+        if len(set(int_fcs)) == 1:
+          int_fc[i] = list(int_fcs)[0]
+          
+        elif len(set(int_fcs)) == 2:
+          int_fcs.remove(str(int(planNo[i])))
+          int_fc[i] = list(int_fcs)[0]
+          
+        else:
+          #buid lookup and calculate based on compass orientation
+          tonode_lookup = dict( zip(int_orients, int_fcs) )
+          
+          #code intersecting fc
+          if tnOrient[i] in [15,1,3,11,9,7]: #NW,N,NE,SW,S,SE
+            west, east = 999,999
+            if tonode_lookup.has_key('ORIENTATIONWEST'):
+              west = int(tonode_lookup['ORIENTATIONWEST'])
+            if tonode_lookup.has_key('ORIENTATIONEAST'):
+              east = int(tonode_lookup['ORIENTATIONEAST'])
+            int_fc[i] = min(west, east) #take higher order fc
+
+          if tnOrient[i] in [5,13]: #E,W
+            north, south = 999,999
+            if tonode_lookup.has_key('ORIENTATIONNORTH'):
+              north = int(tonode_lookup['ORIENTATIONNORTH'])
+            if tonode_lookup.has_key('ORIENTATIONNORTHEAST'):
+              north = int(tonode_lookup['ORIENTATIONNORTHEAST'])
+            if tonode_lookup.has_key('ORIENTATIONNORTHWEST'):
+              north = int(tonode_lookup['ORIENTATIONNORTHWEST'])
+            if tonode_lookup.has_key('ORIENTATIONSOUTH'):
+              south = int(tonode_lookup['ORIENTATIONSOUTH'])
+            if tonode_lookup.has_key('ORIENTATIONSOUTHEAST'):
+              south = int(tonode_lookup['ORIENTATIONSOUTHEAST'])
+            if tonode_lookup.has_key('ORIENTATIONSOUTHWEST'):
+              south = int(tonode_lookup['ORIENTATIONSOUTHWEST'])
+            int_fc[i] = min(north, south) #take higher order fc
+
+        #determine cycle length and gcratio
+        if cType[i] == 1: #0=unknown,1=uncontrolled,2=twowaystop,3=signal,4=allwaystop,5=roundabout,6=twowayyield
+            continue
+        elif cType[i] == 2:
+          if tnOrient[i] not in [tnMajFlw1[i], tnMajFlw2[i]]: #not major flow link, i.e. stop controlled
+            gc_type = "stop" 
+        elif cType[i] == 3:
+          gc_type = "gc3leg" if numlegs[i] == 3 else "gc4leg"
+        elif cType[i] == 4:
+          gc_type = "stop"
+        elif cType[i] == 5:
+          gc_type = "roundabout"
+        cyclelength = vdf_lookup[str(int(planNo[i])) + ";cyclelength;" + str(int_fc[i])]
+        gc = vdf_lookup[str(int(planNo[i])) + ";" + gc_type + ";" + str(int_fc[i])]
+
+        unc_sig_delay[i] = progression_factor * (cyclelength / 2) * (1 - gc)**2
+        unc_sig_delay[i] = unc_sig_delay[i] * 100 #scale up since AddVal2 only supports ints
+                        
+        #right lanes, thru lanes, left lanes at intersection
+        int_fnorient = tnode_fnorient[i].split(",")
+        int_turno = tnode_turnorient[i].split(",")
+        int_lturns_orient = tnode_laneturn_orients[i].split(",")
+        int_lturns_laneno = tnode_laneturn_laneno[i].split(",")
+        
+        #assign L,T,R to lane turns
+        int_lturns_ltr = [0]*len(int_lturns_laneno) #lane turns by L,T,R
+        for j in range(len(int_turno)):
+          nchar = len(int_turno[j])
+          if int_turno[j][(nchar-1):nchar] == "R": #right
+            for k in range(len(int_lturns_orient)):
+              if int_lturns_orient[k] == int_fnorient[j]:
+                int_lturns_ltr[k] = "R"
+          if int_turno[j][(nchar-1):nchar] == "T": #thru
+            for k in range(len(int_lturns_orient)):
+              if int_lturns_orient[k] == int_fnorient[j]:
+                int_lturns_ltr[k] = "T"
+          if int_turno[j][(nchar-1):nchar] == "L": #left
+            for k in range(len(int_lturns_orient)):
+              if int_lturns_orient[k] == int_fnorient[j]:
+                int_lturns_ltr[k] = "L"
+        
+        #count up lanes by movement
+        laneno_ltr = dict()
+        for j in range(len(int_lturns_laneno)):
+          if laneno_ltr.has_key(int_lturns_laneno[j]):
+            laneno_ltr[int_lturns_laneno[j]] = laneno_ltr[int_lturns_laneno[j]] + "," + str(int_lturns_ltr[j])
+          else:
+            laneno_ltr[int_lturns_laneno[j]] = str(int_lturns_ltr[j])
+        for j in laneno_ltr.keys():
+          if "R" in laneno_ltr[j] and "T" not in laneno_ltr[j] and "L" not in laneno_ltr[j]: #exclusive
+            rl[i] = rl[i] + 1
+          if "T" in laneno_ltr[j]: #shared ok
+            tl[i] = tl[i] + 1
+          if "R" not in laneno_ltr[j] and "T" not in laneno_ltr[j] and "L" in laneno_ltr[j]: #exclusive
+            ll[i] = ll[i] + 1
+
+        tlf = turn_cap_per_lane[str(int(planNo[i]))]
+        int_cap[i] = gc * (tl[i] * int_app_cap_per_lane + (rl[i] + ll[i]) * tlf)
+        int_cap[i] = int_cap[i] * tp_factor #convert from hourly to time period
+                
+  except Exception as e:
+      traceback.print_exc()
+      print("link fn=" + str(int(fn[i])) + " tn=" + str(int(tn[i])))
+  
+  #set results  
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_fc", int_fc)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "rl", rl)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "tl", tl)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "ll", ll)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "mid_link_cap", mid_link_cap)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "unc_sig_delay", unc_sig_delay)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_cap", int_cap)
+  
+  print("set results in version file")
+  
+  #set TYPENO = PLANNO for VDF parameter lookup in procedures
+  #para_a is midlink a, para_b is midlink b, para_a2 is intersection a, para_b2 is intersection b
+  planNo = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "TYPENO", planNo)
+ 
 ############################################################
 
 if __name__== "__main__":
@@ -1455,8 +1759,9 @@ if __name__== "__main__":
     Visum = startVisum()
     for tp in ['ea','am','md','pm','ev']:
       loadVersion(Visum, "outputs/networks/taz_skim_initial.ver")
-      #setLinkCapacityTODFactors(Visum)
+      setLinkCapacityTODFactors(Visum)
       setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
+      prepVDFData(Visum, tp, "inputs/vdf_lookup_table.csv")
       loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
       saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
     loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
@@ -1662,3 +1967,4 @@ if __name__== "__main__":
     closeVisum(Visum)
     
   print("end model run: " + time.ctime())
+
