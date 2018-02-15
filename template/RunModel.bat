@@ -6,7 +6,7 @@
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: setup iteration sample rate
-SET MAX_ITER=1
+SET MAX_ITER=3
 SET SAMPLERATE_ITERATION1=0.1
 SET SAMPLERATE_ITERATION2=1.0
 SET SAMPLERATE_ITERATION3=1.0
