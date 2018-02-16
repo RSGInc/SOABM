@@ -78,7 +78,7 @@ double Calc (int tsysind, char tsysisopen,
              double para_a, double para_b, double para_c, double para_d, double para_f, double para_a2, double para_b2, double para_d2, double para_f2, double satcrit)
 {
 	//mid link capacity
-	double mid_link_cap = uval1;
+	double mid_link_cap = uval1 * 1.0;
 	if (mid_link_cap <= 0.0) {
 		return 10E10;
 	}
@@ -88,7 +88,7 @@ double Calc (int tsysind, char tsysisopen,
 	double unc_sig_delay = uval2 / 100.0;
 
 	//intersection congestion adjustment
-	double int_cap = uval3;
+	double int_cap = uval3 * 1.0;
 	double int_cong_adj = 1.0;
 	if (int_cap > 0.0 ) {
 		double int_cong_adj = 1.0 + para_a2 * pow((pcuvol / int_cap), para_b2);
