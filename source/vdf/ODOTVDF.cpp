@@ -91,9 +91,9 @@ double Calc (int tsysind, char tsysisopen,
 	double int_cap = uval3 * 1.0;
 	double int_cong_adj = 1.0;
 	if (int_cap > 0.0 ) {
-		double int_cong_adj = 1.0 + para_a2 * pow((pcuvol / int_cap), para_b2);
+        int_cong_adj = 1.0 + para_a2 * pow((pcuvol / int_cap), para_b2);
 	}
 	
-	//return the complete vdf
+    //return the complete vdf
     return mid_link_bpr + unc_sig_delay * int_cong_adj;
 }
