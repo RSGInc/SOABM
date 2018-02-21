@@ -1702,13 +1702,13 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
       print("link fn=" + str(int(fn[i])) + " tn=" + str(int(tn[i])))
   
   #set results  
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_fc", int_fc)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "rl", rl)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "tl", tl)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "ll", ll)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "mid_link_cap", mid_link_cap)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "unc_sig_delay", unc_sig_delay)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_cap", int_cap)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_fc", int_fc) #intersecting functional class
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "rl", rl) #exclusive right lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "tl", tl) #thru lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "ll", ll) #exclusive left lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "mid_link_cap", mid_link_cap) #mid-link capacity
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "unc_sig_delay", unc_sig_delay) #uncongested signal delay
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_cap", int_cap) #intersection capacity
   
   print("set results in version file")
   
