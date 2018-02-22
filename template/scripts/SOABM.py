@@ -1473,7 +1473,7 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   
   toMainNo = map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation"))
   
-  mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ")
+  mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ") #default to zero
   
   #regular node
   rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\NumLegs")
