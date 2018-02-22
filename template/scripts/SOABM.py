@@ -1472,7 +1472,9 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   m = VisumPy.helpers.GetMulti(Visum.Net.Links, "MEDIAN")
   
   toMainNo = map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation"))
-    
+  
+  mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ")
+  
   #regular node
   rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\NumLegs")
   rn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\ControlType")
@@ -1585,7 +1587,10 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
       else:
         mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
       mid_link_cap[i] = mid_link_cap[i] * tp_factor #convert from hourly to time period
-                
+      
+      #adjust calculated mid_link_cap by subtracting user-input adjustment
+      mid_link_cap[i] = mid_link_cap[i] - mid_link_cap_adj[i]
+      
       if numlegs[i] >= 3:
         
         #get to node incoming link orientations and facility types
