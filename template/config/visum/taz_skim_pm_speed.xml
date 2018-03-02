@@ -28,7 +28,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "MID_LINK_CAP"
+      COMMENT = "VDF_MID_LINK_CAP"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -42,7 +42,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL1"
         ONLYACTIVE = "0"
-        FORMULA = "[MID_LINK_CAP]"
+        FORMULA = "[VDF_MID_LINK_CAP]"
       />      
     </OPERATION>
     <OPERATION
@@ -50,7 +50,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "UNC_SIG_DELAY"
+      COMMENT = "VDF_UNC_SIG_DELAY"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -64,7 +64,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL2"
         ONLYACTIVE = "0"
-        FORMULA = "[UNC_SIG_DELAY]"
+        FORMULA = "[VDF_UNC_SIG_DELAY]"
       />      
     </OPERATION>
     <OPERATION
@@ -72,7 +72,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "INT_CAP"
+      COMMENT = "VDF_INT_CAP"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -86,7 +86,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL3"
         ONLYACTIVE = "0"
-        FORMULA = "[INT_CAP]"
+        FORMULA = "[VDF_INT_CAP]"
       />      
     </OPERATION>
     <OPERATION
@@ -900,7 +900,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "MID_LINK_CAP"
+      COMMENT = "VDF_MID_LINK_CAP"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -914,7 +914,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL1"
         ONLYACTIVE = "0"
-        FORMULA = "[MID_LINK_CAP]"
+        FORMULA = "[VDF_MID_LINK_CAP]"
       />      
     </OPERATION>
     <OPERATION
@@ -922,7 +922,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "UNC_SIG_DELAY"
+      COMMENT = "VDF_UNC_SIG_DELAY"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -936,7 +936,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL2"
         ONLYACTIVE = "0"
-        FORMULA = "[UNC_SIG_DELAY]"
+        FORMULA = "[VDF_UNC_SIG_DELAY]"
       />      
     </OPERATION>
     <OPERATION
@@ -944,7 +944,7 @@
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
       ACTIVE = "1"
-      COMMENT = "INT_CAP"
+      COMMENT = "VDF_INT_CAP"
       EXECUTED = "0"
       STARTTIME = ""
       ENDTIME = ""
@@ -958,7 +958,7 @@
         INCLUDESUBCATEGORIES = "0"
         RESULTATTRNAME = "ADDVAL3"
         ONLYACTIVE = "0"
-        FORMULA = "[INT_CAP]"
+        FORMULA = "[VDF_INT_CAP]"
       />      
     </OPERATION>
   </OPERATIONS>

@@ -137,13 +137,16 @@ CALL application\killjava
 
 %PYTHON% scripts\SOABM.py tap_skim
 
-%PYTHON% scripts\SOABM.py generate_html_inputs
-
 :: -------------------------------------------------------------------------------------------------
 :: Loop again if needed
 :: -------------------------------------------------------------------------------------------------
 
 IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
+
+:: -------------------------------------------------------------------------------------------------
+:: Generate inputs for HTML dashboard
+:: -------------------------------------------------------------------------------------------------
+%PYTHON% scripts\SOABM.py generate_html_inputs
 
 :: -------------------------------------------------------------------------------------------------
 :: Process ABM Outputs and generate HTML dashboard
@@ -173,3 +176,4 @@ CALL %PROJECT_DIRECTORY%\visualizer\generateDashboard %PROJECT_DIRECTORY% %BASE_
 :: -------------------------------------------------------------------------------------------------
 
 ECHO MODEL RUN COMPLETE
+PAUSE

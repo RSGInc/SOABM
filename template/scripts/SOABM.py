@@ -1434,7 +1434,7 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   thru_cap_per_lane["30"] = 1400
   
   freeway_cap_per_auxlane = 1200
-  progression_factor = 1.0
+
   
   #turn capacity by fc
   turn_cap_per_lane = dict()
@@ -1466,13 +1466,16 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   fn = VisumPy.helpers.GetMulti(Visum.Net.Links, "FROMNODENO")
   tn = VisumPy.helpers.GetMulti(Visum.Net.Links, "TONODENO")
   planNo = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+  progression_factor = VisumPy.helpers.GetMulti(Visum.Net.Links, "PROGRESSION_FACTOR")
   
   lanes = VisumPy.helpers.GetMulti(Visum.Net.Links, "NUMLANES")
   al = numpy.nan_to_num(numpy.array(VisumPy.helpers.GetMulti(Visum.Net.Links, "AUX_LANES"), dtype=float))
   m = VisumPy.helpers.GetMulti(Visum.Net.Links, "MEDIAN")
   
   toMainNo = map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation"))
-    
+  
+  mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ") #default to zero
+  
   #regular node
   rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\NumLegs")
   rn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\ControlType")
@@ -1524,20 +1527,20 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
   int_cap = [0]*len(planNo) #intersection capacity
   
   #additional output fields
-  if "int_fc" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("int_fc","int_fc","int_fc",2)
-  if "rl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("rl","rl","rl",2)
-  if "tl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("tl","tl","tl",2)
-  if "ll" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("ll","ll","ll",2)
-  if "mid_link_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("mid_link_cap","mid_link_cap","mid_link_cap",2)
-  if "unc_sig_delay" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("unc_sig_delay","unc_sig_delay","unc_sig_delay",2)
-  if "int_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
-    Visum.Net.Links.AddUserDefinedAttribute("int_cap","int_cap","int_cap",2)
+  if "vdf_int_fc" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_int_fc","vdf_int_fc","vdf_int_fc",2)
+  if "vdf_rl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_rl","vdf_rl","vdf_rl",2)
+  if "vdf_tl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_tl","vdf_tl","vdf_tl",2)
+  if "vdf_ll" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_ll","vdf_ll","vdf_ll",2)
+  if "vdf_mid_link_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_mid_link_cap","vdf_mid_link_cap","vdf_mid_link_cap",2)
+  if "vdf_unc_sig_delay" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_unc_sig_delay","vdf_unc_sig_delay","vdf_unc_sig_delay",2)
+  if "vdf_int_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+    Visum.Net.Links.AddUserDefinedAttribute("vdf_int_cap","vdf_int_cap","vdf_int_cap",2)
   
   print("loop through links")
   
@@ -1585,7 +1588,10 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
       else:
         mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
       mid_link_cap[i] = mid_link_cap[i] * tp_factor #convert from hourly to time period
-                
+      
+      #adjust calculated mid_link_cap by subtracting user-input adjustment
+      mid_link_cap[i] = mid_link_cap[i] - mid_link_cap_adj[i]
+      
       if numlegs[i] >= 3:
         
         #get to node incoming link orientations and facility types
@@ -1638,11 +1644,15 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
             int_fc[i] = min(north, south) #take higher order fc
 
         #determine cycle length and gcratio
+        if cType[i] == 0: #0=unknown
+            continue
         if cType[i] == 1: #0=unknown,1=uncontrolled,2=twowaystop,3=signal,4=allwaystop,5=roundabout,6=twowayyield
             continue
         elif cType[i] == 2:
           if tnOrient[i] not in [tnMajFlw1[i], tnMajFlw2[i]]: #not major flow link, i.e. stop controlled
             gc_type = "stop" 
+          else:
+            continue
         elif cType[i] == 3:
           gc_type = "gc3leg" if numlegs[i] == 3 else "gc4leg"
         elif cType[i] == 4:
@@ -1652,7 +1662,7 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
         cyclelength = vdf_lookup[str(int(planNo[i])) + ";cyclelength;" + str(int_fc[i])]
         gc = vdf_lookup[str(int(planNo[i])) + ";" + gc_type + ";" + str(int_fc[i])]
 
-        unc_sig_delay[i] = progression_factor * (cyclelength / 2) * (1 - gc)**2
+        unc_sig_delay[i] = progression_factor[i] * (cyclelength / 2) * (1 - gc)**2
         unc_sig_delay[i] = unc_sig_delay[i] * 100 #scale up since AddVal2 only supports ints
                         
         #right lanes, thru lanes, left lanes at intersection
@@ -1702,13 +1712,13 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
       print("link fn=" + str(int(fn[i])) + " tn=" + str(int(tn[i])))
   
   #set results  
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_fc", int_fc) #intersecting functional class
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "rl", rl) #exclusive right lanes
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "tl", tl) #thru lanes
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "ll", ll) #exclusive left lanes
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "mid_link_cap", mid_link_cap) #mid-link capacity
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "unc_sig_delay", unc_sig_delay) #uncongested signal delay
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "int_cap", int_cap) #intersection capacity
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_fc", int_fc) #intersecting functional class
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_rl", rl) #exclusive right lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_tl", tl) #thru lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_ll", ll) #exclusive left lanes
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_mid_link_cap", mid_link_cap) #mid-link capacity
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_unc_sig_delay", unc_sig_delay) #uncongested signal delay
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_cap", int_cap) #intersection capacity
   
   print("set results in version file")
   
@@ -1884,7 +1894,6 @@ if __name__== "__main__":
         tod_cnt = 0
         for tod_var in ['EA','AM','MD','PM','EV','DAILY']:
           field_name = tod_var + "_Vol_" + mode_var
-          print(field_name)
           Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
           VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
           tod_cnt = tod_cnt + 1
