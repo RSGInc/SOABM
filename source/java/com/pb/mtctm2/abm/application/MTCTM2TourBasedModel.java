@@ -301,6 +301,7 @@ public final class MTCTM2TourBasedModel
         } catch (RuntimeException e)
         {
             logger.error( "RuntimeException caught in com.pb.mtctm2.abm.application.MTCTM2TourBasedModel.main() -- exiting.", e );
+            System.exit(1);
         }
 
         logger.info("");
