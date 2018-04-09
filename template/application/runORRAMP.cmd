@@ -30,7 +30,19 @@ set PATH=%JAVA_PATH%\bin;%JAR_LOCATION%;%OLDPATH%
 rem ### Run ABM LOCAL 
 java -server -Xmx40g -cp "%CLASSPATH%" -Dlog4j.configuration=log4j.xml -Dproject.folder=%PROJECT_DIRECTORY% -Djppf.config=jppf-clientLocal.properties com.pb.mtctm2.abm.application.MTCTM2TourBasedModel orramp_out -iteration %iteration% -sampleRate %sampleRate% -sampleSeed %sampleSeed%
 ::java -server -Xmx40g -cp "%CLASSPATH%"  -Djava.library.path=%JAR_LOCATION% -Dlog4j.configuration=log4j.xml -Dproject.folder=%PROJECT_DIRECTORY% -Djppf.config=jppf-clientLocal.properties com.pb.mtctm2.abm.application.MTCTM2TourBasedModel orramp_out -iteration %iteration% -sampleRate %sampleRate% -sampleSeed %sampleSeed%
+ECHO %ERRORLEVEL%
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem ### restore saved environment variable values, and change back to original current directory
 set PATH=%OLDPATH%
 set CLASSPATH=%OLDCLASSPATH%
+
+ECHO ORRAMP COMPLETE
+GOTO END
+
+:MODEL_ERROR
+ECHO Model Failed
+PAUSE
+EXIT 1
+
+:END

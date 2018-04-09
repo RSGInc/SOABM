@@ -42,7 +42,19 @@ set PATH=%JAVA_PATH%\bin;%JAR_LOCATION%;%OLDPATH%
 rem java -Dname=p%HOST_MATRIX_PORT% -Xdebug -Xrunjdwp:transport=dt_socket,address=1049,server=y,suspend=y -server -Xmx10g -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_mtx.xml com.pb.mtctm2.abm.ctramp.MatrixDataServer -hostname %HOST_IP_ADDRESS% -port %HOST_MATRIX_PORT% -label "ORRAMP Matrix Sever"
 ECHO ***calling: %JAVA_PATH%\bin\java -Dname=p%HOST_MATRIX_PORT% -Xmx10g -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_mtx.xml com.pb.mtctm2.abm.ctramp.MatrixDataServer -hostname %HOST_IP_ADDRESS% -port %HOST_MATRIX_PORT% -label "ORRAMP Matrix Server"
 START %JAVA_PATH%\bin\java -Djava.library.path=%JAR_LOCATION% -Dname=p%HOST_MATRIX_PORT% -Xmx10g -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_mtx.xml com.pb.mtctm2.abm.ctramp.MatrixDataServer -hostname %HOST_IP_ADDRESS% -port %HOST_MATRIX_PORT% -label "ORRAMP Matrix Server"
+ECHO %ERRORLEVEL%
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem ### restore saved environment variable values, and change back to original current directory
 set PATH=%OLDPATH%
 set CLASSPATH=%OLDCLASSPATH%
+
+ECHO MtxMgr COMPLETE
+GOTO END
+
+:MODEL_ERROR
+ECHO Model Failed
+PAUSE
+EXIT 1
+
+:END

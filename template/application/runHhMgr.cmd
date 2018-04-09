@@ -38,7 +38,20 @@ rem ### Change current directory to RUNTIME, and issue the java command to run t
 ECHO ***calling: java -server -Xmx35000m -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_hh.xml com.pb.mtctm2.abm.application.SandagHouseholdDataManager2 -hostname %HOST_IP_ADDRESS% -port %HOST_PORT%
 START %JAVA_PATH%\bin\java -server -Xmx10000m -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_hh.xml com.pb.mtctm2.abm.application.SandagHouseholdDataManager2 -hostname %HOST_IP_ADDRESS% -port %HOST_PORT%
 rem java -Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y -server -Xms40000m -Xmx40000m -cp "%CLASSPATH%" -Dlog4j.configuration=log4j_hh.xml com.pb.mtctm2.abm.application.SandagHouseholdDataManager2 -hostname %HOST_IP_ADDRESS% -port %HOST_PORT%
+ECHO %ERRORLEVEL%
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
  
 rem ### restore saved environment variable values, and change back to original current directory
 set PATH=%OLDPATH%
 set CLASSPATH=%OLDCLASSPATH%
+
+ECHO HhMgr COMPLETE
+GOTO END
+
+:MODEL_ERROR
+ECHO Model Failed
+PAUSE
+EXIT 1
+
+:END
+

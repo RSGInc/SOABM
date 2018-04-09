@@ -193,7 +193,7 @@ def switchZoneSystem(Visum, zoneSystem):
     mazXs = Visum.Net.MainZones.GetMultiAttValues("Xcoord")
     mazYs = Visum.Net.MainZones.GetMultiAttValues("Ycoord")
     
-    print("create zones, add connectors, copy over UDAs, copy over polygons")
+    print("create zones, add connectors")
     for i in range(len(mazIds)):
       zoneObj = Visum.Net.AddZone(mazIds[i][1])
       zoneObj.SetAttValue("Xcoord",mazXs[i][1])
@@ -205,17 +205,18 @@ def switchZoneSystem(Visum, zoneSystem):
         nodeObj = Visum.Net.Nodes.ItemByKey(nid)
         if not Visum.Net.Connectors.ExistsByKey(nodeObj, zoneObj):
           Visum.Net.AddConnector(zoneObj, nodeObj)
-      
-      #set attributes
-      mzObj = Visum.Net.MainZones.ItemByKey(mazIds[i][1])
-      for i in Visum.Net.MainZones.Attributes.GetAll:
-        if i.category=="User-defined attributes":
-          zoneObj.SetAttValue(i.Name,mzObj.AttValue(i.Name))
-      
+
+    print("copy UDAs and polygons")
+    for i in Visum.Net.MainZones.Attributes.GetAll:
+      if i.category=="User-defined attributes":
+        attData = VisumPy.helpers.GetMulti(Visum.Net.MainZones, i.Name)
+        VisumPy.helpers.SetMulti(Visum.Net.Zones, i.Name, attData) 
+        
       #create zone polygon as well
-      zoneObj.SetAttValue("WKTSurface",mzObj.AttValue("WKTSurface"))
+      attData = VisumPy.helpers.GetMulti(Visum.Net.MainZones, "WKTSurface")
+      VisumPy.helpers.SetMulti(Visum.Net.Zones, "WKTSurface", attData)
   
-  #taps from stop areas to tazs
+  #taps from stop areas to tazs           
   if zoneSystem=="tap":
     print("taps from stop areas to tazs")
     
@@ -636,21 +637,28 @@ def writeMazDataFile(Visum, fileName):
     f.write(row[i] + "\n")
   f.close()
 
-def setLinkCapacityTODFactors(Visum):
+def setLinkCapacityTODFactors(Visum, tp):
 
-  print("set time period link capacity factors on Network")
+  print("set time period link capacities on Links and Network")
 
   #factors to convert hourly link capacities to time period capacities
-  tods =    ["EA","AM","MD","PM","EV"]
+  tods =    ["ea","am","md","pm","ev"]
   factors = [4   ,1.5 ,8   ,2   ,8.5 ]
+  capFac = factors[tods.index(tp)]
   
-  #set factors
-  for i in range(len(tods)):
-    attName = "TOD_FACTOR_" + tods[i]
-    if attName not in map(lambda x: x.Code,Visum.Net.Attributes.GetAll):
-      Visum.Net.AddUserDefinedAttribute(attName,attName,attName,2)
-    Visum.Net.SetAttValue(attName, factors[i])
-    
+  vdf_mid_link_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
+  vdf_int_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
+  
+  #set factor
+  attName = "TOD_FACTOR_" + tp
+  if attName not in map(lambda x: x.Code,Visum.Net.Attributes.GetAll):
+    Visum.Net.AddUserDefinedAttribute(attName,attName,attName,2)
+  Visum.Net.SetAttValue(attName, capFac)
+  
+  #convert from hourly to time period
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_mid_link_cap", vdf_mid_link_cap * capFac)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_cap", vdf_int_cap * capFac) 
+  
 def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
   print("set time period link speeds")
@@ -1421,7 +1429,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     f.write("%i,%i\n" % (tap,parks))
   f.close()
 
-def prepVDFData(Visum, tp, vdfLookupTableFileName):
+def prepVDFData(Visum, vdfLookupTableFileName):
 
   #through capacity per lane by fc
   thru_cap_per_lane = dict()
@@ -1457,11 +1465,8 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
     for j in range(2,len(vdf_lookup_table[0])):
       key = vdf_lookup_table[i][0] + ";" + vdf_lookup_table[i][1] + ";" + vdf_lookup_table[0][j]
       vdf_lookup[key] = float(vdf_lookup_table[i][j])
-  
-  #get time period hourly factor
-  tp_factor = Visum.Net.AttValue("TOD_FACTOR_" + tp)
 
-  print("get link and node data")
+  print("get link and node data for vdf calculation")
   
   fn = VisumPy.helpers.GetMulti(Visum.Net.Links, "FROMNODENO")
   tn = VisumPy.helpers.GetMulti(Visum.Net.Links, "TONODENO")
@@ -1587,11 +1592,7 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
         mid_link_cap[i] = lanes[i] * mlc + al[i] * freeway_cap_per_auxlane
       else:
         mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
-      mid_link_cap[i] = mid_link_cap[i] * tp_factor #convert from hourly to time period
-      
-      #adjust calculated mid_link_cap by subtracting user-input adjustment
-      mid_link_cap[i] = mid_link_cap[i] - mid_link_cap_adj[i]
-      
+
       if numlegs[i] >= 3:
         
         #get to node incoming link orientations and facility types
@@ -1705,7 +1706,6 @@ def prepVDFData(Visum, tp, vdfLookupTableFileName):
 
         tlf = turn_cap_per_lane[str(int(planNo[i]))]
         int_cap[i] = gc * (tl[i] * int_app_cap_per_lane + (rl[i] + ll[i]) * tlf)
-        int_cap[i] = int_cap[i] * tp_factor #convert from hourly to time period
                 
   except Exception as e:
       traceback.print_exc()
@@ -1735,215 +1735,262 @@ if __name__== "__main__":
   runmode = sys.argv[1].lower()
     
   print("start " + runmode + " run: " + time.ctime())
-  
   if runmode == 'maz_initial':
-    Visum = startVisum()
-    loadVersion(Visum, "inputs/SOABM.ver")
-    assignStopAreasToAccessNodes(Visum)
-    switchZoneSystem(Visum, "maz")
-    calculateDensityMeasures(Visum)
-    setSeqMaz(Visum)
-    saveVersion(Visum, "outputs/networks/maz_skim_initial.ver")
-    createAltFiles(Visum, "outputs/other")
-    writeMazDataFile(Visum, "inputs/maz_data_export.csv")
-    closeVisum(Visum)
+    try:
+      Visum = startVisum()
+      loadVersion(Visum, "inputs/SOABM.ver")
+      assignStopAreasToAccessNodes(Visum)
+      switchZoneSystem(Visum, "maz")
+      calculateDensityMeasures(Visum)
+      setSeqMaz(Visum)
+      saveVersion(Visum, "outputs/networks/maz_skim_initial.ver")
+      createAltFiles(Visum, "outputs/other")
+      writeMazDataFile(Visum, "inputs/maz_data_export.csv")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
   
   if runmode == 'maz_skim':
-    Visum = startVisum()
-    for mode in ["Walk","Bike"]:
-      loadVersion(Visum, "outputs/networks/maz_skim_initial.ver")
-      createMazToTap(Visum, mode, "outputs/skims")
-      loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".xml")
-      createNearbyMazsFile(Visum, mode, "outputs/skims")
-      saveVersion(Visum, "outputs/networks/maz_skim_" + mode + ".ver")
-    closeVisum(Visum)
+    try:
+      Visum = startVisum()
+      for mode in ["Walk","Bike"]:
+        loadVersion(Visum, "outputs/networks/maz_skim_initial.ver")
+        createMazToTap(Visum, mode, "outputs/skims")
+        loadProcedure(Visum, "config/visum/maz_skim_" + mode + ".xml")
+        createNearbyMazsFile(Visum, mode, "outputs/skims")
+        saveVersion(Visum, "outputs/networks/maz_skim_" + mode + ".ver")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
     
   if runmode == 'taz_initial':
-    Visum = startVisum()
-    loadVersion(Visum, "inputs/SOABM.ver")
-    #codeTAZConnectors(Visum) #TAZ connectors input in master version file
-    saveVersion(Visum, "outputs/networks/taz_skim_initial.ver")
-    closeVisum(Visum)
-    
+    try:
+      Visum = startVisum()
+      loadVersion(Visum, "inputs/SOABM.ver")
+      #codeTAZConnectors(Visum) #TAZ connectors input in master version file
+      saveVersion(Visum, "outputs/networks/taz_skim_initial.ver")
+      closeVisum(Visum)
+      sys.exit(0)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
+      
   if runmode == 'taz_skim_speed': #tomtom speeds
-    Visum = startVisum()
-    for tp in ['ea','am','md','pm','ev']:
+    try:
+      Visum = startVisum()
       loadVersion(Visum, "outputs/networks/taz_skim_initial.ver")
-      setLinkCapacityTODFactors(Visum)
-      setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
-      prepVDFData(Visum, tp, "inputs/vdf_lookup_table.csv")
-      loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
-      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-    loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
-    tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
-    closeVisum(Visum)
+      prepVDFData(Visum, "inputs/vdf_lookup_table.csv")
+      saveVersion(Visum, "outputs/networks/taz_skim_initial.ver")
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_initial.ver")
+        setLinkCapacityTODFactors(Visum, tp)
+        setLinkSpeedTODFactors(Visum, "inputs/linkSpeeds.csv")
+        loadProcedure(Visum, "config/visum/taz_skim_" + tp + "_speed.xml")
+        saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+      loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
+      tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
 
   if runmode == 'taz_skim': #using modeled speeds and assign
-    Visum = startVisum()
-    for tp in ['ea','am','md','pm','ev']:
+    try:
+      Visum = startVisum()
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
+        saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
       loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
-      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-    loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-    tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
-    closeVisum(Visum)
+      tazsToTapsForDriveAccess(Visum, "outputs/skims/drive_taz_tap.csv", "outputs/skims/tap_data.csv")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
 
   if runmode == 'generate_html_inputs': #BMP 10/31/17, write out link volumes on count locations,links and total vmt
-    Visum = startVisum()
-    loadVersion(Visum, "inputs/SOABM.ver")
-    dst_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "Length")
-    link_planno = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
-    linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
-    fromNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "FromNodeNo")
-    toNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeNo")
-    countLocs = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "No")
-    planno = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\PLANNO")
-    am_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "AM_COUNT")
-    md_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "MD_COUNT")
-    pm_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "PM_COUNT")
-    day_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "DAY_COUNT_FINAL")
-    loadVersion(Visum, "outputs/networks/tap_skim_am_speed_set1.ver")
-    lineRoutes = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "LineName")
-    f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'wb')
-    f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
-    for i in range(len(countLocs)):
-        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],am_count[i],md_count[i],pm_count[i],day_count[i]))
-    f.close()
-    vol_list = [[0]*len(countLocs) for i in range(6)]
-    all_vol_list = [[0]*len(dst_list) for i in range(6)]
-    auto_vol_list = [[0]*len(dst_list) for i in range(6)]
-    truck_vol_list = [[0]*len(dst_list) for i in range(6)]
-    vmt_list = [[0]*5 for i in range(6)]
-    numRoutes = len(lineRoutes) + 1
-    #print("Number of Routes: " + str(numRoutes))
-    lineUTrips = [[0]*numRoutes for i in range(6)]
-    tod_cnt = 0
-    for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\VolVehPrT(AP)")
-      all_vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVehPrT(AP)")
-      sov_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(SOV,AP)")
-      hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
-      hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
-      trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
-      loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set1.ver")
-      line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
-      for rt in range(numRoutes-1):
-        lineUTrips[tod_cnt][rt] = line_utrips[rt]
-      lineUTrips[tod_cnt][numRoutes-1] = sum(line_utrips)
+    try:
+      Visum = startVisum()
+      loadVersion(Visum, "inputs/SOABM.ver")
+      dst_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "Length")
+      link_planno = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
+      linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
+      fromNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "FromNodeNo")
+      toNode = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeNo")
+      countLocs = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "No")
+      planno = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\PLANNO")
+      am_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "AM_COUNT")
+      md_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "MD_COUNT")
+      pm_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "PM_COUNT")
+      day_count = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "DAY_COUNT_FINAL")
+      loadVersion(Visum, "outputs/networks/tap_skim_am_speed_set1.ver")
+      lineRoutes = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "LineName")
+      f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'wb')
+      f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
       for i in range(len(countLocs)):
-        vol_list[5][i] = vol_list[5][i] + vol_list[tod_cnt][i]
-      for i in range(len(linkID)):
-        all_vol_list[5][i] = all_vol_list[5][i] + all_vol_list[tod_cnt][i]
-        auto_vol_list[tod_cnt][i] = sov_list[i] + hv2_list[i] + hv3_list[i]
-        auto_vol_list[5][i] = auto_vol_list[5][i] + auto_vol_list[tod_cnt][i]
-        truck_vol_list[tod_cnt][i] = trk_list[i]
-        truck_vol_list[5][i] = truck_vol_list[5][i] + truck_vol_list[tod_cnt][i]
-      vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
-      vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
-      vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)
-      vmt_list[tod_cnt][3] = numpy.dot(dst_list, trk_list)
-      vmt_list[tod_cnt][4] = vmt_list[tod_cnt][0] + vmt_list[tod_cnt][1] + vmt_list[tod_cnt][2] + vmt_list[tod_cnt][3]
-      vmt_list[5][0] = vmt_list[5][0] + vmt_list[tod_cnt][0]
-      vmt_list[5][1] = vmt_list[5][1] + vmt_list[tod_cnt][1]
-      vmt_list[5][2] = vmt_list[5][2] + vmt_list[tod_cnt][2]
-      vmt_list[5][3] = vmt_list[5][3] + vmt_list[tod_cnt][3]
-      vmt_list[5][4] = vmt_list[5][4] + vmt_list[tod_cnt][4]
-      for rt in range(numRoutes):
-        lineUTrips[5][rt] = lineUTrips[5][rt] + lineUTrips[tod_cnt][rt]	  
-      tod_cnt = tod_cnt + 1
-    f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
-    f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
-    for i in range(len(countLocs)):
-        f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[1][i],vol_list[2][i],vol_list[3][i],vol_list[5][i]))
-    f.close()
-    f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'wb')
-    f.write("id,From_Node,To_Node,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
-    for i in range(len(linkID)):
-        f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[1][i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[5][i]))
-    f.close()
-    f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'wb')
-    f.write("TOD,SOV,HOV2,HOV3,Truck,Total\n")
-    tod_cnt = 0
-    for tp in ['EA','AM','MD','PM','EV','Daily']:
-        f.write("%s,%.3f,%.3f,%.3f,%.3f,%.3f\n" % (tp,vmt_list[tod_cnt][0],vmt_list[tod_cnt][1],vmt_list[tod_cnt][2],vmt_list[tod_cnt][3],vmt_list[tod_cnt][4]))
-        tod_cnt = tod_cnt + 1
-    f.close()
-    f = open("outputs/other/ABM_Summaries/transitBoardingSummary.csv", 'wb')
-    f.write("TOD,")
-    for rt in range(numRoutes-1):
-       f.write("%s," % (lineRoutes[rt]))
-    f.write("Total\n")
-    for tp in ['Daily']:
-        f.write("%s," % (tp)) 
+          f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],am_count[i],md_count[i],pm_count[i],day_count[i]))
+      f.close()
+      vol_list = [[0]*len(countLocs) for i in range(6)]
+      all_vol_list = [[0]*len(dst_list) for i in range(6)]
+      auto_vol_list = [[0]*len(dst_list) for i in range(6)]
+      truck_vol_list = [[0]*len(dst_list) for i in range(6)]
+      vmt_list = [[0]*5 for i in range(6)]
+      numRoutes = len(lineRoutes) + 1
+      #print("Number of Routes: " + str(numRoutes))
+      lineUTrips = [[0]*numRoutes for i in range(6)]
+      tod_cnt = 0
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\VolVehPrT(AP)")
+        all_vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVehPrT(AP)")
+        sov_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(SOV,AP)")
+        hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
+        hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
+        trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
+        loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set1.ver")
+        line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
         for rt in range(numRoutes-1):
-           f.write("%.3f," % (lineUTrips[5][rt]))
-        f.write("%.3f\n" % (lineUTrips[5][numRoutes-1]))
-    f.close()
-    # write out final volumes to each period version files
-    for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      mode_count = 0
-      for mode_var in ['AUTO','TRUCK','TOTAL']:
-        if mode_var=="AUTO":
-          set_list = auto_vol_list
-        elif mode_var=="TRUCK":
-          set_list = truck_vol_list
-        else:
-          set_list = all_vol_list
-        tod_cnt = 0
-        for tod_var in ['EA','AM','MD','PM','EV','DAILY']:
-          field_name = tod_var + "_Vol_" + mode_var
-          Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
-          VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
+          lineUTrips[tod_cnt][rt] = line_utrips[rt]
+        lineUTrips[tod_cnt][numRoutes-1] = sum(line_utrips)
+        for i in range(len(countLocs)):
+          vol_list[5][i] = vol_list[5][i] + vol_list[tod_cnt][i]
+        for i in range(len(linkID)):
+          all_vol_list[5][i] = all_vol_list[5][i] + all_vol_list[tod_cnt][i]
+          auto_vol_list[tod_cnt][i] = sov_list[i] + hv2_list[i] + hv3_list[i]
+          auto_vol_list[5][i] = auto_vol_list[5][i] + auto_vol_list[tod_cnt][i]
+          truck_vol_list[tod_cnt][i] = trk_list[i]
+          truck_vol_list[5][i] = truck_vol_list[5][i] + truck_vol_list[tod_cnt][i]
+        vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
+        vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
+        vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)
+        vmt_list[tod_cnt][3] = numpy.dot(dst_list, trk_list)
+        vmt_list[tod_cnt][4] = vmt_list[tod_cnt][0] + vmt_list[tod_cnt][1] + vmt_list[tod_cnt][2] + vmt_list[tod_cnt][3]
+        vmt_list[5][0] = vmt_list[5][0] + vmt_list[tod_cnt][0]
+        vmt_list[5][1] = vmt_list[5][1] + vmt_list[tod_cnt][1]
+        vmt_list[5][2] = vmt_list[5][2] + vmt_list[tod_cnt][2]
+        vmt_list[5][3] = vmt_list[5][3] + vmt_list[tod_cnt][3]
+        vmt_list[5][4] = vmt_list[5][4] + vmt_list[tod_cnt][4]
+        for rt in range(numRoutes):
+          lineUTrips[5][rt] = lineUTrips[5][rt] + lineUTrips[tod_cnt][rt]	  
+        tod_cnt = tod_cnt + 1
+      f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
+      f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
+      for i in range(len(countLocs)):
+          f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[1][i],vol_list[2][i],vol_list[3][i],vol_list[5][i]))
+      f.close()
+      f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'wb')
+      f.write("id,From_Node,To_Node,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
+      for i in range(len(linkID)):
+          f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[1][i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[5][i]))
+      f.close()
+      f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'wb')
+      f.write("TOD,SOV,HOV2,HOV3,Truck,Total\n")
+      tod_cnt = 0
+      for tp in ['EA','AM','MD','PM','EV','Daily']:
+          f.write("%s,%.3f,%.3f,%.3f,%.3f,%.3f\n" % (tp,vmt_list[tod_cnt][0],vmt_list[tod_cnt][1],vmt_list[tod_cnt][2],vmt_list[tod_cnt][3],vmt_list[tod_cnt][4]))
           tod_cnt = tod_cnt + 1
-        mode_count = mode_count + 1	
-        saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")		
-    closeVisum(Visum)
-    	
+      f.close()
+      f = open("outputs/other/ABM_Summaries/transitBoardingSummary.csv", 'wb')
+      f.write("TOD,")
+      for rt in range(numRoutes-1):
+         f.write("%s," % (lineRoutes[rt]))
+      f.write("Total\n")
+      for tp in ['Daily']:
+          f.write("%s," % (tp)) 
+          for rt in range(numRoutes-1):
+             f.write("%.3f," % (lineUTrips[5][rt]))
+          f.write("%.3f\n" % (lineUTrips[5][numRoutes-1]))
+      f.close()
+      # write out final volumes to each period version files
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        mode_count = 0
+        for mode_var in ['AUTO','TRUCK','TOTAL']:
+          if mode_var=="AUTO":
+            set_list = auto_vol_list
+          elif mode_var=="TRUCK":
+            set_list = truck_vol_list
+          else:
+            set_list = all_vol_list
+          tod_cnt = 0
+          for tod_var in ['EA','AM','MD','PM','EV','DAILY']:
+            field_name = tod_var + "_Vol_" + mode_var
+            Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+            VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
+            tod_cnt = tod_cnt + 1
+          mode_count = mode_count + 1	
+          saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")		
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
+
   if runmode == 'tap_initial':
-    Visum = startVisum()
-    loadVersion(Visum, "inputs/SOABM.ver")
-    assignStopAreasToAccessNodes(Visum)
-    switchZoneSystem(Visum, "tap")
-    saveVersion(Visum, "outputs/networks/tap_skim_initial.ver")
-    createTapLines(Visum, "outputs/skims/tapLines.csv")
-    createTapFareMatrix(Visum, "inputs/fares.csv", "outputs/skims/fare.omx")
-    closeVisum(Visum)
+    try:
+      Visum = startVisum()
+      loadVersion(Visum, "inputs/SOABM.ver")
+      assignStopAreasToAccessNodes(Visum)
+      switchZoneSystem(Visum, "tap")
+      saveVersion(Visum, "outputs/networks/tap_skim_initial.ver")
+      createTapLines(Visum, "outputs/skims/tapLines.csv")
+      createTapFareMatrix(Visum, "inputs/fares.csv", "outputs/skims/fare.omx")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
 
   if runmode == 'tap_skim_speed':
+    try:
     Visum = startVisum()
-    for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
-      for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/networks/tap_skim_initial.ver")
-        loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
-        loadProcedure(Visum, "config/visum/tap_skim_speed_" + tp + ".xml")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
-        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
-          "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
-      reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
-        "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
-    closeVisum(Visum)
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
+        for setid in ['1','2','3']:
+          loadVersion(Visum, "outputs/networks/tap_skim_initial.ver")
+          loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
+          loadProcedure(Visum, "config/visum/tap_skim_speed_" + tp + ".xml")
+          loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
+          saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+          updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
+            "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
+        reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
+          "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
 
   if runmode == 'tap_skim': #using modeled speeds and assign
-    Visum = startVisum()
-    for tp in ['ea','am','md','pm','ev']:
-      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
-      for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + ".xml")
-        loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
-        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
-          "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
-      reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
-        "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
-    closeVisum(Visum)
+    try:
+      Visum = startVisum()
+      for tp in ['ea','am','md','pm','ev']:
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
+        for setid in ['1','2','3']:
+          loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+          loadLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
+          loadProcedure(Visum, "config/visum/tap_skim_" + tp + ".xml")
+          loadProcedure(Visum, "config/visum/tap_skim_" + tp + "_set" + setid + ".xml")
+          saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+          updateFareSkim(Visum, "outputs/skims/fare.omx", "fare", 
+            "outputs/skims/tap_skim_" + tp + "_set" + setid + ".omx", "6")
+        reviseDuplicateSkims(Visum, "outputs/skims/tap_skim_" + tp + "_set1.omx", 
+          "outputs/skims/tap_skim_" + tp + "_set2.omx", "outputs/skims/tap_skim_" + tp + "_set3.omx")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
         
   if runmode == 'build_trip_matrices':
     
@@ -1974,6 +2021,10 @@ if __name__== "__main__":
         loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
         saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")  
     closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)
     
   print("end model run: " + time.ctime())
 
