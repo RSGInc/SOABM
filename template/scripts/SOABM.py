@@ -1950,7 +1950,7 @@ if __name__== "__main__":
 
   if runmode == 'tap_skim_speed':
     try:
-    Visum = startVisum()
+      Visum = startVisum()
       for tp in ['ea','am','md','pm','ev']:
         loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
         saveLinkSpeeds(Visum, "outputs/networks/taz_skim_" + tp + "_speed_linkspeeds.csv")
@@ -1993,34 +1993,34 @@ if __name__== "__main__":
       sys.exit(1)
         
   if runmode == 'build_trip_matrices':
-    
-    #get hh sample rate for matrix expansion and global iteration number
-    hhsamplerate = float(sys.argv[2].lower())
-    iteration = int(sys.argv[3].lower())
-    
-    #build ct-ramp trip matrices
-    tripFileName = "outputs/other/indivTripData_" + str(iteration) + ".csv"
-    jtripFileName = "outputs/other/jointTripData_" + str(iteration) + ".csv"
-    
-    Visum = startVisum()
-    loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
-    buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv", 
-      "outputs/trips/ctrampTazTrips.omx", "outputs/trips/ctrampTapTrips.omx", "outputs/trips/tapParks.csv")
-    closeVisum(Visum)
-    
-    #load trip matrices
-    for tp in ['ea','am','md','pm','ev']:
-      #taz
-      loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
-      loadTripMatrices(Visum, "outputs/trips", tp, "taz")
-      saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+    try:
+      #get hh sample rate for matrix expansion and global iteration number
+      hhsamplerate = float(sys.argv[2].lower())
+      iteration = int(sys.argv[3].lower())
       
-      #tap set
-      for setid in ['1','2','3']:
-        loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
-        loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
-        saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")  
-    closeVisum(Visum)
+      #build ct-ramp trip matrices
+      tripFileName = "outputs/other/indivTripData_" + str(iteration) + ".csv"
+      jtripFileName = "outputs/other/jointTripData_" + str(iteration) + ".csv"
+      
+      Visum = startVisum()
+      loadVersion(Visum, "outputs/networks/taz_skim_am_speed.ver")
+      buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv", 
+        "outputs/trips/ctrampTazTrips.omx", "outputs/trips/ctrampTapTrips.omx", "outputs/trips/tapParks.csv")
+      closeVisum(Visum)
+      
+      #load trip matrices
+      for tp in ['ea','am','md','pm','ev']:
+        #taz
+        loadVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        loadTripMatrices(Visum, "outputs/trips", tp, "taz")
+        saveVersion(Visum, "outputs/networks/taz_skim_" + tp + "_speed.ver")
+        
+        #tap set
+        for setid in ['1','2','3']:
+          loadVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")
+          loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
+          saveVersion(Visum, "outputs/networks/tap_skim_" + tp + "_speed_set" + setid + ".ver")  
+      closeVisum(Visum)
     except Exception as e:
       print(runmode + " Failed")
       print(e)
