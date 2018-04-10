@@ -650,7 +650,7 @@ def setLinkCapacityTODFactors(Visum, tp):
   vdf_int_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
   
   #set factor
-  attName = "TOD_FACTOR_" + tp
+  attName = "TOD_FACTOR_" + tp.upper()
   if attName not in map(lambda x: x.Code,Visum.Net.Attributes.GetAll):
     Visum.Net.AddUserDefinedAttribute(attName,attName,attName,2)
   Visum.Net.SetAttValue(attName, capFac)
