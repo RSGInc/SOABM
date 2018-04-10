@@ -643,7 +643,7 @@ def setLinkCapacityTODFactors(Visum, tp):
 
   #factors to convert hourly link capacities to time period capacities
   tods =    ["ea","am","md","pm","ev"]
-  factors = [4   ,1.5 ,8   ,2   ,8.5 ]
+  factors = [4.0 ,1.5 ,8.0 ,2.0 ,8.5 ]
   capFac = factors[tods.index(tp)]
   
   vdf_mid_link_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
@@ -656,8 +656,8 @@ def setLinkCapacityTODFactors(Visum, tp):
   Visum.Net.SetAttValue(attName, capFac)
   
   #convert from hourly to time period
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_mid_link_cap", vdf_mid_link_cap * capFac)
-  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_cap", vdf_int_cap * capFac) 
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_mid_link_cap", numpy.array(vdf_mid_link_cap) * capFac)
+  VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_cap", numpy.array(vdf_int_cap) * capFac) 
   
 def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
