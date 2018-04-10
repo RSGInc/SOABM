@@ -155,16 +155,24 @@ public class MatrixDataServer
             else if (args[i].equalsIgnoreCase("-ram")) ram = Integer.parseInt(args[i + 1]);
         }
 
-        MatrixDataServer matrixServer = new MatrixDataServer();
+        try
+        {
+          MatrixDataServer matrixServer = new MatrixDataServer();
 
-        // bind this concrete object with the cajo library objects for managing RMI
-        Remote.config(serverAddress, serverPort, null, 0);
-        ItemServer.bind(matrixServer, className);
+          // bind this concrete object with the cajo library objects for managing RMI
+          Remote.config(serverAddress, serverPort, null, 0);
+          ItemServer.bind(matrixServer, className);
 
-        // log that the server started
-        System.out.println( "server starting on " + (System.getProperty("os.arch")) + " operating system." );
-        System.out.println(String.format("%s version %s started on: %s:%d", serverLabel, VERSION,
+          // log that the server started
+          System.out.println( "server starting on " + (System.getProperty("os.arch")) + " operating system." );
+          System.out.println(String.format("%s version %s started on: %s:%d", serverLabel, VERSION,
                 serverAddress, serverPort));
+          
+        } catch (RuntimeException e)
+        {
+        	System.out.println( "RuntimeException caught in com.pb.mtctm2.abm.ctramp.MatrixDataServer.main() -- exiting.");
+            System.exit(1);
+        }
 
     }
 
