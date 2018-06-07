@@ -1592,6 +1592,9 @@ def prepVDFData(Visum, vdfLookupTableFileName):
         mid_link_cap[i] = lanes[i] * mlc + al[i] * freeway_cap_per_auxlane
       else:
         mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
+		
+      #adjust calculated mid_link_cap by subtracting user-input adjustment
+      mid_link_cap[i] = mid_link_cap[i] - mid_link_cap_adj[i]
 
       if numlegs[i] >= 3:
         
