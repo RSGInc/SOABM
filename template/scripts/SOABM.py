@@ -1431,32 +1431,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
 
 def prepVDFData(Visum, vdfLookupTableFileName):
 
-  #through capacity per lane by fc
-  thru_cap_per_lane = dict()
-  thru_cap_per_lane["1"] = 1950
-  thru_cap_per_lane["3"] = 1800
-  thru_cap_per_lane["4"] = 1800
-  thru_cap_per_lane["5"] = 1400
-  thru_cap_per_lane["6"] = 1400
-  thru_cap_per_lane["7"] = 1400
-  thru_cap_per_lane["30"] = 1400
-  
-  freeway_cap_per_auxlane = 1200
-
-  
-  #turn capacity by fc
-  turn_cap_per_lane = dict()
-  turn_cap_per_lane["1"] = 250
-  turn_cap_per_lane["3"] = 250
-  turn_cap_per_lane["4"] = 150
-  turn_cap_per_lane["5"] = 100
-  turn_cap_per_lane["6"] = 100
-  turn_cap_per_lane["7"] = 100
-  turn_cap_per_lane["30"] = 100
-  
-  int_app_cap_per_lane = 1800
-  
-  #intersection vdf lookup table
+  #link/intersection vdf lookup table
   #PLANNO,VALUE,1,3,4,5,6,7,30
   #1,gc4leg,0.35,0.39,0.5,0.56,0.56,0.63,0.47
   vdf_lookup_table = VisumPy.csvHelpers.readCSV(vdfLookupTableFileName)
@@ -1587,8 +1562,9 @@ def prepVDFData(Visum, vdfLookupTableFileName):
       if tnOrient[i] == 0 or planNo[i] == 998:
         continue
         
-      mlc = thru_cap_per_lane[str(int(planNo[i]))]
+      mlc = vdf_lookup[str(int(planNo[i])) + ";thru_cap_per_lane;" + str(int(planNo[i]))]
       if planNo[i] == 1: #interstate
+        freeway_cap_per_auxlane = vdf_lookup[str(int(planNo[i])) + ";freeway_cap_per_auxlane;" + str(int(planNo[i]))]
         mid_link_cap[i] = lanes[i] * mlc + al[i] * freeway_cap_per_auxlane
       else:
         mid_link_cap[i] = lanes[i] * mlc - 300 - 200 * (m[i]==0)
@@ -1707,9 +1683,10 @@ def prepVDFData(Visum, vdfLookupTableFileName):
           if "R" not in laneno_ltr[j] and "T" not in laneno_ltr[j] and "L" in laneno_ltr[j]: #exclusive
             ll[i] = ll[i] + 1
 
-        tlf = turn_cap_per_lane[str(int(planNo[i]))]
+        tlf = vdf_lookup[str(int(planNo[i])) + ";turn_cap_per_lane;" + str(int(planNo[i]))] 
+        int_app_cap_per_lane = vdf_lookup[str(int(planNo[i])) + ";int_app_cap_per_lane;" + str(int(planNo[i]))] 
         int_cap[i] = gc * (tl[i] * int_app_cap_per_lane + (rl[i] + ll[i]) * tlf)
-                
+
   except Exception as e:
       traceback.print_exc()
       print("link fn=" + str(int(fn[i])) + " tn=" + str(int(tn[i])))
