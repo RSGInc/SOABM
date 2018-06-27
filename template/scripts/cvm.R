@@ -7,7 +7,7 @@
 #################USER MANAGED##################
 ###############################################
 
-source("scripts/omx.R") #OMX matrices
+library(omxr) #OMX matrices
 
 ###################INPUTS######################
 
@@ -31,7 +31,7 @@ nonWorkFrictionFileName <- "config/cvm/nonWorkFriction.csv"
 workFrictionFileName <- "config/cvm/workFriction.csv"
 
 #In vehicle time skim
-skimFileName <- "outputs/taz_skim_sov_pm.omx"
+skimFileName <- "outputs/skims/taz_skim_sov_pm.omx"
 timeSkimNum <- 2
 
 #Time of day filenames
@@ -45,11 +45,11 @@ TOD_periodsFileName  <- "config/cvm/TOD_Periods.csv"
 
 ##Outputs Directory
 #Matrix output filename prefixes (suffixes by TOD period added later)
-carOut <- "outputs/CAR"
-suOut <- "outputs/SU"
-muOut <- "outputs/MU"
+carOut <- "outputs/other/CAR"
+suOut <- "outputs/other/SU"
+muOut <- "outputs/other/MU"
 
-omxFileName = "outputs/cvmTrips.omx"
+omxFileName = "outputs/trips/cvmTrips.omx"
 
 ###############################################
 ##################MAIN SCRIPT##################
@@ -76,7 +76,7 @@ tazData$WSTEMP = as.vector(tapply(mazData$EMP_WHOLE,mazData$TAZ,sum))
 tazData = tazData[order(tazData$TAZ),]
 
 #add externals
-tazsWithExternals = readLookupOMX(skimFileName, "NO")$Lookup
+tazsWithExternals = read_lookup(skimFileName, "NO")$Lookup
 externalTazs = tazsWithExternals[!(tazsWithExternals %in% tazData$TAZ)] 
 externalsData = as.data.frame(matrix(0, length(externalTazs), ncol(tazData)))
 colnames(externalsData) = colnames(tazData)
@@ -97,9 +97,9 @@ nwkFriction <- read.csv(nonWorkFrictionFileName, header = TRUE, row.names=1)
 wkFriction <- read.csv(workFrictionFileName, header = TRUE, row.names=1)
 
 #Travel time skim inputs
-ivTimepeakdriveAlone = readMatrixOMX(skimFileName, timeSkimNum)
-rownames(ivTimepeakdriveAlone) = readLookupOMX(skimFileName, "NO")$Lookup
-colnames(ivTimepeakdriveAlone) = readLookupOMX(skimFileName, "NO")$Lookup
+ivTimepeakdriveAlone = read_omx(skimFileName, timeSkimNum)
+rownames(ivTimepeakdriveAlone) = read_lookup(skimFileName, "NO")$Lookup
+colnames(ivTimepeakdriveAlone) = read_lookup(skimFileName, "NO")$Lookup
 
 #Time of day 
 carTOD <- read.csv(carTODFileName, header = TRUE)
@@ -247,8 +247,8 @@ periods <- TOD_periods["Period"][,1]
 n <- sqrt(length(WORK_CAR_TRIPS))
 dailycommercialvehicle <- matrix(rep(0, n^2), nrow=n, ncol=n)
 
-createFileOMX(omxFileName, n, n)
-writeLookupOMX(omxFileName, rownames(WORK_CAR_TRIPS), "NO")
+create_omx(omxFileName, n, n)
+write_lookup(omxFileName, rownames(WORK_CAR_TRIPS), "NO")
 
 for(i in 1:length(periods))
 {
@@ -263,9 +263,9 @@ for(i in 1:length(periods))
 	write.table(su, paste(suOut,"_",periods[i],".csv",sep = ""), sep=",", row.names=TRUE, col.names=NA)
 	write.table(mu, paste(muOut,"_",periods[i],".csv",sep = ""), sep=",", row.names=TRUE, col.names=NA)
 	
-	writeMatrixOMX(omxFileName, car, paste("car_",periods[i],sep = ""))
-	writeMatrixOMX(omxFileName, su, paste("su_",periods[i],sep = ""))
-	writeMatrixOMX(omxFileName, mu, paste("mu_",periods[i],sep = ""))
+	write_omx(omxFileName, car, paste("car_",periods[i],sep = ""))
+	write_omx(omxFileName, su, paste("su_",periods[i],sep = ""))
+	write_omx(omxFileName, mu, paste("mu_",periods[i],sep = ""))
 	
 	dailycommercialvehicle <- dailycommercialvehicle + car + su + mu
 }

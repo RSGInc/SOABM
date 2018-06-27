@@ -1,4 +1,3 @@
-ODOT Southern Oregon ABM
+## ODOT Southern Oregon Activity Based Model (SOABM)
 
-  - source: Java source code and dependencies for building the AB demand model program
-  - template: Template full model setup (except for inputs) for the Southern Oregon ABM
+Documentation - https://github.com/RSGInc/SOABM/wiki

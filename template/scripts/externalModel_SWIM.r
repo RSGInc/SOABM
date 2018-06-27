@@ -39,23 +39,24 @@ if(!("fun" %in% ls())) {
   fun = list()
   runModel = TRUE
   
-  omxScriptName = "scripts/omx.R"
+  library(omxr) #OMX matrices
   
   inputLoc = "inputs/"
-  storeLoc = "outputs/"
+  storeLoc = "outputs/other/"
+  storeLocTrips = "outputs/trips/"
   
   SWIM_SL_Filename_Pattern <- "_outputs"
   externalDisaggregateMethodNumber <- 1
   year <- 2010
   
-  Crosswalk <- read.csv("inputs/SWIM_JEMnR_TAZ_CW.csv")
+  Crosswalk <- read.csv(paste(inputLoc, "SWIM_JEMnR_TAZ_CW.csv", sep=""))
   
   TOD_periods <- read.csv("config/cvm/TOD_Periods.csv", header=T, as.is=T)      
   if(sum("daily" %in% TOD_periods$Period) == 0) {
     TOD_periods <- rbind(TOD_periods, list("daily", 0, 2359, "all times of the day", "24"))
   }
     
-  externals <- read.csv("inputs/selectLinks.csv")
+  externals <- read.csv(paste(inputLoc, "selectLinks.csv", sep=""))
   pCols <- unlist(sapply(TOD_periods$Period, function(x) grep(paste("^",x,sep=""), colnames(externals))))
   colnames(externals)[pCols] <- names(pCols)
   externals <- externals[,c("STATIONNUMBER", "DIRECTION", "AutoAADT", "TruckAADT", "AADT_YEAR", names(pCols), "GrowthRate")]
@@ -63,7 +64,7 @@ if(!("fun" %in% ls())) {
   rm(pCols)
   colnames(externals)[1] <- "station"
   
-  maz <- read.csv("inputs/maz_data_export.csv")
+  maz <- read.csv(paste(inputLoc, "maz_data_export.csv", sep=""))
   taz <- tapply(maz$TAZ,maz$TAZ,min)
   tazpopbase <- tapply(maz$POP,maz$TAZ,sum)
   tazempbase <- tapply(maz$EMP_TOTAL,maz$TAZ,sum)
@@ -77,20 +78,20 @@ if(!("fun" %in% ls())) {
 
 fun$externalModelSWIM <- function(IPF=TRUE) {
 
-	#process SWIM select link datasets to create RData files
-	  processSLDataSets(SWIM_SL_Filename_Pattern, inputLoc)
-	
-	# Create external array
-	# Choose a disaggregation  method (select between 1 to 4)
+  # process SWIM select link datasets to create RData files
+    processSLDataSets(SWIM_SL_Filename_Pattern, inputLoc)
+
+  # Create external array
+  # Choose a disaggregation  method (select between 1 to 4)
     disaggregateMethod <- c("SWIMPCT","LOCALPOPSHARE", "LOCALEMPSHARE", "LOCALPOP2EMPSHARE")
-	  disaggregateMethod <- disaggregateMethod[externalDisaggregateMethodNumber]
-	  print(paste("create external demand array using", disaggregateMethod))
-	  out <- createExternalMatrices(disaggregateMethod, inputLoc, storeLoc)
-	
-	# IPF external matrix to counts   
+    disaggregateMethod <- disaggregateMethod[externalDisaggregateMethodNumber]
+    print(paste("create external demand array using", disaggregateMethod))
+    out <- createExternalMatrices(disaggregateMethod, inputLoc, storeLoc)
+
+  # IPF external matrix to counts   
     ipfExternalMatricesToCounts(IPF,storeLoc) #set to FALSE to skip IPF and just collapse on purpose
-    
-    # return ee, ie, ei trips to the R workspace
+
+  # return ee, ie, ei trips to the R workspace
     out
 }
 
@@ -699,26 +700,22 @@ fun$ipfExternalMatricesToCounts <- function(IPF,storeLoc) {
 	
 	# export the external information being used in the run 
 	save(ext.ZnZnTdMd, file=paste(storeLoc, "externalOD_ZnZnTdMd.RData", sep=""))
-	
-	if(file.exists(omxScriptName)) { 
 		
-		print("write OMX matrices")
-		
-		source(omxScriptName)
-	 	fName = paste(storeLoc, "externalOD.omx", sep="")
-		createFileOMX(fName, nrow(ext.ZnZnTdMd), nrow(ext.ZnZnTdMd))
-		writeLookupOMX(fName, dimnames(ext.ZnZnTdMd)[1][[1]], "NO")
+	print("write OMX matrices")
 	
-		timeperiods = dimnames(ext.ZnZnTdMd)[3][[1]]
-		purposes = dimnames(ext.ZnZnTdMd)[4][[1]]
+ 	fName = paste(storeLocTrips, "externalOD.omx", sep="")
+	create_omx(fName, nrow(ext.ZnZnTdMd), nrow(ext.ZnZnTdMd))
+	write_lookup(fName, dimnames(ext.ZnZnTdMd)[1][[1]], "NO")
+
+	timeperiods = dimnames(ext.ZnZnTdMd)[3][[1]]
+	purposes = dimnames(ext.ZnZnTdMd)[4][[1]]
+
+	for(i in 1:length(timeperiods)) {
+		for(j in 1:length(purposes)) {
 	
-		for(i in 1:length(timeperiods)) {
-			for(j in 1:length(purposes)) {
-		
-				mat = ext.ZnZnTdMd[,,timeperiods[i],purposes[j]]
-				matName = paste(timeperiods[i],purposes[j],sep="_")
-				writeMatrixOMX(fName, mat, matName)
-			}
+			mat = ext.ZnZnTdMd[,,timeperiods[i],purposes[j]]
+			matName = paste(timeperiods[i],purposes[j],sep="_")
+			write_omx(fName, mat, matName)
 		}
 	}
 	

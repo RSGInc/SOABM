@@ -717,14 +717,19 @@ public class SandagHouseholdDataManager2
             }
         }
 
-        Remote.config(serverAddress, serverPort, null, 0);
+        try
+        {
+        	Remote.config(serverAddress, serverPort, null, 0);
+            SandagHouseholdDataManager2 hhDataManager = new SandagHouseholdDataManager2();
+            ItemServer.bind(hhDataManager, HH_DATA_SERVER_NAME);
+            System.out.println(String.format( "MTCTM2 Household Data Manager server started on: %s:%d", serverAddress, serverPort) );
 
-        SandagHouseholdDataManager2 hhDataManager = new SandagHouseholdDataManager2();
-
-        ItemServer.bind(hhDataManager, HH_DATA_SERVER_NAME);
-
-        System.out.println(String.format( "MTCTM2 Household Data Manager server started on: %s:%d", serverAddress, serverPort) );
-
+	    } catch (RuntimeException e)
+	    {
+	    	System.out.println( "RuntimeException caught in com.pb.mtctm2.abm.application.SandagHouseholdDataManager2.main() -- exiting.");
+	        System.exit(1);
+	    }
+        
     }
 
     public int[] getJointToursByHomeMgra(String purposeString)
