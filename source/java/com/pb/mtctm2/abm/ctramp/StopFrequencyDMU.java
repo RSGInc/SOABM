@@ -345,7 +345,16 @@ public abstract class StopFrequencyDMU
         return NUM_OB_STOPS_FOR_ALT[alt];
     }
 
+    public int getTourDepartPeriod()
+    {
+    	return tour.getTourDepartPeriod();
+    }
     
+    public int getTourArrivePeriod()
+    {
+    	return tour.getTourArrivePeriod();
+    }
+
     /**
      * get the tour duration, measured in hours
      * @return duration of tour in hours - number of half-hour intervals - arrive period - depart period divided by 2.
