@@ -115,6 +115,7 @@ public class BestTransitPathCalculator implements Serializable
     private int[] utilityCount;								//counter for utilities    
     private double[] expUtilities;							//exponentiated utility array for path choice
     
+    private float nestingCoefficient;
     /**
      * Constructor.
      * 
@@ -197,6 +198,7 @@ public class BestTransitPathCalculator implements Serializable
         maxLogsumUtilitiesBySkimSet = Util.getIntegerArrayFromPropertyMap(rbMap, "utility.bestTransitPath.maxPathsPerSkimSetForLogsum");
         utilityCount = new int[numSkimSets];
         expUtilities = new double[numTransitAlts];
+        nestingCoefficient =  new Float(Util.getStringValueFromPropertyMap(rbMap, "utility.bestTransitPath.nesting.coeff")).floatValue();
     }
     
    
@@ -247,6 +249,9 @@ public class BestTransitPathCalculator implements Serializable
     			storedWalkAccessUtils[pMgra][pTap] = accUtil;
             } else {
             	accUtil = storedWalkAccessUtils[pMgra][pTap];
+            	if(writeCalculations){
+            		myLogger.info("Stored walk access utility from Mgra "+pMgra+" to Tap "+pTap+" is "+accUtil);
+            	}
             }
 
             for (int aTap : aMgraSet)
@@ -259,6 +264,9 @@ public class BestTransitPathCalculator implements Serializable
         			storedWalkEgressUtils[aTap][aMgra] = egrUtil;
                 } else {
                 	egrUtil = storedWalkEgressUtils[aTap][aMgra];	
+                	if(writeCalculations){
+                		myLogger.info("Stored walk egress utility from Tap "+aTap+" to Mgra "+aMgra+" is "+egrUtil);
+                	}
                 }
                 	
                 // Calculate the pTap to aTap utility values
@@ -272,6 +280,9 @@ public class BestTransitPathCalculator implements Serializable
         			storedDepartPeriodTapTapUtils.get(WTW).get(period).putIfAbsent(storedDataObject.paTapKey(pTap, aTap), tapTapUtil);
         		} else {
 	                tapTapUtil = storedDepartPeriodTapTapUtils.get(WTW).get(period).get(storedDataObject.paTapKey(pTap, aTap));
+	            	if(writeCalculations)
+	        			for (int set=0; set<numSkimSets; set++)
+	        				myLogger.info("Stored WTW tap to tap utility set "+set+" from Tap "+pTap+" to Tap "+aTap+" is "+tapTapUtil[set]);
             	}
         		
         		//create path for each skim set
@@ -306,7 +317,7 @@ public class BestTransitPathCalculator implements Serializable
                     }
 
         boolean writeCalculations = false;
-        if (tracer.isTraceOn() && tracer.isTraceZonePair(pTaz, aTaz) && debug)
+        if ((tracer.isTraceOn() && tracer.isTraceZonePair(pTaz, aTaz)) || debug)
         {
             writeCalculations = true;
         }
@@ -326,6 +337,8 @@ public class BestTransitPathCalculator implements Serializable
     			storedDriveAccessUtils[pTaz][pTap] = accUtil;
             } else {
             	accUtil = storedDriveAccessUtils[pTaz][pTap];
+        		if(writeCalculations)
+        			myLogger.info("Stored drive access utility from TAZ "+pTaz+" to Tap "+pTap+" is "+accUtil);
             }
             
             int lotID = (int)tapParkingInfo[pTap][0][0]; // lot ID
@@ -345,6 +358,9 @@ public class BestTransitPathCalculator implements Serializable
             			storedWalkEgressUtils[aTap][aMgra] = egrUtil;
                     } else {
                     	egrUtil = storedWalkEgressUtils[aTap][aMgra];	
+                    	if(writeCalculations){
+                    		myLogger.info("Stored walk egress utility from Tap "+aTap+" to Mgra "+aMgra+" is "+egrUtil);
+                    	}
                     }
                                         
                     // Calculate the pTap to aTap utility values
@@ -358,6 +374,9 @@ public class BestTransitPathCalculator implements Serializable
             			storedDepartPeriodTapTapUtils.get(DTW).get(period).putIfAbsent(storedDataObject.paTapKey(pTap, aTap), tapTapUtil);
             		} else {
     	                tapTapUtil = storedDepartPeriodTapTapUtils.get(DTW).get(period).get(storedDataObject.paTapKey(pTap, aTap));
+    	            	if(writeCalculations)
+    	        			for (int set=0; set<numSkimSets; set++)
+    	        				myLogger.info("Stored DTW tap to tap utility set "+set+" from Tap "+pTap+" to Tap "+aTap+" is "+tapTapUtil[set]);
                 	}
             		
             		//create path for each skim set
@@ -393,7 +412,7 @@ public class BestTransitPathCalculator implements Serializable
                     }
 
         boolean writeCalculations = false;
-        if (tracer.isTraceOn() && tracer.isTraceZonePair(pTaz, aTaz) && debug)
+        if ((tracer.isTraceOn() && tracer.isTraceZonePair(pTaz, aTaz)) || debug)
         {
             writeCalculations = true;
         }
@@ -410,6 +429,9 @@ public class BestTransitPathCalculator implements Serializable
     			storedWalkAccessUtils[pMgra][pTap] = accUtil;
             } else {
             	accUtil = storedWalkAccessUtils[pMgra][pTap];
+            	if(writeCalculations){
+            		myLogger.info("Stored walk access utility from Mgra "+pMgra+" to Tap "+pTap+" is "+accUtil);
+            	}
             }
 
             for (int aTap : tazManager.getParkRideOrKissRideTapsForZone(aTaz, accMode))
@@ -799,29 +821,44 @@ public class BestTransitPathCalculator implements Serializable
      */
     public int chooseTripPath(float rnum, double[][] bestTapPairs, boolean myTrace, Logger myLogger) {
     	
+    	if(myTrace){
+    		myLogger.info("****************************************");
+    		myLogger.info("Choosing best TAP pair with rnum "+rnum);
+    		myLogger.info("BestPath    Utility   ExpUtility  Prob  Cumul.P");
+    		myLogger.info("-----------------------------------------------");
+    	}
     	Arrays.fill(expUtilities, 0);
     	int alt=-1;
     	//iterate through paths and calculate exponentiated utility and sum
     	double sumExpUtility=0;
     	for(int i = 0; i<bestTapPairs.length;++i){
-    		if(bestTapPairs[i] != null){
-    			expUtilities[i] = Math.exp(bestTapPairs[i][3]);
+    		if(bestTapPairs[i] == null)
+    			continue;
+    		if(bestTapPairs[i][3]<-500)
+    			continue;
+    		expUtilities[i] = Math.exp(bestTapPairs[i][3]/nestingCoefficient);
     			sumExpUtility += expUtilities[i]; 
-        	}
     			
     	}
     	if(sumExpUtility>0){
+			double cumProb=0;
     		//re-iterate through paths and calculate probability, choose alternative based on rnum
     		for(int i = 0; i<bestTapPairs.length;++i){
-    			double cumProb=0;
-    			if(bestTapPairs[i] != null){
+        		if(bestTapPairs[i] == null)
+        			continue;
+        		if(bestTapPairs[i][3]<-500)
+        			continue;
     				cumProb += (expUtilities[i]/sumExpUtility);
+   				if(myTrace){
+   					myLogger.info(i+"     "+bestTapPairs[i][3]+"  "+expUtilities[i]+"  "+(expUtilities[i]/sumExpUtility)+"  "+ cumProb);
+   				}
     				if(rnum<=cumProb){
     					alt = i;
+   					if(myTrace)
+   						myLogger.info("Chose Tap Pair "+i);
     					break;
     				}
     					
-    			}
     		}
     	}
     	else{
@@ -913,7 +950,7 @@ public class BestTransitPathCalculator implements Serializable
      */
     public double getTransitBestPathLogsum(){
     	
-    	double logsum=-999;
+    	double logsum = NA;
     	double sumExpUtility  = getSumExpUtilities();
     	if(sumExpUtility>0)
     		logsum = Math.log(sumExpUtility);
@@ -933,10 +970,12 @@ public class BestTransitPathCalculator implements Serializable
      */
     public double getTransitBestPathLogsum(double[][] bestTapPairs, boolean myTrace, Logger myLogger){
     	
-    	double logsum=-999;
+    	double logsum = NA;
     	double sumExpUtility  = getSumExpUtilities(bestTapPairs, myTrace, myLogger);
-    	if(sumExpUtility>0)
+    	if(sumExpUtility>0.0)
     		logsum = Math.log(sumExpUtility);
+    	if(myTrace)
+    		myLogger.info("Best Transit Path Logsum "+logsum);
     	return logsum;
     }
 
@@ -957,20 +996,28 @@ public class BestTransitPathCalculator implements Serializable
      */
      public double getSumExpUtilities(double[][] bestTapPairs, boolean myTrace, Logger myLogger){
     	double sumExpUtility=0;
+    	if(myTrace){
+    		myLogger.info("Calculating sum of exponentiated utilities for transit best TAP pairs");
+    		myLogger.info("Best_Path   Utility   Skim_Set  Included?  ExpUtility  Sum");
+    	}
     	//utilityCount tracks how many utilities included in logsum calc by skimset
     	Arrays.fill(utilityCount,0); 
     	for(int i = 0; i<bestTapPairs.length;++i){
+    		byte included=0;
     		if(bestTapPairs[i] != null){
     			int skimSet = (int)bestTapPairs[i][2];
     			
     			//only include the utility in the logsum if the count
     			//by skimset hasn't been met yet.
         		if(utilityCount[skimSet]<maxLogsumUtilitiesBySkimSet[skimSet]){
+        			included=1;
         			sumExpUtility += Math.exp(bestTapPairs[i][3]); 
         			++utilityCount[skimSet];
         		}
     		}
-    			
+    		if(myTrace)
+    			if(bestTapPairs[i] != null)
+    				myLogger.info(i+"  "+bestTapPairs[i][3]+" "+bestTapPairs[i][2]+"    "+included+"    "+Math.exp(bestTapPairs[i][3])+" "+sumExpUtility);
     	}
 
     	return sumExpUtility;

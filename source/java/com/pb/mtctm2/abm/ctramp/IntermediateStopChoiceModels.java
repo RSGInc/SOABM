@@ -1532,6 +1532,15 @@ public class IntermediateStopChoiceModels implements Serializable {
                 	float rn = (float)household.getHhRandom().nextDouble();
                 	int pathindex = logsumHelper.chooseTripPath(rn, bestTaps, household.getDebugChoiceModels(), smcLogger);
                 	
+                	if(pathindex==-1){
+                		
+                		logger.fatal("Error: Transit trip mode selected but cannot find transit path");
+                		household.logHouseholdObject("Path choice error household", smcLogger);
+                		person.logPersonObject( smcLogger, 500);
+                		tour.logTourObject(smcLogger, 500);
+                		stop.logStopObject(smcLogger, 500);
+                	}
+                		
                     stop.setBoardTap( (int)bestTaps[pathindex][0] );
                     stop.setAlightTap( (int)bestTaps[pathindex][1] );
                     stop.setSet( (int)bestTaps[pathindex][2] );
