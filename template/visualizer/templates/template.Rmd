@@ -9,7 +9,7 @@ output:
     source_code: embed
 ---
 
-```{r Setup}
+```{r Seimup}
 opts_knit$set(root.dir = SYSTEM_APP_PATH)
 ```
 
@@ -352,7 +352,7 @@ plotly_pie_chart <- function(data, label_var, value_var, title = "",
 
 lm_eqn <- function(df){
     m <- lm(y ~ x - 1, df);
-    eq <- paste("Y = ", format(coef(m)[1], digits = 2), " * X , ", " r2 = ", format(summary(m)$r.squared, digits = 3), sep = "")
+    eq <- paste("Y = ", format(coef(m)[1], digits = 2), " * X,  ", "r2=", format(summary(m)$r.squared, digits = 3), sep = "")
     return(eq)
 }
 
@@ -822,64 +822,278 @@ Only for build scenario.
 Chart Column 2{.tabset}
 --------------------------------------------
 
-### Employment vs Workers by Employment Type{data-height=575}
+### Management{data-height=575}
 ```{r job_wrk1}
-#base_df <- base_data[[which(base_csv_names=="job_worker_Summary")]]
-#base_df <- base_df[base_df$occp!="Total",]
-counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
-counts_df <- counts_df[counts_df$occp!="Total",]
 
-#counts_df <- data.frame(base_df[,c("MAZ","occp", "value")], build_df$value)
-counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
-counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Management.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Management",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2
 
-colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
-
-#remove rows where both x and y are zeros
-counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
-
-eq <- counts_df %>% group_by(OCCTYPE) %>% do(V1 = lm_eqn(.))
-y_pos <- c(500, 650, 800, 950, 1100, 1250)
-eq$y_pos <- y_pos
-
-p1 <- ggplot(counts_df, aes(x=x, y=y, color=OCCTYPE)) + 
-  geom_point(shape=1) + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
-  geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 100, y = y_pos,label=V1),  parse = TRUE) + 
-  geom_text(x = 1250, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="Workers", y="Employment")
-p1 <- plotly_build(p1)
-p1
+}
 
 
 ```
 
-### Employment vs Workers (Total){data-height=575}
+### White Collar{data-height=575}
 ```{r job_wrk2}
-#base_df <- base_data[[which(base_csv_names=="job_worker_Summary")]]
-#base_df <- base_df[base_df$occp=="Total",]
-counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
-counts_df <- counts_df[counts_df$occp=="Total",]
 
-#counts_df <- data.frame(base_df[,c("MAZ","occp", "value")], build_df$value)
-counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
-counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+# Use PNGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_White Collar.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="White Collar",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
 
-colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
 
-#remove rows where both x and y are zeros
-counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
 
-p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
-  geom_point(shape=1, color = "#0072B2") + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
-  geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = 500, y = 2000,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
-  geom_text(x = 2000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
-  labs(x="Employment", y="Workers")
-p2 <- plotly_build(p2)
-p2
+```
+
+### Blue Collar{data-height=575}
+```{r job_wrk3}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Blue Collar.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Blue Collar",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
+### Sales & marketing{data-height=575}
+```{r job_wrk4}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Sales & marketing.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Sales & marketing",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
+### Natural Resources{data-height=575}
+```{r job_wrk5}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Natural Resources.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Natural Resources",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
+### Production{data-height=575}
+```{r job_wrk6}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Production.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Production",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
+### Total{data-height=575}
+```{r job_wrk7}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Jobs_Workers_Total.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="job_worker_Summary")]]
+  counts_df <- counts_df[counts_df$occp=="Total",]
+  
+  counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
+  counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.75*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Employment", y="Workers")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
 ```
 
 
@@ -1400,15 +1614,15 @@ Results are shown for tours, filtered by tour purpose.
 
 **Aggregate Tour Arrival-Departure**
 
-_EA_: 3:00 AM to 7:30 AM
+_EA_: 3:00 AM to 7:00 AM
 
-_AM_: 7:30 AM to 9:00 AM
+_AM_: 7:00 AM to 8:30 AM
 
-_MD_: 9:00 AM to 5:00 PM
+_MD_: 8:30 AM to 4:30 PM
 
-_PM_: 5:00 PM to 7:00 PM
+_PM_: 4:30 PM to 6:30 PM
 
-_EV_: 7:00 PM to 3:00 AM
+_EV_: 6:30 PM to 3:00 AM
 
 Chart Column 1 {.tabset}
 --------------------------------------------
@@ -1494,7 +1708,12 @@ Chart Column 1{data-width=150}
 
 ### Tour Mode Choice
 ```{r tourMode}
-base_df <- base_data[[which(base_csv_names=="tmodeProfile_vis_OBS")]]
+if(IS_BASE_SURVEY=="Yes"){
+  base_df <- base_data[[which(base_csv_names=="tmodeProfile_vis_OBS")]]
+}else{
+  base_df <- base_data[[which(base_csv_names=="tmodeProfile_vis")]]
+}
+
 base_df$purpose <- as.character(base_df$purpose)
 base_df$purpose <- purpose_type_df$name[match(base_df$purpose, purpose_type_df$code)]
 build_df <- build_data[[which(build_csv_names=="tmodeProfile_vis")]]
@@ -1609,7 +1828,7 @@ build_df$purpose <- purpose_type_df$name[match(build_df$purpose, purpose_type_df
 
 
 sd.pertype2 <- get_standardDF(data_df1=base_df, data_df2=build_df, x="nstops", y = c("freq"), grp = "purpose", shared = T)
-p1 <- plotly_bar_plotter(data = sd.pertype2, height = 350, xlabel = "Number of Stops", ylabel = "Percent", ynames = c(BASE_SCENARIO_NAME, BUILD_SCENARIO_NAME), percent = T, tickvals = seq(1,6), ticktext = c("0", "1", "2", "4", "5", "6pl"))
+p1 <- plotly_bar_plotter(data = sd.pertype2, height = 350, xlabel = "Number of Stops", ylabel = "Percent", ynames = c("SD-HTS", BUILD_SCENARIO_NAME), percent = T, tickvals = seq(1,7), ticktext = c("0", "1", "2", "3", "4", "5", "6pl"))
 
 bscols(widths=c(3,9),
   list(
@@ -1820,9 +2039,16 @@ Distribution of trips by trip mode and tour mode, which constrains the availabil
 
 ### Trip Mode Choice
 ```{r tripMode}
-base_df <- base_data[[which(base_csv_names=="tripModeProfile_vis_OBS")]]
-build_df <- build_data[[which(build_csv_names=="tripModeProfile_vis")]]
-colnames(build_df) <- colnames(base_df)
+if(IS_BASE_SURVEY=="Yes"){
+  base_df <- base_data[[which(base_csv_names=="tripModeProfile_vis_OBS")]]
+  build_df <- build_data[[which(build_csv_names=="tripModeProfile_vis")]]
+  colnames(build_df) <- colnames(base_df)
+}else{
+  base_df <- base_data[[which(base_csv_names=="tripModeProfile_vis")]]
+  build_df <- build_data[[which(build_csv_names=="tripModeProfile_vis")]]
+  colnames(build_df) <- colnames(base_df)
+}
+
 
 # change purpose names to standard format
 base_df$purpose <- as.character(base_df$purpose)
@@ -1888,28 +2114,40 @@ colnames(counts_df) <- c("CountLocation", "FACTYPE", "x", "y")
 
 #remove rows where both x and y are zeros
 counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+y_max <- max(counts_df$y)
+x_max <- max(counts_df$x)
 
 eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
-y_pos <- c(13000, 14000, 15000, 16000, 17000, 18000, 19000)
+y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
+y_lab_pos <- 0.75*y_max
+x_lab_pos <- 0.2*x_max
+x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 2500, y = y_pos,label=V1),  parse = TRUE) + 
-  geom_text(x = 22500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
+  geom_text(x = x_45l_pos, y = 0,label = "-----:45DegLine",  parse = FALSE, color = "black") + 
   labs(x="24 Hours Counts", y="24 Hours Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "Daily_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
-p1
+if(SCATTER_JPEG=="No"){
+  p1
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Daily_FT.PNG"))
+}
+
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = 2500, y = 17500,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
-  geom_text(x = 22500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="24 Hours Counts", y="24 Hours Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "Daily_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2001,7 +2239,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ### Count vs Volume - All Links{data-height=575}
 ```{r count_vol2}
-p2
+if(SCATTER_JPEG=="No"){
+  p2
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Daily_All.PNG"))
+}
+
 ```
 
 ### Gap Statistics{data-height=575}
@@ -2068,28 +2311,40 @@ colnames(counts_df) <- c("CountLocation", "FACTYPE", "x", "y")
 
 #remove rows where both x and y are zeros
 counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+y_max <- max(counts_df$y)
+x_max <- max(counts_df$x)
 
 eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
-y_pos <- c(1500, 1650, 1800, 1950, 2100, 2250, 2400)
+y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
+y_lab_pos <- 0.75*y_max
+x_lab_pos <- 0.2*x_max
+x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 250, y = y_pos,label=V1),  parse = TRUE) + 
-  geom_text(x = 1500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="AM Counts", y="AM Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "AM_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
-p1
+if(SCATTER_JPEG=="No"){
+  p1
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "AM_FT.PNG"))
+}
+
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = 250, y = 2200,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
-  geom_text(x = 1500, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="AM Counts", y="AM Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "AM_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2181,7 +2436,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ### AM Count vs Volume - All Links{data-height=575}
 ```{r count_vol5}
-p2
+
+if(SCATTER_JPEG=="No"){
+  p2
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "AM_All.PNG"))
+}
 ```
 
 ### AM Gap Statistics{data-height=575}
@@ -2248,28 +2508,40 @@ colnames(counts_df) <- c("CountLocation", "FACTYPE", "x", "y")
 
 #remove rows where both x and y are zeros
 counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+y_max <- max(counts_df$y)
+x_max <- max(counts_df$x)
 
 eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
-y_pos <- c(5000, 5500, 6000, 6500, 7000, 7500, 8000)
+y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
+y_lab_pos <- 0.75*y_max
+x_lab_pos <- 0.2*x_max
+x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 1000, y = y_pos,label=V1),  parse = TRUE) + 
-  geom_text(x = 10000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="MD Counts", y="MD Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "MD_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
-p1
+if(SCATTER_JPEG=="No"){
+  p1
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "MD_FT.PNG"))
+}
+
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = 1000, y = 6000,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
-  geom_text(x = 10000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="MD Counts", y="MD Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "MD_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2361,7 +2633,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ### MD Count vs Volume - All Links{data-height=575}
 ```{r count_vol8}
-p2
+
+if(SCATTER_JPEG=="No"){
+  p2
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "MD_All.PNG"))
+}
 ```
 
 ### MD Gap Statistics{data-height=575}
@@ -2428,28 +2705,40 @@ colnames(counts_df) <- c("CountLocation", "FACTYPE", "x", "y")
 
 #remove rows where both x and y are zeros
 counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+y_max <- max(counts_df$y)
+x_max <- max(counts_df$x)
 
 eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
-y_pos <- c(1500, 1650, 1800, 1950, 2100, 2250, 2400)
+y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
+y_lab_pos <- 0.75*y_max
+x_lab_pos <- 0.2*x_max
+x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(data = eq, aes(x = 250, y = y_pos,label=V1),  parse = TRUE) + 
-  geom_text(x = 3000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="PM Counts", y="PM Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "PM_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
-p1
+if(SCATTER_JPEG=="No"){
+  p1
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "PM_FT.PNG"))
+}
+
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
   geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = 500, y = 2000,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
-  geom_text(x = 3000, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
   labs(x="PM Counts", y="PM Volume")
+ggsave(paste(SYSTEM_JPEG_PATH, "PM_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
 # Gap summary
@@ -2541,7 +2830,12 @@ gap_summary2 <- gap_summary2[1:3, ]
 
 ### PM Count vs Volume - All Links{data-height=575}
 ```{r count_vol11}
-p2
+
+if(SCATTER_JPEG=="No"){
+  p2
+}else{
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "PM_All.PNG"))
+}
 ```
 
 ### PM Gap Statistics{data-height=575}

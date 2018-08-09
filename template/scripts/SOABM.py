@@ -603,7 +603,7 @@ def writeMazDataFile(Visum, fileName):
   
   print("write MAZ data file")
   
-  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","COUNTY","HH","POP","HHP",
+  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","DISTID","COUNTY","HH","POP","HHP",
     "EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT","EMP_ACCFD","EMP_AGR",
     "EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD","EMP_METAL","EMP_TRANS",
     "EMP_POSTAL","EMP_INFO","EMP_FINANC","EMP_REALES","EMP_PROF","EMP_MGMT",
@@ -933,7 +933,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   #build taz lookup for quick access later
   tazIds = [-1]*(len(tazs)+1) 
   for i in range(len(tazs)):
-    tazIds[i] = uniqTazs.index(tazs[i])-1 #assumes seq maz ids
+    tazIds[i+1] = uniqTazs.index(tazs[i]) #assumes seq maz ids
   
   #create empty matrices
   sov = numpy.zeros((len(timePeriods),len(uniqTazs),len(uniqTazs)))

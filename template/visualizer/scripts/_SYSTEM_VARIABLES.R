@@ -2,12 +2,16 @@
 SYSTEM_APP_PATH       <- WORKING_DIR
 SYSTEM_DATA_PATH      <- file.path(SYSTEM_APP_PATH, "data")
 SYSTEM_SHP_PATH       <- file.path(SYSTEM_DATA_PATH, "SHP")
+SYSTEM_JPEG_PATH      <- file.path(SYSTEM_DATA_PATH, "JPEG")
 SYSTEM_TEMPLATES_PATH <- file.path(SYSTEM_APP_PATH, "templates")
 SYSTEM_SCRIPTS_PATH   <- file.path(SYSTEM_APP_PATH, "scripts")
 OUTPUT_PATH           <- file.path(SYSTEM_APP_PATH, "outputs")
 RUNTIME_PATH          <- file.path(SYSTEM_APP_PATH, "runtime")
 BASE_DATA_PATH        <- file.path(SYSTEM_DATA_PATH, "base")
 BUILD_DATA_PATH       <- file.path(SYSTEM_DATA_PATH, "build")
+
+### Control Parameters
+
 
 ### Names
 if(IS_BASE_SURVEY=="Yes"){
@@ -18,6 +22,7 @@ if(IS_BASE_SURVEY=="Yes"){
   AO_CENSUS_SHORT       <- "ACS 2010"
   AO_CENSUS_LONG        <- "ACS 2010, one year sample (PUMA 800,900)"
   WFH_Source            <- "ACS 2010 - 3 Year Sample"
+  SCATTER_JPEG          <- "No"
 }else{
   #   Non-Survey Base
   BASE_SCENARIO_ALT     <- BASE_SCENARIO_NAME
@@ -25,6 +30,7 @@ if(IS_BASE_SURVEY=="Yes"){
   AO_CENSUS_SHORT       <- BASE_SCENARIO_NAME
   AO_CENSUS_LONG        <- BASE_SCENARIO_NAME
   WFH_Source            <- BASE_SCENARIO_NAME
+  SCATTER_JPEG          <- "Yes"
 }
 
 ### Other Codes
@@ -77,7 +83,7 @@ aggTimePeriods        <- c("EV1","EA","AM","MD","PM","EV2", "Daily")
 fiveTimePeriods       <- c("EA","AM","MD","PM","EV", "Daily")
 timePeriodBreaks      <- c(0,1,7,10,26,30, 41)
 occp_type_codes       <- c("occ1", "occ2", "occ3", "occ4", "occ5", "occ6", "Total")
-occp_type_names       <- c("Management", "White COllar", "Blue Collar", "Sales & marketing", "Natural Resources", "Production", "Total")
+occp_type_names       <- c("Management", "White Collar", "Blue Collar", "Sales & marketing", "Natural Resources", "Production", "Total")
 occp_type_df          <- data.frame(code = occp_type_codes, name = occp_type_names)
 
 

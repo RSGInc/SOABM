@@ -2,6 +2,9 @@
 #Yegor Malinovskiy, malinovskiyy@pbworld.com
 #Ben Stabler, stabler@pbworld.com 9/23/2013
 #Ben Stabler, ben.stabler@rsginc.com, 06/30/15
+#
+#Modified:
+# Binny M Paul       binny.mathewpaul@rsginc.com 07-15 - 2018 - read TOD calibration factors from CSV input and apply for each TOD
 
 ###############################################
 #################USER MANAGED##################
@@ -40,6 +43,8 @@ suTODFileName <- "config/cvm/TOD_SUTruck.csv"
 muTODFileName <- "config/cvm/TOD_MUTruck.csv"
 
 TOD_periodsFileName  <- "config/cvm/TOD_Periods.csv"
+
+TOD_calFacFileName  <- "config/cvm/TOD_CalibrationFactors.csv"
 
 ###################OUTPUTS######################
 
@@ -107,6 +112,7 @@ suTOD <- read.csv(suTODFileName, header = TRUE)
 muTOD <- read.csv(muTODFileName, header = TRUE)
 
 TOD_periods  <- read.csv(TOD_periodsFileName, header=T, as.is=T)
+TOD_calFacs  <- read.csv(TOD_calFacFileName, header=T, as.is=T)
 
 ##TAZ limits (internal TAZs only)
 allTAZs <- as.integer(unlist(dimnames(ivTimepeakdriveAlone)[1]))
@@ -252,12 +258,20 @@ write_lookup(omxFileName, rownames(WORK_CAR_TRIPS), "NO")
 
 for(i in 1:length(periods))
 {
-	car <- generateODMatrix(carTOD, periods[i], WORK_CAR_TRIPS, NWORK_CAR_TRIPS)
+	todCalFac <- TOD_calFacs$calfac[TOD_calFacs$Period==periods[i]]
+	
+  car <- generateODMatrix(carTOD, periods[i], WORK_CAR_TRIPS, NWORK_CAR_TRIPS)
 	print(paste("Car trips ", periods[i], ": ", sum(car)))
+	car <- car * todCalFac
+	print(paste("Car trips with calibration factor ", periods[i], ": ", sum(car)))
 	su <- generateODMatrix(suTOD, periods[i], WORK_SU_TRIPS, NWORK_SU_TRIPS)
 	print(paste("Single-unit truck trips ", periods[i], ": ", sum(su)))
+	su <- su * todCalFac
+	print(paste("Car trips with calibration factor ", periods[i], ": ", sum(su)))
 	mu <- generateODMatrix(muTOD, periods[i], WORK_MU_TRIPS, NWORK_MU_TRIPS)
 	print(paste("Multi-unit truck trips ", periods[i], ": ", sum(mu)))
+	mu <- mu * todCalFac
+	print(paste("Car trips with calibration factor ", periods[i], ": ", sum(mu)))
 	
 	write.table(car, paste(carOut,"_",periods[i],".csv",sep = ""), sep=",", row.names=TRUE, col.names=NA)
 	write.table(su, paste(suOut,"_",periods[i],".csv",sep = ""), sep=",", row.names=TRUE, col.names=NA)

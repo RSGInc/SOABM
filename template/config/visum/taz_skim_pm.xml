@@ -23,7 +23,7 @@
         FORMULA = "[FFSPEED]"
       />      
     </OPERATION>
-        <OPERATION
+    <OPERATION
       NO = "2"
       CODE = ""
       OPERATIONTYPE = "EditAttribute"
@@ -2346,7 +2346,7 @@
         />        
         <VDFUNCTION
           VDFUNCTIONNUMBER = "30"
-          VDFUNCTIONTYPE = "@ODOTVDF"
+          VDFUNCTIONTYPE = "EXPONENTIAL"
           BLOCKED = "0"
           HARDBLOCKING = "0"
           CAPACITYFACTOR = "1"
@@ -2393,8 +2393,8 @@
           SCHILLER_D = "0.001"
           SCHILLER_F = "10"
           SCHILLER_SATCRIT = "1"
-          EXPONENTIAL_A = "1"
-          EXPONENTIAL_B = "1"
+          EXPONENTIAL_A = "0.06"
+          EXPONENTIAL_B = "0.05"
           EXPONENTIAL_D = "1"
           EXPONENTIAL_SATCRIT = "1"
           AKCELIK2_A = "1"
@@ -2575,8 +2575,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(HOV2)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(HOV2)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2627,8 +2635,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(HOV2Toll)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(HOV2Toll)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2679,8 +2695,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(HOV3)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(HOV3)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2731,8 +2755,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(HOV3Toll)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(HOV3Toll)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2783,8 +2815,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(SOV)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(SOV)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2835,8 +2875,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(SOVToll)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(SOVToll)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.012427423844746679"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2887,8 +2935,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(Truck)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(Truck)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.0062137119223733394"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
@@ -2939,8 +2995,16 @@
           FIRSTATTRCOEFF = "1"
           FIRSTATTRNAME = "TCUR_PRTSYS(TruckToll)"
           OPERATION = "Add"
-          SECONDATTRCOEFF = "144"
+          SECONDATTRCOEFF = "166.5"
           SECONDATTRNAME = "TOLL_PRTSYS(TruckToll)"
+        />        
+        <LINCOMBITEM
+          NO = "2"
+          FIRSTATTRCOEFF = "0.0062137119223733394"
+          FIRSTATTRNAME = "LENGTH"
+          OPERATION = "None"
+          SECONDATTRCOEFF = "0"
+          SECONDATTRNAME = "1.0"
         />        
       </LINCOMB>
       <LINCOMB        NETOBJECTTYPE = "LINK">
