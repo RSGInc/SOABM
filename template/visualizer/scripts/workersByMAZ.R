@@ -4,7 +4,7 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
-#Parameters_File     <- "E:/Projects/Clients/odot/SouthernOregonABM/Calibration_Round3/CalibrationSetUp/template/visualizer/runtime/parameters.csv"
+#Parameters_File     <- "E:/Projects/Clients/odot/SouthernOregonABM/Calibration_Round3/CalibrationSetUp/template_pdx/visualizer/runtime/parameters.csv"
 
 SYSTEM_REPORT_PKGS <- c("reshape", "dplyr", "ggplot2", "plotly")
 lib_sink <- suppressWarnings(suppressMessages(lapply(SYSTEM_REPORT_PKGS, library, character.only = TRUE))) 
@@ -20,7 +20,7 @@ ABMOutputDir  <- file.path(PROJECT_DIR, "outputs/other")
 ABMInputDir   <- file.path(PROJECT_DIR, "inputs")
 factorDir     <- file.path(WORKING_DIR, "data")
 OutputDir     <- file.path(WORKING_DIR, "data/JPEG")
-OutputCSVDir  <- file.path(WORKING_DIR, "data/build")
+OutputCSVDir  <- file.path(PROJECT_DIR, "outputs/other/ABM_Summaries")
 
 
 # read data
@@ -129,7 +129,7 @@ for(occ in occp_type_names){
 }
 
 #### Write outputs
-write.csv(df, paste(OutputCSVDir, "job_worker_summary.csv", sep = "/"), row.names = F)
+write.csv(df, paste(OutputCSVDir, "job_worker_Summary.csv", sep = "/"), row.names = F)
 
 
 

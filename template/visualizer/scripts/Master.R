@@ -13,7 +13,7 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
-#Parameters_File <- "E:/Projects/Clients/odot/SouthernOregonABM/Calibration_Round3/CalibrationSetUp/template/visualizer/runtime/parameters.csv"
+#Parameters_File <- "E:/Projects/Clients/odot/SouthernOregonABM/Calibration_Round3/CalibrationSetUp/template_pdx/visualizer/runtime/parameters.csv"
 
 ### Read parameters from Parameters_File
 parameters          <- read.csv(Parameters_File, header = TRUE)
