@@ -50,6 +50,16 @@ ECHO PROJECT_DIRECTORY: %PROJECT_DIRECTORY%
 SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
 ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
+:: Copy the ODOT VDF DLLs to the local VISUM DLL folder
+SET VDF_BMP=%~dp0..\source\vdf
+ECHO VDF_BMP: %VDF_BMP%
+
+SET VDF_DLL=%~dp0..\source\vdf\x64\Release
+ECHO VDF_DLL: %VDF_DLL%
+
+COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
+COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
+
 :: empty outputs folder
 ECHO empty outputs folder
 DEL outputs\*.* /S /Q
