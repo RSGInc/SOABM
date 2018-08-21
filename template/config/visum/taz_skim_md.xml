@@ -2346,7 +2346,7 @@
         />        
         <VDFUNCTION
           VDFUNCTIONNUMBER = "30"
-          VDFUNCTIONTYPE = "EXPONENTIAL"
+          VDFUNCTIONTYPE = "@ODOTVDF"
           BLOCKED = "0"
           HARDBLOCKING = "0"
           CAPACITYFACTOR = "1"
