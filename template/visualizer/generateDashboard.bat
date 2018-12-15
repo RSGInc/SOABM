@@ -63,6 +63,7 @@ ECHO MAX_ITER,%MAX_ITER% >> %PARAMETERS_FILE%
 :: #######################################
 ECHO %startTime%%Time%: Running R script to process ABM output...
 %R_SCRIPT% %WORKING_DIR%\scripts\workersByMAZ.R %PARAMETERS_FILE%
+%R_SCRIPT% %WORKING_DIR%\scripts\studentsByMAZ.R %PARAMETERS_FILE%
 %R_SCRIPT% %WORKING_DIR%\scripts\SummarizeABM.R %PARAMETERS_FILE%
 
 :: Call the master R script

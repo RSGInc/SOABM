@@ -6,7 +6,7 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
-#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Calibration_Round3/CalibrationSetUp/template_pdx/visualizer/runtime/parameters.csv"
+#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Contingency/SOABM/template/visualizer/runtime/parameters.csv"
 
 SYSTEM_REPORT_PKGS <- c("reshape", "omxr", "data.table", "plyr", "weights")
 lib_sink <- suppressWarnings(suppressMessages(lapply(SYSTEM_REPORT_PKGS, library, character.only = TRUE))) 
@@ -2105,11 +2105,15 @@ cat("Total number of tours : ", nrow(tours) + sum(unique_joint_tours$NUMBER_HH))
 
 
 # output total numbers in a file
+workersbyMAZ <- wsLoc[(wsLoc$PersonType<=3 | wsLoc$PersonType==6) & wsLoc$WorkLocation>0 & wsLoc$WorkSegment %in% c(0,1,2,3,4,5),] 
+
 total_population <- sum(pertypeDistbn$freq)
 total_households <- nrow(hh)
 total_tours <- nrow(tours) + sum(unique_joint_tours$NUMBER_HH)
 total_trips <- nrow(trips) + sum(jtrips$num_participants)
 total_stops <- nrow(stops) + sum(jstops$num_participants)
+total_workers <- nrow(workersbyMAZ)
+total_jobs <- sum(xwalk$EMP_TOTAL)
 
 trips$num_travel[trips$TRIPMODE==1] <- 1
 trips$num_travel[trips$TRIPMODE==2] <- 2
@@ -2124,8 +2128,8 @@ jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
 total_vmt <- sum((trips$od_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIPMODE<=3]) + 
   sum((jtrips$od_dist[jtrips$TRIPMODE<=3])/jtrips$num_travel[jtrips$TRIPMODE<=3])
 
-totals_var <- c("total_population", "total_households", "total_tours", "total_trips", "total_stops", "total_vmt")
-totals_val <- c(total_population,total_households, total_tours, total_trips, total_stops, total_vmt)
+totals_var <- c("total_population", "total_households", "total_tours", "total_trips", "total_stops", "total_vmt", "total_workers", "total_jobs")
+totals_val <- c(total_population,total_households, total_tours, total_trips, total_stops, total_vmt, total_workers, total_jobs)
 
 totals_df <- data.frame(name = totals_var, value = totals_val)
 

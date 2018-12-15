@@ -356,6 +356,12 @@ lm_eqn <- function(df){
     return(eq)
 }
 
+lm_eqn_intercept <- function(df){
+    m <- lm(y ~ x, df)
+    eq <- paste("Y = ", format(coef(m)[2], digits = 3), " * X + ", format(coef(m)[1], digits = 3), ",  ", "r2=", format(summary(m)$r.squared, digits = 3), sep = "")
+    return(eq)
+}
+
 ```
 
 Welcome
@@ -376,6 +382,8 @@ This document is best viewed using the most recent versions of the following web
 * [Microsoft Internet Explorer](https://www.microsoft.com/en-us/download/internet-explorer.aspx)
 
 Note: Mozilla Firefox does not correctly render the images in this HTML file.
+
+Please set the browser zoom to 90% for optimal sizing of charts. 
 
 Summary {data-width=600}
 --------------------------------------------
@@ -411,12 +419,26 @@ sample_rate <- ifelse(IS_BASE_SURVEY=="Yes", "-", paste(as.character(BASE_SAMPLE
 valueBox(BASE_SCENARIO_NAME, paste("Sample Rate: ", sample_rate, sep = ""), color = "DarkOrange")
 base_pos <- which(base_csv_names=="totals")
 base_df <- base_data[[base_pos]]
+build_pos <- which(build_csv_names=="totals")
+build_df <- build_data[[build_pos]]
 ```
 
 ### Base Population
 ```{r Population1_ValueBox}
 valueBox(prettyNum(round(base_df$value[base_df$name=="total_population"]/BASE_SAMPLE_RATE), big.mark = ","), "Population", icon = "ion-ios-people")
 ```
+
+### Base Jobs
+```{r Jobs1_ValueBox}
+# jobs when base is survey, else number of workers
+if(IS_BASE_SURVEY=="Yes"){
+  valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment", icon = "fas fa-industry")
+}else{
+  valueBox(prettyNum(round(base_df$value[base_df$name=="total_workers"]/BASE_SAMPLE_RATE), big.mark = ","), "Workers", icon = "fas fa-industry")
+}
+
+```
+
 
 ### Base Households
 ```{r Household1_ValueBox}
@@ -461,6 +483,12 @@ build_df <- build_data[[build_pos]]
 valueBox(prettyNum(round(build_df$value[build_df$name=="total_population"]/BUILD_SAMPLE_RATE), big.mark = ","), "Population", icon = "ion-ios-people")
 ```
 
+### Build Workers
+```{r Workers1_ValueBox}
+valueBox(prettyNum(round(build_df$value[build_df$name=="total_workers"]/BUILD_SAMPLE_RATE), big.mark = ","), "Workers", icon = "fas fa-industry")
+```
+
+
 ### Build Households
 ```{r Household2_ValueBox}
 valueBox(prettyNum(round(build_df$value[build_df$name=="total_households"]/BUILD_SAMPLE_RATE), big.mark = ","), "Households", icon = "glyphicon glyphicon-home")
@@ -489,7 +517,7 @@ valueBox(prettyNum(round(build_df$value[build_df$name=="total_vmt"]/BUILD_SAMPLE
 
 Chart Column 1 {data-width=275}
 --------------------------------------------
-### Person Type Distribution
+### Person Type Distribution 
 ```{r Chart_Person_Type}
 base_pos <- which(base_csv_names=="pertypeDistbn")
 base_df <- base_data[[base_pos]]
@@ -508,7 +536,7 @@ p
 
 ```
 
-### Household Size Distribution
+### Household Size Distribution 
 ```{r Chart_HHSize}
 base_pos <- which(base_csv_names=="hhSizeDist")
 base_df <- base_data[[base_pos]]
@@ -532,6 +560,8 @@ Base Highlights2 {data-width=90}
 valueBox(BASE_SCENARIO_NAME, "", color = "DarkOrange")
 base_pos <- which(base_csv_names=="totals")
 base_df <- base_data[[base_pos]]
+build_pos <- which(build_csv_names=="totals")
+build_df <- build_data[[build_pos]]
 ```
 
 
@@ -556,7 +586,13 @@ gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 2, gaugeSectors(
 ### Trips per Household
 ```{r TRate3_Gauge}
 rate <- base_df$value[base_df$name=="total_trips"]/base_df$value[base_df$name=="total_households"]
-gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 10, gaugeSectors(danger = c(0,10), colors = c("Green", "Green", "Green")))
+gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 15, gaugeSectors(danger = c(0,15), colors = c("Green", "Green", "Green")))
+```
+
+### Jobs per Worker
+```{r JobRate3_Gauge}
+rate <- build_df$value[build_df$name=="total_jobs"]/build_df$value[build_df$name=="total_workers"]
+gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 2, gaugeSectors(danger = c(0,2), colors = c("Green", "Green", "Green")))
 ```
 
 
@@ -593,7 +629,13 @@ gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 2, gaugeSectors(
 ### Trips per Household
 ```{r TRate4_Gauge}
 rate <- build_df$value[build_df$name=="total_trips"]/build_df$value[build_df$name=="total_households"]
-gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 10, gaugeSectors(danger = c(0,10), colors = c("Green", "Green", "Green")))
+gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 15, gaugeSectors(danger = c(0,15), colors = c("Green", "Green", "Green")))
+```
+
+### Average HH Size
+```{r AvgHHSize4_Gauge}
+rate <- build_df$value[build_df$name=="total_population"]/build_df$value[build_df$name=="total_households"]
+gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 5, gaugeSectors(danger = c(0,5), colors = c("Green", "Green", "Green")))
 ```
 
 
@@ -838,7 +880,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -848,9 +890,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -877,7 +919,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -887,9 +929,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -917,7 +959,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -927,9 +969,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -956,7 +998,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -966,9 +1008,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -995,7 +1037,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -1005,9 +1047,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -1034,7 +1076,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -1044,9 +1086,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -1073,7 +1115,7 @@ if(SCATTER_JPEG=="Yes"){
   counts_df$occp <- occp_type_df$name[match(counts_df$occp, occp_type_df$code)]
   counts_df$occp <- factor(counts_df$occp, levels = occp_type_names)
   
-  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "x", "y")
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
@@ -1083,9 +1125,9 @@ if(SCATTER_JPEG=="Yes"){
   
   p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
     geom_point(shape=1, color = "#0072B2") + 
-    geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
     geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
     labs(x="Employment", y="Workers")
   p2 <- plotly_build(p2)
@@ -1095,6 +1137,173 @@ if(SCATTER_JPEG=="Yes"){
 
 
 ```
+
+
+Enrollment vs Students{data-navmenu="Long Term"}
+============================================
+
+Description {.sidebar data-width=175}
+--------------------------------------------
+
+********
+
+**Total enrollment vs Number of students comparison at MAZ level**
+
+Results of school location model.
+
+Comparison of assigned students to enrollments at MAZ level.
+
+Only for build scenario.
+
+
+Chart Column 2{.tabset}
+--------------------------------------------
+
+### Grade K-8{data-height=575}
+```{r enrl_stud1}
+
+# Use JPEGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Students_Enrollments_Grade_K_8.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="enrollment_students_Summary")]]
+  counts_df <- counts_df[counts_df$studCat=="Grade_K_8",]
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.80*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Enrollments-Grade_K_8", y="Students-Grade_K_8")
+  p2 <- plotly_build(p2)
+  p2
+
+}
+
+
+```
+
+### Grade 9-12{data-height=575}
+```{r enrl_stud2}
+
+# Use PNGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Students_Enrollments_Grade_9_12.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="enrollment_students_Summary")]]
+  counts_df <- counts_df[counts_df$studCat=="Grade_9_12",]
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.80*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Enrollments-Grade_9_12", y="Students-Grade_9_12")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+
+```
+
+### University{data-height=575}
+```{r enrl_stud3}
+
+# Use PNGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Students_Enrollments_University.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="enrollment_students_Summary")]]
+  counts_df <- counts_df[counts_df$studCat=="University",]
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.80*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Enrollments-University", y="Students-University")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
+### Total{data-height=575}
+```{r enrl_stud4}
+
+# Use PNGs for ABM vs ABM run
+if(SCATTER_JPEG=="Yes"){
+  
+  knitr::include_graphics(file.path(SYSTEM_JPEG_PATH, "Students_Enrollments_Total.PNG"))
+  
+}else{
+  
+  counts_df <- build_data[[which(build_csv_names=="enrollment_students_Summary")]]
+  counts_df <- counts_df[counts_df$studCat=="Total",]
+  
+  colnames(counts_df) <- c("CountLocation", "OCCTYPE", "y", "x")
+  
+  #remove rows where both x and y are zeros
+  counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
+  lab_pos_x <- 0.25*max(counts_df$x)
+  lab_pos_y <- 0.75*max(counts_df$y)
+  lab_45l_x <- 0.80*max(counts_df$x)
+  
+  p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
+    geom_point(shape=1, color = "#0072B2") + 
+    geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
+    geom_abline(intercept = 0, slope = 1, linetype = 2) + 
+    geom_text(x = lab_pos_x, y = lab_pos_y,label = lm_eqn_intercept(counts_df),  parse = TRUE, color = "#0072B2", size = 6) + 
+    geom_text(x = lab_45l_x, y = 0,label = "- - - - : 45 Deg Line",  parse = TRUE, color = "black") + 
+    labs(x="Enrollments-Total", y="Students-Total")
+  p2 <- plotly_build(p2)
+  p2  
+  
+}
+
+
+```
+
 
 
 Tour Summaries{data-navmenu="Tour Level"}
@@ -2098,13 +2307,24 @@ Chart Column 2{.tabset}
 ### Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol1}
 if(IS_BASE_SURVEY=="Yes"){
-  # both count and volume summaries for count_locations are in base summary folder
+  # both count and volume summaries for count_locations are in the build summary folder
   base_df <- build_data[[which(build_csv_names=="countLocCounts")]]
   build_df <- build_data[[which(build_csv_names=="countLocVolumes")]]
 }else{
+  #for non-survey base, all links summaries are created
+  #a unique ID needs to be created using from node and to node IDs
   base_df <- base_data[[which(base_csv_names=="allLinkSummary")]]
+  base_df$id <- paste(base_df$From_Node, base_df$To_Node, sep = "-")
   build_df <- build_data[[which(build_csv_names=="allLinkSummary")]]
+  build_df$id <- paste(build_df$From_Node, build_df$To_Node, sep = "-")
 }
+
+#keep only records that are common between base and build scenario
+common_ids <- intersect(unique(base_df$id), unique(build_df$id))
+base_df <- base_df[base_df$id %in% common_ids, ]
+build_df <- build_df[build_df$id %in% common_ids, ]
+base_df <- base_df[order(base_df$id), ]
+build_df <- build_df[order(build_df$id), ]
 
 counts_df <- data.frame(base_df[,c("id","FACTYPE", "day_vol")], build_df$day_vol)
 counts_df$FACTYPE <- facility_df$type[match(counts_df$FACTYPE, facility_df$code)]
@@ -2117,7 +2337,7 @@ counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
 y_max <- max(counts_df$y)
 x_max <- max(counts_df$x)
 
-eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
+eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn_intercept(.))
 y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
 y_lab_pos <- 0.75*y_max
@@ -2126,11 +2346,12 @@ x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
   geom_text(x = x_45l_pos, y = 0,label = "-----:45DegLine",  parse = FALSE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "24 Hours Counts", paste("24 Hours ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "24 Hours Volume", paste("24 Hours ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "Daily_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
 if(SCATTER_JPEG=="No"){
@@ -2142,11 +2363,12 @@ if(SCATTER_JPEG=="No"){
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn_intercept(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="24 Hours Counts", y="24 Hours Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "24 Hours Counts", paste("24 Hours ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "24 Hours Volume", paste("24 Hours ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "Daily_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
@@ -2295,13 +2517,24 @@ Chart Column 2{.tabset}
 ### AM Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol4}
 if(IS_BASE_SURVEY=="Yes"){
-  # both count and volume summaries for count_locations are in base summary folder
+  # both count and volume summaries for count_locations are in the build summary folder
   base_df <- build_data[[which(build_csv_names=="countLocCounts")]]
   build_df <- build_data[[which(build_csv_names=="countLocVolumes")]]
 }else{
+  #for non-survey base, all links summaries are created
+  #a unique ID needs to be created using from node and to node IDs
   base_df <- base_data[[which(base_csv_names=="allLinkSummary")]]
+  base_df$id <- paste(base_df$From_Node, base_df$To_Node, sep = "-")
   build_df <- build_data[[which(build_csv_names=="allLinkSummary")]]
+  build_df$id <- paste(build_df$From_Node, build_df$To_Node, sep = "-")
 }
+
+#keep only records that are common between base and build scenario
+common_ids <- intersect(unique(base_df$id), unique(build_df$id))
+base_df <- base_df[base_df$id %in% common_ids, ]
+build_df <- build_df[build_df$id %in% common_ids, ]
+base_df <- base_df[order(base_df$id), ]
+build_df <- build_df[order(build_df$id), ]
 
 counts_df <- data.frame(base_df[,c("id","FACTYPE", "am_vol")], build_df$am_vol)
 counts_df$FACTYPE <- facility_df$type[match(counts_df$FACTYPE, facility_df$code)]
@@ -2314,7 +2547,7 @@ counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
 y_max <- max(counts_df$y)
 x_max <- max(counts_df$x)
 
-eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
+eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn_intercept(.))
 y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
 y_lab_pos <- 0.75*y_max
@@ -2323,11 +2556,12 @@ x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="AM Counts", y="AM Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "AM Counts", paste("AM ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "AM Volume", paste("AM ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "AM_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
 if(SCATTER_JPEG=="No"){
@@ -2339,11 +2573,12 @@ if(SCATTER_JPEG=="No"){
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn_intercept(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="AM Counts", y="AM Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "AM Counts", paste("AM ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "AM Volume", paste("AM ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "AM_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
@@ -2492,13 +2727,24 @@ Chart Column 2{.tabset}
 ### MD Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol7}
 if(IS_BASE_SURVEY=="Yes"){
-  # both count and volume summaries for count_locations are in base summary folder
+  # both count and volume summaries for count_locations are in the build summary folder
   base_df <- build_data[[which(build_csv_names=="countLocCounts")]]
   build_df <- build_data[[which(build_csv_names=="countLocVolumes")]]
 }else{
+  #for non-survey base, all links summaries are created
+  #a unique ID needs to be created using from node and to node IDs
   base_df <- base_data[[which(base_csv_names=="allLinkSummary")]]
+  base_df$id <- paste(base_df$From_Node, base_df$To_Node, sep = "-")
   build_df <- build_data[[which(build_csv_names=="allLinkSummary")]]
+  build_df$id <- paste(build_df$From_Node, build_df$To_Node, sep = "-")
 }
+
+#keep only records that are common between base and build scenario
+common_ids <- intersect(unique(base_df$id), unique(build_df$id))
+base_df <- base_df[base_df$id %in% common_ids, ]
+build_df <- build_df[build_df$id %in% common_ids, ]
+base_df <- base_df[order(base_df$id), ]
+build_df <- build_df[order(build_df$id), ]
 
 counts_df <- data.frame(base_df[,c("id","FACTYPE", "md_vol")], build_df$md_vol)
 counts_df$FACTYPE <- facility_df$type[match(counts_df$FACTYPE, facility_df$code)]
@@ -2511,7 +2757,7 @@ counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
 y_max <- max(counts_df$y)
 x_max <- max(counts_df$x)
 
-eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
+eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn_intercept(.))
 y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
 y_lab_pos <- 0.75*y_max
@@ -2520,11 +2766,12 @@ x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="MD Counts", y="MD Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "MD Counts", paste("MD ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "MD Volume", paste("MD ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "MD_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
 if(SCATTER_JPEG=="No"){
@@ -2536,11 +2783,12 @@ if(SCATTER_JPEG=="No"){
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn_intercept(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="MD Counts", y="MD Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "MD Counts", paste("MD ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "MD Volume", paste("MD ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "MD_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
@@ -2689,13 +2937,24 @@ Chart Column 2{.tabset}
 ### PM Count vs Volume by Facility Type{data-height=575}
 ```{r count_vol10}
 if(IS_BASE_SURVEY=="Yes"){
-  # both count and volume summaries for count_locations are in base summary folder
+  # both count and volume summaries for count_locations are in the build summary folder
   base_df <- build_data[[which(build_csv_names=="countLocCounts")]]
   build_df <- build_data[[which(build_csv_names=="countLocVolumes")]]
 }else{
+  #for non-survey base, all links summaries are created
+  #a unique ID needs to be created using from node and to node IDs
   base_df <- base_data[[which(base_csv_names=="allLinkSummary")]]
+  base_df$id <- paste(base_df$From_Node, base_df$To_Node, sep = "-")
   build_df <- build_data[[which(build_csv_names=="allLinkSummary")]]
+  build_df$id <- paste(build_df$From_Node, build_df$To_Node, sep = "-")
 }
+
+#keep only records that are common between base and build scenario
+common_ids <- intersect(unique(base_df$id), unique(build_df$id))
+base_df <- base_df[base_df$id %in% common_ids, ]
+build_df <- build_df[build_df$id %in% common_ids, ]
+base_df <- base_df[order(base_df$id), ]
+build_df <- build_df[order(build_df$id), ]
 
 counts_df <- data.frame(base_df[,c("id","FACTYPE", "pm_vol")], build_df$pm_vol)
 counts_df$FACTYPE <- facility_df$type[match(counts_df$FACTYPE, facility_df$code)]
@@ -2708,7 +2967,7 @@ counts_df <- counts_df[!(counts_df$x==0 & counts_df$y==0),]
 y_max <- max(counts_df$y)
 x_max <- max(counts_df$x)
 
-eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn(.))
+eq <- counts_df %>% group_by(FACTYPE) %>% do(V1 = lm_eqn_intercept(.))
 y_pos <- c(y_max*0.675, y_max*0.70, y_max*0.725, y_max*0.75, y_max*0.775, y_max*0.800, y_max*0.825)
 eq$y_pos <- y_pos
 y_lab_pos <- 0.75*y_max
@@ -2717,11 +2976,12 @@ x_45l_pos <- 0.75*x_max
 
 p1 <- ggplot(counts_df, aes(x=x, y=y, color=FACTYPE)) + 
   geom_point(shape=1) + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE) + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE) + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
   geom_text(data = eq, aes(x = x_lab_pos, y = y_pos,label=V1),  parse = FALSE) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="PM Counts", y="PM Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "PM Counts", paste("PM ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "PM Volume", paste("PM ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "PM_FT.PNG", sep = "\\"), plot = p1, width=12,height=10, device = "png", dpi = 200)
 p1 <- plotly_build(p1)
 if(SCATTER_JPEG=="No"){
@@ -2733,11 +2993,12 @@ if(SCATTER_JPEG=="No"){
 
 p2 <- ggplot(counts_df, aes(x=x, y=y)) + 
   geom_point(shape=1, color = "#0072B2") + 
-  geom_smooth(method=lm, formula = y ~ x - 1, se=FALSE, color = "#0072B2") + 
+  geom_smooth(method=lm, formula = y ~ x, se=FALSE, color = "#0072B2") + 
   geom_abline(intercept = 0, slope = 1, linetype = 2) + 
-  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
+  geom_text(x = x_lab_pos, y = y_lab_pos,label = lm_eqn_intercept(counts_df),  parse = FALSE, color = "#0072B2", size = 6) + 
   geom_text(x = x_45l_pos, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-  labs(x="PM Counts", y="PM Volume")
+  labs(x=ifelse(IS_BASE_SURVEY=="Yes", "PM Counts", paste("PM ", BASE_SCENARIO_NAME, " Volume", sep = "")), 
+       y=ifelse(IS_BASE_SURVEY=="Yes", "PM Volume", paste("PM ", BUILD_SCENARIO_NAME, " Volume", sep = "")))
 ggsave(paste(SYSTEM_JPEG_PATH, "PM_All.PNG", sep = "\\"), plot = p2, width=12,height=10, device = "png", dpi = 200)
 p2 <- plotly_build(p2)
 
@@ -2966,7 +3227,9 @@ Chart Column 1
 
 cat("Transit Boardings:", BASE_SCENARIO_NAME)
 base_df <- base_data[[which(base_csv_names=="transitBoardingSummary")]]
-df <- base_df
+build_df <- build_data[[which(build_csv_names=="transitBoardingSummary")]]
+common_routes <- intersect(colnames(base_df), colnames(build_df))
+df <- base_df[,common_routes]
 
 eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
   kable_styling('striped', font_size = 10, full_width=F, position='center') %>%
@@ -2983,7 +3246,7 @@ t1
 cat("Transit Boardings:", BUILD_SCENARIO_NAME)
 
 build_df <- build_data[[which(build_csv_names=="transitBoardingSummary")]]
-df <- build_df
+df <- build_df[,common_routes]
 
 eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
   kable_styling('striped', font_size = 10, full_width=F, position='center') %>%

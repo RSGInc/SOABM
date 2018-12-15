@@ -51,8 +51,14 @@ SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
 ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
 :: Copy the ODOT VDF DLLs to the local VISUM DLL folder
-COPY application\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
-COPY application\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
+SET VDF_BMP=%~dp0..\source\vdf
+ECHO VDF_BMP: %VDF_BMP%
+
+SET VDF_DLL=%~dp0..\source\vdf\x64\Release
+ECHO VDF_DLL: %VDF_DLL%
+
+COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
+COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
 
 :: empty outputs folder
 ECHO empty outputs folder
@@ -160,9 +166,12 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
 
 :: -------------------------------------------------------------------------------------------------
-:: Generate inputs for HTML dashboard
+:: Generate assignment summary file and inputs for HTML dashboard
 :: -------------------------------------------------------------------------------------------------
 %PYTHON% scripts\SOABM.py generate_html_inputs
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+
+%PYTHON% scripts\SOABM.py generate_final_summary %PROJECT_DIRECTORY%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------

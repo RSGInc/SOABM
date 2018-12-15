@@ -1,5 +1,9 @@
-##########################################################
-### Script to summarize workers by MAZ and Occupation Type
+##################################################################
+### Script to summarize students by MAZ and Grade level attending
+###
+### MAZ level enrollment is read from the MAZ data file
+### NUmber of students by MAZ are summarized from the school location choice model output
+##################################################################
 
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
@@ -27,11 +31,9 @@ OutputCSVDir  <- file.path(PROJECT_DIR, "outputs/other/ABM_Summaries")
 per     <- read.csv(paste(ABMOutputDir, paste("personData_",MAX_ITER, ".csv", sep = ""), sep = "/"), as.is = T)
 wsLoc   <- read.csv(paste(ABMOutputDir, paste("wsLocResults_",MAX_ITER, ".csv", sep = ""), sep = "/"), as.is = T)
 mazData <- read.csv(paste(ABMInputDir, "maz_data_export.csv", sep = "/"), as.is = T)
-occFac  <- read.csv(paste(factorDir, "occFactors.csv", sep = "/"), as.is = T)
 
-occp_type_codes       <- c("occ1", "occ2", "occ3", "occ4", "occ5", "occ6", "Total")
-occp_type_names       <- c("Management", "White Collar", "Blue Collar", "Sales & marketing", "Natural Resources", "Production", "Total")
-occp_type_df          <- data.frame(code = occp_type_codes, name = occp_type_names)
+student_types <- c("Grade_K_8", "Grade_9_12", "University", "Total")
+
 
 ### Functions
 lm_eqn <- function(df){
@@ -40,14 +42,14 @@ lm_eqn <- function(df){
   return(eq)
 }
 
-createScatter <- function(df, occ){
-  df <- df[df$occp==occ,]
-  colnames(df) <- c("CountLocation", "OCCTYPE", "y", "x")
+createScatter <- function(df, stud){
+  df <- df[df$studCat==stud,]
+  colnames(df) <- c("CountLocation", "STUD_TYPE", "y", "x")
   
   #remove rows where both x and y are zeros
   df <- df[!(df$x==0 & df$y==0),]
   
-  x_pos <- round(max(df$x)*0.40)
+  x_pos <- round(max(df$x)*0.25)
   x_pos1 <- round(max(df$x)*0.75)
   y_pos <- round(max(df$y)*0.80)
   
@@ -57,49 +59,38 @@ createScatter <- function(df, occ){
     geom_abline(intercept = 0, slope = 1, linetype = 2) + 
     geom_text(x = x_pos, y = y_pos,label = as.character(lm_eqn(df)) ,  parse = FALSE, color = "#0072B2", size = 6) + 
     geom_text(x = x_pos1, y = 0,label = "- - - - : 45 Deg Line",  parse = FALSE, color = "black") + 
-    labs(x=paste("Employment", occ, sep = "-"), y=paste("Workers", occ, sep = "-"))
+    labs(x=paste("Enrollments", stud, sep = "-"), y=paste("Students", stud, sep = "-"))
   
-  ggsave(file=paste(OutputDir, paste("Jobs_Workers_", occ, ".PNG", sep = ""), sep = "/"), width=12,height=10, device = "png", dpi = 200)
+  ggsave(file=paste(OutputDir, paste("Students_Enrollments_", stud, ".PNG", sep = ""), sep = "/"), width=12,height=10, device = "png", dpi = 200)
 }
 
-# workers by occupation type
-workersbyMAZ <- wsLoc[(wsLoc$PersonType<=3 | wsLoc$PersonType==6) & wsLoc$WorkLocation>0 & wsLoc$WorkSegment %in% c(0,1,2,3,4,5),] %>%
-  mutate(weight = 1/BUILD_SAMPLE_RATE) %>%
-  group_by(WorkLocation, WorkSegment) %>%
-  mutate(num_workers = sum(weight)) %>%
-  select(WorkLocation, WorkSegment, num_workers)
+# students by grade [K-8, 9-12, Univ]
+# remove non-students and home-schooled
+studentsByMAZ <- wsLoc[wsLoc$StudentCategory != 3 & !(wsLoc$SchoolSegment %in% c(88888)), ] 
 
-ABM_Summary <- cast(workersbyMAZ, WorkLocation~WorkSegment, value = "num_workers", fun.aggregate = max)
-ABM_Summary$`0`[is.infinite(ABM_Summary$`0`)] <- 0
+studentsByMAZ <- studentsByMAZ %>%
+  mutate(weight = 1/BUILD_SAMPLE_RATE) %>%
+  mutate(studCat = ifelse((StudentCategory==1) & (SchoolSegment<=8), 1, 0)) %>%                              # K-8
+  mutate(studCat = ifelse((StudentCategory==1) & (SchoolSegment>8) & (SchoolSegment<=16), 2, studCat)) %>%   # 9-12
+  mutate(studCat = ifelse((StudentCategory==2), 3, studCat)) %>%                                             # Univ
+  group_by(SchoolLocation, studCat) %>%
+  mutate(num_students = sum(weight)) %>%
+  select(SchoolLocation, studCat, num_students) %>%
+  ungroup()
+
+ABM_Summary <- cast(studentsByMAZ, SchoolLocation~studCat, value = "num_students", fun.aggregate = max)
 ABM_Summary$`1`[is.infinite(ABM_Summary$`1`)] <- 0
 ABM_Summary$`2`[is.infinite(ABM_Summary$`2`)] <- 0
-ABM_Summary$`3`[is.infinite(ABM_Summary$`3`)] <- 0
-ABM_Summary$`4`[is.infinite(ABM_Summary$`4`)] <- 0
-ABM_Summary$`5`[is.infinite(ABM_Summary$`5`)] <- 0
+ABM_Summary$`3`[is.infinite(ABM_Summary$`3`)] <- 0  
 
-colnames(ABM_Summary) <- c("MAZ", "occ1", "occ2", "occ3", "occ4", "occ5", "occ6")
+colnames(ABM_Summary) <- c("MAZ", "Grade_K_8", "Grade_9_12", "University")
 
 
-# compute jobs by occupation type
-empCat <- colnames(occFac)[colnames(occFac)!="emp_code"]
+# compute enrollments by student categories
+mazData <- mazData %>%
+  mutate(ENROLLUNIV = ENROLLCOLL + ENROLLCOOT + ENROLLADSC)
 
-mazData$occ1 <- 0
-mazData$occ2 <- 0
-mazData$occ3 <- 0
-mazData$occ4 <- 0
-mazData$occ5 <- 0
-mazData$occ6 <- 0
-
-for(cat in empCat){
-  mazData$occ1 <- mazData$occ1 + mazData[,c(cat)]*occFac[1,c(cat)]
-  mazData$occ2 <- mazData$occ2 + mazData[,c(cat)]*occFac[2,c(cat)]
-  mazData$occ3 <- mazData$occ3 + mazData[,c(cat)]*occFac[3,c(cat)]
-  mazData$occ4 <- mazData$occ4 + mazData[,c(cat)]*occFac[4,c(cat)]
-  mazData$occ5 <- mazData$occ5 + mazData[,c(cat)]*occFac[5,c(cat)]
-  mazData$occ6 <- mazData$occ6 + mazData[,c(cat)]*occFac[6,c(cat)]
-}
-
-### get df in right format before outputting
+### Prepare final DF in right format
 df1 <- mazData[,c("MAZ", "NO")] %>%
   left_join(ABM_Summary, by = c("MAZ"="MAZ")) %>%
   select(-NO)
@@ -108,28 +99,31 @@ df1[is.na(df1)] <- 0
 df1$Total <- rowSums(df1[,!colnames(df1) %in% c("MAZ")])
 df1[is.na(df1)] <- 0
 df1 <- melt(df1, id = c("MAZ"))
-colnames(df1) <- c("MAZ", "occp", "value")
+colnames(df1) <- c("MAZ", "studCat", "value")
 
-df2 <- mazData[,c("MAZ","occ1", "occ2", "occ3", "occ4", "occ5", "occ6")]
+df2 <- mazData[,c("MAZ","ENROLLK_8", "ENROLL9_12", "ENROLLUNIV")]
+df2 <- df2 %>%
+  rename(Grade_K_8 = ENROLLK_8) %>%
+  rename(Grade_9_12 = ENROLL9_12) %>%
+  rename(University = ENROLLUNIV)
+
 df2[is.na(df2)] <- 0
 df2$Total <- rowSums(df2[,!colnames(df2) %in% c("MAZ")])
 df2[is.na(df2)] <- 0
 df2 <- melt(df2, id = c("MAZ"))
-colnames(df2) <- c("MAZ", "occp", "value")
+colnames(df2) <- c("MAZ", "studCat", "value")
 
 df <- cbind(df1, df2$value)
-colnames(df) <- c("MAZ", "occp", "workers", "jobs")
-df$occp <- occp_type_df$name[match(df$occp, occp_type_df$code)]
-df$occp <- factor(df$occp, levels = occp_type_names)
+colnames(df) <- c("MAZ", "studCat", "Students", "Enrollments")
 
 ### Create scatter plots
-for(occ in occp_type_names){
-  cat(occ, "\n")
-  createScatter(df, occ)
+for(stud in student_types){
+  cat(stud, "\n")
+  createScatter(df, stud)
 }
 
 #### Write outputs
-write.csv(df, paste(OutputCSVDir, "job_worker_Summary.csv", sep = "/"), row.names = F)
+write.csv(df, paste(OutputCSVDir, "enrollment_students_Summary.csv", sep = "/"), row.names = F)
 
 
 

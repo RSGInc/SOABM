@@ -46,7 +46,7 @@ if(!("fun" %in% ls())) {
   storeLocTrips = "outputs/trips/"
   
   SWIM_SL_Filename_Pattern <- "_outputs"
-  externalDisaggregateMethodNumber <- 4
+  externalDisaggregateMethodNumber <- 1
   year <- 2010
   
   Crosswalk <- read.csv(paste(inputLoc, "SWIM_JEMnR_TAZ_CW.csv", sep=""))
