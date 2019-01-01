@@ -41,8 +41,8 @@ public class AutoAndNonMotorizedSkimsCalculator
     private static final int              WALK_INDEX             = 0;                                                            
     private static final int              BIKE_INDEX             = 1;                                                            
                                                                                                                                  
-    private static final double           WALK_SPEED             = (1.0/Constants.walkMinutesPerFoot)*60/5280;// mph                             
-    private static final double           BIKE_SPEED             = (1.0/Constants.bikeMinutesPerFoot)*60/5280;// mph                             
+    private double           WALK_SPEED;                 
+    private double           BIKE_SPEED;                        
                                                                                                                                  
     // declare an array of UEC objects, 1 for each time period                                                                   
     private UtilityExpressionCalculator[] autoSkimUECs;                                                                          
@@ -151,6 +151,9 @@ public class AutoAndNonMotorizedSkimsCalculator
         iv = new IndexValues();                                                                               
                                                                                                                                  
         mgraManager = MgraDataManager.getInstance();     
+        WALK_SPEED             = (1.0/mgraManager.getWalkMinutesPerFoot())*60/5280;// mph                             
+        BIKE_SPEED             = (1.0/mgraManager.getBikeMinutesPerFoot())*60/5280;// mph                             
+
       
 //        distances = new double[mgraManager.getMaxMgra()+1];
     }                                                                                                                            

@@ -86,7 +86,10 @@ public final class MgraDataManager
     private static final String MGRA_DISTANCE_COEFF_OTHER = "mgra.avg.cost.dist.coeff.other";
     private static final String LOG_MGRA_PARKCOST = "mgra.avg.cost.trace.zone";
     public static final String PROPERTIES_MAX_WALK_DIST = "mgra.max.parking.distance";
-
+    public static final String PROPERTIES_WALK_MILES_PER_HOUR = "mgra.walk.milesperhour";
+    public static final String PROPERTIES_BIKE_MILES_PER_HOUR = "mgra.bike.milesperhour";
+    
+    
     public static final int PARK_AREA_ONE = 1;
     private static final String MGRA_PARKAREA_FIELD   = "parkarea";
     private static final String MGRA_HSTALLSOTH_FIELD = "hstallsoth";
@@ -163,8 +166,9 @@ public final class MgraDataManager
     private TableDataSet tapLinesTable;
     private HashMap<Integer,String> taplines;
     private Set<Integer> tapSet; //an set of final taps
-    
-    /**
+    private float     walkMinutesPerFoot = 0.0038f;  // 20 minutes per  mile(dist is in feet) or 3 mph.
+	private float     bikeMinutesPerFoot = 0.00095f;    // 5 minutes per mile (dist is in feet) or 12 mph.
+   /**
      * Constructor.
      * 
      * @param rbMap A HashMap created from a resourcebundle with model properties.
@@ -176,6 +180,12 @@ public final class MgraDataManager
         
         useExternals = new Boolean(rbMap.get(PROPERTIES_USE_EXTERNALS));
         
+        float walkMilesPerHour = Util.getFloatValueFromPropertyMap(rbMap, PROPERTIES_WALK_MILES_PER_HOUR);
+        float bikeMilesPerHour = Util.getFloatValueFromPropertyMap(rbMap, PROPERTIES_BIKE_MILES_PER_HOUR);
+        float feetPerMile = 5280f;
+        
+        walkMinutesPerFoot = 1.0f/(walkMilesPerHour/60.0f * feetPerMile);
+        bikeMinutesPerFoot = 1.0f/(bikeMilesPerHour/60.0f * feetPerMile);
         readMgraTableData(rbMap);
         
         //read maz to tap and trim set 
@@ -594,7 +604,7 @@ public final class MgraDataManager
      */
     public float getMgraToTapWalkTime(int mgra, int pos)
     {
-        return ((float) mgraWlkTapsDistArray[mgra][1][pos]) * Constants.walkMinutesPerFoot;
+        return ((float) mgraWlkTapsDistArray[mgra][1][pos]) * walkMinutesPerFoot;
     }
 
     /**
@@ -645,7 +655,7 @@ public final class MgraDataManager
      */
     public float getMgraToMgraWalkTime(int oMgra, int dMgra)
     {
-    	return getMgraToMgraWalkDistTo(oMgra,dMgra)*Constants.walkMinutesPerFoot;
+    	return getMgraToMgraWalkDistTo(oMgra,dMgra) * walkMinutesPerFoot;
     }
 
     /**
@@ -696,7 +706,7 @@ public final class MgraDataManager
      */
     public float getMgraToMgraBikeTime(int oMgra, int dMgra)
     {
-    	return getMgraToMgraBikeDistTo(oMgra,dMgra)*Constants.bikeMinutesPerFoot;
+    	return getMgraToMgraBikeDistTo(oMgra,dMgra) * bikeMinutesPerFoot;
     }
 
     /**
@@ -1440,6 +1450,14 @@ private void calculateMgraAvgParkingCosts( HashMap<String,String> propertyMap ) 
     
     public boolean tapExists(int tap) {
 		return tapSet.contains(tap);
+	}
+
+	public float getWalkMinutesPerFoot() {
+		return walkMinutesPerFoot;
+	}
+
+	public float getBikeMinutesPerFoot() {
+		return bikeMinutesPerFoot;
 	}
 
 	public static void main(String[] args)
