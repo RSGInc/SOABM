@@ -430,13 +430,7 @@ valueBox(prettyNum(round(base_df$value[base_df$name=="total_population"]/BASE_SA
 
 ### Base Jobs
 ```{r Jobs1_ValueBox}
-# jobs when base is survey, else number of workers
-if(IS_BASE_SURVEY=="Yes"){
-  valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment", icon = "fas fa-industry")
-}else{
-  valueBox(prettyNum(round(base_df$value[base_df$name=="total_workers"]/BASE_SAMPLE_RATE), big.mark = ","), "Workers", icon = "fas fa-industry")
-}
-
+  valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment (MAZData)", icon = "fas fa-industry")
 ```
 
 
@@ -517,7 +511,7 @@ valueBox(prettyNum(round(build_df$value[build_df$name=="total_vmt"]/BUILD_SAMPLE
 
 Chart Column 1 {data-width=275}
 --------------------------------------------
-### Person Type Distribution 
+### Person Type Distribution {data-height=100}
 ```{r Chart_Person_Type}
 base_pos <- which(base_csv_names=="pertypeDistbn")
 base_df <- base_data[[base_pos]]
@@ -536,7 +530,7 @@ p
 
 ```
 
-### Household Size Distribution 
+### Household Size Distribution {data-height=100}
 ```{r Chart_HHSize}
 base_pos <- which(base_csv_names=="hhSizeDist")
 base_df <- base_data[[base_pos]]
@@ -549,6 +543,46 @@ std_DF <- get_standardDF(data_df1 = base_df, data_df2 = build_df, x = "HHSIZE", 
 p <- plotly_bar_plotter(data = std_DF, xlabel = "HH Size", ylabel = "Percent", ynames = c(BASE_SCENARIO_NAME, BUILD_SCENARIO_NAME), percent = T)
 p
 
+```
+
+### Average HH Size{data-height=75}
+```{r avghhsize1}
+
+#cat("Average HH Size: ", BASE_SCENARIO_NAME, " vs. ", BUILD_SCENARIO_NAME)
+
+base_df <- base_data[[which(base_csv_names=="totals")]]
+build_df <- build_data[[which(build_csv_names=="totals")]]
+rate1 <- base_df$value[base_df$name=="total_population"]/base_df$value[base_df$name=="total_households"]
+#gauge1 <- gauge(round(rate1, 2), min = 0, max = 5, gaugeSectors(danger =  c(0,5), colors = c("Green", "Green", "Green")))
+
+rate2 <- build_df$value[build_df$name=="total_population"]/build_df$value[build_df$name=="total_households"]
+#gauge2 <- gauge(round(rate2, 2), min = 0, max = 5, gaugeSectors(danger =  c(0,5), colors = c("Green", "Green", "Green")))
+#
+#bscols(widths = c(6,6),
+#  gauge1,
+#  gauge2
+#)
+
+y <- c(BASE_SCENARIO_NAME,BUILD_SCENARIO_NAME)
+x <- c(rate1,rate2)
+df <- data.frame(y,x)
+
+p1 <- plot_ly(x = ~x, y = ~reorder(y, x), name = 'Avg HH Size',
+              type = 'bar', orientation = 'h',
+              marker = list(color = 'rgba(50, 171, 96, 0.6)',
+                            line = list(color = 'rgba(50, 171, 96, 1.0)', width = 1))) %>%
+  layout(yaxis = list(showgrid = FALSE, showline = FALSE, showticklabels = TRUE, domain= c(0, 0.85)),
+         xaxis = list(zeroline = FALSE, showline = FALSE, showticklabels = TRUE, showgrid = TRUE)) %>%
+  layout(barmode = 'stack',
+         xaxis = list(title = ""),
+         yaxis = list(title ="")) %>%
+  add_annotations(xref = 'x1', yref = 'y',
+                  x = x + 0.1,  y = y,
+                  text = round(x, 2),
+                  font = list(family = 'Arial', size = 18, color = 'rgb(50, 171, 96)'),
+                  showarrow = FALSE)
+
+p1
 ```
 
 Base Highlights2 {data-width=90}
@@ -591,9 +625,15 @@ gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 15, gaugeSectors
 
 ### Jobs per Worker
 ```{r JobRate3_Gauge}
-rate <- build_df$value[build_df$name=="total_jobs"]/build_df$value[build_df$name=="total_workers"]
+if(IS_BASE_SURVEY=="Yes"){
+  rate <- build_df$value[build_df$name=="total_jobs"]/build_df$value[build_df$name=="total_workers"]
+}else{
+  rate <- base_df$value[base_df$name=="total_jobs"]/base_df$value[base_df$name=="total_workers"]
+}
+
 gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 2, gaugeSectors(danger = c(0,2), colors = c("Green", "Green", "Green")))
 ```
+
 
 
 Build Highlights2 {data-width=90}
@@ -632,11 +672,12 @@ rate <- build_df$value[build_df$name=="total_trips"]/build_df$value[build_df$nam
 gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 15, gaugeSectors(danger = c(0,15), colors = c("Green", "Green", "Green")))
 ```
 
-### Average HH Size
-```{r AvgHHSize4_Gauge}
-rate <- build_df$value[build_df$name=="total_population"]/build_df$value[build_df$name=="total_households"]
-gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 5, gaugeSectors(danger = c(0,5), colors = c("Green", "Green", "Green")))
+### Jobs per Worker
+```{r JobRate4_Gauge}
+rate <- build_df$value[build_df$name=="total_jobs"]/build_df$value[build_df$name=="total_workers"]
+gauge(prettyNum(round(rate, 2), big.mark = ","), min = 0, max = 2, gaugeSectors(danger = c(0,2), colors = c("Green", "Green", "Green")))
 ```
+
 
 
 Long Term Models{data-navmenu="Long Term"}
@@ -3225,11 +3266,12 @@ Chart Column 1
 ### 
 ```{r Table1_transit}
 
-cat("Transit Boardings:", BASE_SCENARIO_NAME)
+cat("Transit Boardings:", BOARDINGS_SOURCE)
 base_df <- base_data[[which(base_csv_names=="transitBoardingSummary")]]
 build_df <- build_data[[which(build_csv_names=="transitBoardingSummary")]]
-common_routes <- intersect(colnames(base_df), colnames(build_df))
-df <- base_df[,common_routes]
+union_routes <- union(colnames(base_df), colnames(build_df))
+df <- base_df[,union_routes]
+df[is.na(df)] <- 0
 
 eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
   kable_styling('striped', font_size = 10, full_width=F, position='center') %>%
@@ -3246,7 +3288,8 @@ t1
 cat("Transit Boardings:", BUILD_SCENARIO_NAME)
 
 build_df <- build_data[[which(build_csv_names=="transitBoardingSummary")]]
-df <- build_df[,common_routes]
+df <- build_df[,union_routes]
+df[is.na(df)] <- 0
 
 eval_expr <- paste("t1 <- kable(df, format = 'html', digits = 0, row.names = F, align = 'c', format.args = list(big.mark = ',')) %>%
   kable_styling('striped', font_size = 10, full_width=F, position='center') %>%

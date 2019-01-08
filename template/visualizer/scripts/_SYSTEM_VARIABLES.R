@@ -23,6 +23,7 @@ if(IS_BASE_SURVEY=="Yes"){
   AO_CENSUS_LONG        <- "ACS 2010, one year sample (PUMA 800,900)"
   WFH_Source            <- "ACS 2010 - 3 Year Sample"
   SCATTER_JPEG          <- "No"
+  BOARDINGS_SOURCE      <- "RVTD Boarding Data (2011)"
 }else{
   #   Non-Survey Base
   BASE_SCENARIO_ALT     <- BASE_SCENARIO_NAME
@@ -31,6 +32,7 @@ if(IS_BASE_SURVEY=="Yes"){
   AO_CENSUS_LONG        <- BASE_SCENARIO_NAME
   WFH_Source            <- BASE_SCENARIO_NAME
   SCATTER_JPEG          <- "Yes"
+  BOARDINGS_SOURCE      <- BASE_SCENARIO_NAME
 }
 
 ### Other Codes

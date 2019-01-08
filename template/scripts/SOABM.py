@@ -18,7 +18,7 @@
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 16/Exe/PythonModules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 18/Exe/PythonModules")
 import win32com.client as com
 import VisumPy.helpers, omx, numpy
 import VisumPy.csvHelpers
@@ -30,7 +30,7 @@ import traceback
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(16)
+  Visum = VisumPy.helpers.CreateVisum(18)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)): 
     Visum.SetPath(pathNo[i], os.getcwd())
@@ -679,6 +679,11 @@ def setLinkCapacityTODFactors(Visum, tp):
   VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_mid_link_cap", numpy.multiply(numpy.array(vdf_mid_link_cap), numpy.array(capFac)))
   VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_cap", numpy.multiply(numpy.array(vdf_int_cap), numpy.array(capFac)))  
   
+  ## Copy the minimum of intersection and mid-link capacity to CapPrt field
+  #tod_vdf_mid_link_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
+  #tod_vdf_int_cap = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
+  #VisumPy.helpers.SetMulti(Visum.Net.Links, "CapPrt", numpy.minimum(numpy.array(tod_vdf_mid_link_cap), numpy.array(tod_vdf_int_cap)))
+  
 def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
   print("set time period link speeds")
@@ -731,7 +736,7 @@ def createTapFareMatrix(Visum, faresFileName, fileName):
       mat[i][j] = float(fare_lookup[fzs[i] + "," + fzs[j]])
   
   #write fare matrix
-  omxFile = omx.openFile(fileName,'w')
+  omxFile = omx.open_file(fileName,'w')
   omxFile['fare'] = mat
   omxFile.close()
 
@@ -739,11 +744,11 @@ def updateFareSkim(Visum, inputFareOmxFile, inputMatName, updateFareOmxFile, upd
 
   print("update skimmed fare matrix with OD-based created earlier")
 
-  omxFile = omx.openFile(inputFareOmxFile,'a')
+  omxFile = omx.open_file(inputFareOmxFile,'a')
   fare = numpy.array(omxFile[inputMatName])
   omxFile.close()
   
-  omxUpdateFile = omx.openFile(updateFareOmxFile,'a')
+  omxUpdateFile = omx.open_file(updateFareOmxFile,'a')
   omxUpdateFile[updateMatName][:] = fare #[:] update items, not object 
   omxUpdateFile.close()
   
@@ -755,9 +760,9 @@ def reviseDuplicateSkims(Visum, omxFile1, omxFile2, omxFile3):
   NA = 0
   skims = ["1","2","3","4","5","6","7","8","9","10"]
   
-  omxFile1 = omx.openFile(omxFile1,'a')
-  omxFile2 = omx.openFile(omxFile2,'a')
-  omxFile3 = omx.openFile(omxFile3,'a')
+  omxFile1 = omx.open_file(omxFile1,'a')
+  omxFile2 = omx.open_file(omxFile2,'a')
+  omxFile3 = omx.open_file(omxFile3,'a')
   
   #if total time (IVT+OWT+TWT+WKT) is equal, then set skims to NA
   timeSet1 = numpy.array(omxFile1["1"]) + numpy.array(omxFile1["2"]) + numpy.array(omxFile1["3"]) + numpy.array(omxFile1["4"])
@@ -799,9 +804,9 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
     hov3toll = numpy.zeros((len(tazIds),len(tazIds)))
     
     #open matrices
-    cvmTrips = omx.openFile(outputsFolder + "\\cvmTrips.omx",'r')
-    externalTrips = omx.openFile(outputsFolder + "\\externalOD.omx",'r')
-    ctrampTazTrips = omx.openFile(outputsFolder + "\\ctrampTazTrips.omx",'r')
+    cvmTrips = omx.open_file(outputsFolder + "\\cvmTrips.omx",'r')
+    externalTrips = omx.open_file(outputsFolder + "\\externalOD.omx",'r')
+    ctrampTazTrips = omx.open_file(outputsFolder + "\\ctrampTazTrips.omx",'r')
     
     #add matrices together
     for aMatTP in matTP:
@@ -905,7 +910,7 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
     transit = numpy.zeros((len(tapIds),len(tapIds)))
     
     #open matrices 
-    ctrampTapTrips = omx.openFile(outputsFolder + "\\ctrampTapTrips.omx",'r')
+    ctrampTapTrips = omx.open_file(outputsFolder + "\\ctrampTapTrips.omx",'r')
   
     #add matrices together
     for aMatTP in matTP:
@@ -1405,8 +1410,8 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
           hov3[tod][o,d] = hov3[tod][o,d] + expansionFactor
 
   #open output files
-  omxFileTaz = omx.openFile(fileNameTaz,'w')
-  omxFileTap = omx.openFile(fileNameTap,'w')
+  omxFileTaz = omx.open_file(fileNameTaz,'w')
+  omxFileTap = omx.open_file(fileNameTap,'w')
   
   #write lookups
   omxFileTaz.createMapping("NO",uniqTazs)
@@ -1864,12 +1869,12 @@ if __name__== "__main__":
                           Visum.Net.StopPoints.AddUserDefinedAttribute(out_field,out_field,out_field,2,3) #1=int, 2=float, 5=text
                           
           udaNames = []
-          for i in Visum.Net.Zones.Attributes.GetAll:
+          for i in Visum.Net.MainZones.Attributes.GetAll:
               if i.category=="User-defined attributes":
                   udaNames.append(i.Name)
           for out_field in ["DUDEN", "EMPDEN", "TOTINT", "POPDEN", "RETDEN"]:
               if out_field not in udaNames:
-                  Visum.Net.Zones.AddUserDefinedAttribute(out_field,out_field,out_field,2,3) #1=int, 2=float, 5=text
+                  Visum.Net.MainZones.AddUserDefinedAttribute(out_field,out_field,out_field,2,3) #1=int, 2=float, 5=text
                   
           saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
           closeVisum(Visum)
@@ -1884,7 +1889,7 @@ if __name__== "__main__":
               maz_var = VisumPy.helpers.GetMulti(Visum.Net.Zones, out_field)
               #set attributes
               loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
-              VisumPy.helpers.SetMulti(Visum.Net.Zones, out_field, maz_var)
+              VisumPy.helpers.SetMulti(Visum.Net.MainZones, out_field, maz_var)
               saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
           
           # Copy Transit Assignment Results
@@ -1896,7 +1901,7 @@ if __name__== "__main__":
                   #get attributes
                   loadVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + str(setid) + ".ver")
                   line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
-                  set_total = set_total + line_utrips
+                  set_total = [sum(x) for x in zip(set_total, line_utrips)]
                   #set attributes
                   loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
                   VisumPy.helpers.SetMulti(Visum.Net.LineRoutes, out_field, line_utrips)
@@ -1915,7 +1920,7 @@ if __name__== "__main__":
                       #get attributes
                       loadVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + str(setid) + ".ver")
                       stop_var = VisumPy.helpers.GetMulti(Visum.Net.StopPoints, field_dict[field])
-                      set_total = set_total + stop_var
+                      set_total = [sum(x) for x in zip(set_total, stop_var)]
                       #set attributes
                       out_field = tp + field + str(setid)
                       loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
@@ -2000,6 +2005,7 @@ if __name__== "__main__":
       all_vol_list = [[0]*len(dst_list) for i in range(6)]
       auto_vol_list = [[0]*len(dst_list) for i in range(6)]
       truck_vol_list = [[0]*len(dst_list) for i in range(6)]
+      min_cap = [[0]*len(dst_list) for i in range(5)]
       vmt_list = [[0]*5 for i in range(6)]
       numRoutes = len(lineRoutes) + 1
       #print("Number of Routes: " + str(numRoutes)
@@ -2013,6 +2019,8 @@ if __name__== "__main__":
         hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
         hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
         trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
+        mlc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
+        inc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
         loadVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set1.ver")
         line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
         for rt in range(numRoutes-1):
@@ -2026,6 +2034,13 @@ if __name__== "__main__":
           auto_vol_list[5][i] = auto_vol_list[5][i] + auto_vol_list[tod_cnt][i]
           truck_vol_list[tod_cnt][i] = trk_list[i]
           truck_vol_list[5][i] = truck_vol_list[5][i] + truck_vol_list[tod_cnt][i]
+          if inc[i]==0:
+              min_cap[tod_cnt][i] = mlc[i]
+          else:
+              min_cap[tod_cnt][i] = min(mlc[i], inc[i])
+        loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "CapPrt", min_cap[tod_cnt])
+        saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
         vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
         vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
         vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)

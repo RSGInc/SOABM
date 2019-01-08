@@ -92,9 +92,9 @@ rem # generate tap skims using tomtom speeds
 %PYTHON% scripts\SOABM.py tap_skim_speed
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-rem # update hh mazs to match sequential mazs
-%PYTHON% scripts\zoneChecker.py
-IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+::rem # update hh mazs to match sequential mazs
+::%PYTHON% scripts\zoneChecker.py
+::IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
 :: Run Commercial Vehicle Model and External Model

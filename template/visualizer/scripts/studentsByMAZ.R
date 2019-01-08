@@ -64,9 +64,9 @@ createScatter <- function(df, stud){
   ggsave(file=paste(OutputDir, paste("Students_Enrollments_", stud, ".PNG", sep = ""), sep = "/"), width=12,height=10, device = "png", dpi = 200)
 }
 
-# students by grade [K-8, 9-12, Univ]
+# students by grade [K-8, 9-12, Univ], preschoolers not included
 # remove non-students and home-schooled
-studentsByMAZ <- wsLoc[wsLoc$StudentCategory != 3 & !(wsLoc$SchoolSegment %in% c(88888)), ] 
+studentsByMAZ <- wsLoc[wsLoc$StudentCategory != 3 & !(wsLoc$SchoolSegment %in% c(88888)) & wsLoc$PersonType != 8, ] 
 
 studentsByMAZ <- studentsByMAZ %>%
   mutate(weight = 1/BUILD_SAMPLE_RATE) %>%
