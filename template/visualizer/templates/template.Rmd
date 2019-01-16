@@ -428,9 +428,14 @@ build_df <- build_data[[build_pos]]
 valueBox(prettyNum(round(base_df$value[base_df$name=="total_population"]/BASE_SAMPLE_RATE), big.mark = ","), "Population", icon = "ion-ios-people")
 ```
 
-### Base Jobs
+### Base Employment
 ```{r Jobs1_ValueBox}
-  valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment (MAZData)", icon = "fas fa-industry")
+if(IS_BASE_SURVEY=="Yes"){
+  valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment", icon = "fas fa-industry")
+}else{
+  valueBox(prettyNum(round(base_df$value[base_df$name=="total_jobs"]), big.mark = ","), "Employment", icon = "fas fa-industry")
+}  
+
 ```
 
 
@@ -477,9 +482,9 @@ build_df <- build_data[[build_pos]]
 valueBox(prettyNum(round(build_df$value[build_df$name=="total_population"]/BUILD_SAMPLE_RATE), big.mark = ","), "Population", icon = "ion-ios-people")
 ```
 
-### Build Workers
-```{r Workers1_ValueBox}
-valueBox(prettyNum(round(build_df$value[build_df$name=="total_workers"]/BUILD_SAMPLE_RATE), big.mark = ","), "Workers", icon = "fas fa-industry")
+### Build Jobs
+```{r Jobs2_ValueBox}
+valueBox(prettyNum(round(build_df$value[build_df$name=="total_jobs"]), big.mark = ","), "Employment", icon = "fas fa-industry")
 ```
 
 

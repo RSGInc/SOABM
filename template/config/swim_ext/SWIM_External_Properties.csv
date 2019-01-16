@@ -1,0 +1,5 @@
+key,value,notes
+SWIM_SL_Filename_Pattern,_outputs,
+externalDisaggregateMethodNumber,4,
+year,2010,
+Crosswalk,SWIM_JEMnR_TAZ_CW.csv,file should be in the inputs directory

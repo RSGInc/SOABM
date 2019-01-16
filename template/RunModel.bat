@@ -51,14 +51,14 @@ SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
 ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
 :: Copy the ODOT VDF DLLs to the local VISUM DLL folder
-SET VDF_BMP=%~dp0..\source\vdf
+SET VDF_BMP=%~dp0..\dependencies\vdf
 ECHO VDF_BMP: %VDF_BMP%
 
-SET VDF_DLL=%~dp0..\source\vdf\x64\Release
+SET VDF_DLL=%~dp0..\dependencies\vdf\x64\Release
 ECHO VDF_DLL: %VDF_DLL%
 
-COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
-COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 16\UserVDF-DLLs"
+COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 18\UserVDF-DLLs"
+COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 18\UserVDF-DLLs"
 
 :: empty outputs folder
 ECHO empty outputs folder
@@ -105,7 +105,7 @@ rem # run cvm
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # run external model
-%R_SCRIPT% scripts\externalModel_SWIM.R
+%R_SCRIPT% scripts\runExternalModel.R
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
