@@ -40,6 +40,7 @@
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 3/21/17- The code was not properly setup to work with disaggregate Method, "SWIMPCT" (1), updates were made to allow this functionality to work.
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/5/18 - Blocked load and library warnings, removed redundent error file print, upped iterations in IPF to 100.
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 9/19/18 - Corrected for the condition that a night OD by purpose could be totally empty - reporting back to the user if controls don't match in general
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/23/19 - Corrected a spelling error in the IPF warning message
           
       ############################ CREATE EXTERNAL OD MATRICES ############################################      
       #create external PA matrices (for multiple SWIM select link output scenarios)
@@ -639,7 +640,7 @@
             	            colcheck <- sum(abs(1-colfactor))
             	            iter <- iter + 1
                     }
-                    if(iter == maxiter) cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClouser Criteria = ", closure, "\n\n",sep=""))
+                    if(iter == maxiter) cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClosuer Criteria = ", closure, "\n\n",sep=""))  # AB 1-23-19, corrected Clouser
 
                     #Repack the EE, EI, and IE into the full matrix
                     result[extSta, extSta] <- ee

@@ -22,7 +22,7 @@ if(!("fun" %in% ls())) {
   library(omxr) #OMX matrices
   
   ## source SWIM functions
-  source("scripts/externalModel_SWIM_ODOT_Standalone.R")
+  source("scripts/externalModel_SWIM.r")
   
   inputLoc = "inputs/"
   storeLoc = "outputs/other/"
