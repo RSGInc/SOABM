@@ -41,6 +41,7 @@
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/5/18 - Blocked load and library warnings, removed redundent error file print, upped iterations in IPF to 100.
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 9/19/18 - Corrected for the condition that a night OD by purpose could be totally empty - reporting back to the user if controls don't match in general
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/23/19 - Corrected a spelling error in the IPF warning message
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 3/13/19 - Updating some small typos in messages to the screen
           
       ############################ CREATE EXTERNAL OD MATRICES ############################################      
       #create external PA matrices (for multiple SWIM select link output scenarios)
@@ -109,7 +110,7 @@
                                    
                                     #If output file doesn't exist, create it
                                     if(!file.exists(outFileName)) {
-                                          print(paste("process SWIM select link datasets to create RData files\n", outFileName))
+                                          writeLines(paste("process SWIM select link datasets to create RData files\n", outFileName)) # 3-13-19 AB - change from a print to a writeLines so that the \n would work properly
                                     		  #Read year of SWIM run from file name   
                                           parsedName = strsplit(strsplit(datasets[d],SWIM_SL_Filename_Pattern)[[1]][1],"_")[[1]]
                                           swimyr = as.integer(parsedName[length(parsedName)])
@@ -640,7 +641,7 @@
             	            colcheck <- sum(abs(1-colfactor))
             	            iter <- iter + 1
                     }
-                    if(iter == maxiter) cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClosuer Criteria = ", closure, "\n\n",sep=""))  # AB 1-23-19, corrected Clouser
+                    if(iter == maxiter) cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClosure Criteria = ", closure, "\n\n",sep=""))  # AB 1-23-19, corrected Clouser , 3-13-19 - corrected again, had changed it Closuer, third times the charm
 
                     #Repack the EE, EI, and IE into the full matrix
                     result[extSta, extSta] <- ee
