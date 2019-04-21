@@ -25,6 +25,9 @@ import VisumPy.csvHelpers
 #import VisumPy.excel
 #import VisumPy.reports
 import traceback
+import pandas as pd
+sys.path.append("scripts")
+from Properties import Properties
 
 ############################################################
 
@@ -625,8 +628,85 @@ def setSeqMaz(Visum):
     seqMaz[i] = i+1
   VisumPy.helpers.SetMulti(Visum.Net.Zones, "SEQMAZ", seqMaz)
   
-def writeMazDataFile(Visum, fileName):
+def updateMazTotals(Visum):
   
+  print("Update population totals in MAZ data")
+  
+  #read properties file
+  properties = Properties()
+  properties.loadPropertyFile("config\orramp.properties")
+  hhFilename = properties['PopulationSynthesizer.InputToCTRAMP.HouseholdFile']
+  
+  # Read input synthetic population HH file
+  hh = pd.read_csv(hhFilename.strip("/"))
+  
+  # Read seq MAZ and TAZ IDs from MAZ data table
+  maz_data = pd.DataFrame()
+  maz_data['maz'] = VisumPy.helpers.GetMulti(Visum.Net.Zones, "NO")
+  maz_data['taz'] = VisumPy.helpers.GetMulti(Visum.Net.Zones, "TAZ")
+  maz_data['HH'] = 0
+  maz_data['POP'] = 0
+  maz_data['HHP'] = 0
+  
+  maz_data.index = maz_data['maz']
+  
+  # compute HH Size distribution [exclude GQ and visitor population]
+  hhs = pd.crosstab(hh.maz[(hh.gqflag==0) & (hh.visitor_flag==0)], hh.np[(hh.gqflag==0) & (hh.visitor_flag==0)])
+  
+  # Compute HH, HHP and POP
+  maz_data.loc[hhs.index,'HHP'] = hhs.apply(lambda row: row * hhs.columns, axis=1).sum(axis=1)
+  maz_data.loc[hhs.index,'HH'] = hhs.sum(axis=1)
+  
+  # compute GQ distribution
+  hhs = pd.crosstab(hh.maz[(hh.gqflag==1) & (hh.visitor_flag==0)], hh.gqtype[(hh.gqflag==1) & (hh.visitor_flag==0)])
+  
+  # Compute POP
+  maz_data.POP = maz_data.HHP
+  maz_data.loc[hhs.index,'POP'] = maz_data.loc[hhs.index,'POP'] + hhs.sum(axis=1)
+  
+  # Set HH, HHP and POP in MAZ table
+  VisumPy.helpers.SetMulti(Visum.Net.Zones, "HH", maz_data.HH.tolist())
+  VisumPy.helpers.SetMulti(Visum.Net.Zones, "HHP", maz_data.HHP.tolist())
+  VisumPy.helpers.SetMulti(Visum.Net.Zones, "POP", maz_data.POP.tolist())
+  
+
+def updateInputSyntheticPopulation(Visum):
+  
+  print("Update input synthetic population")
+  
+  #read properties file and inputs
+  properties = Properties()
+  properties.loadPropertyFile("config\orramp.properties")
+  
+  hhFilename = properties['PopulationSynthesizer.InputToCTRAMP.HouseholdFile']
+  hh = pd.read_csv(hhFilename.strip("/"))
+  
+  perFilename = properties['PopulationSynthesizer.InputToCTRAMP.PersonFile']
+  per = pd.read_csv(perFilename.strip("/"))
+  
+  maz_xwalk = pd.DataFrame()
+  maz_xwalk['maz'] = VisumPy.helpers.GetMulti(Visum.Net.Zones, "NO")
+  maz_xwalk['seq_maz'] = VisumPy.helpers.GetMulti(Visum.Net.Zones, "SEQMAZ")
+  
+  # Copy seq MAZs to input HH file
+  print("Copy seq MAZs from Visum maz_data to input HH file")
+  maz_xwalk.index = maz_xwalk.maz
+  hh.maz = maz_xwalk.loc[hh.maz].seq_maz.tolist()
+  
+  # Order HH and Person file
+  hh.sort_values(by = ['hhid'], inplace=True)
+  per.sort_values(by = ['hhid', 'sporder'], inplace=True)
+  
+  # Generate PERID for person file
+  per['PERID'] = range(1, len(per.index) + 1)
+  
+  # Write out hh and person files
+  hh.to_csv(hhFilename, index = None)
+  per.to_csv(perFilename, index = None)
+
+
+def writeMazDataFile(Visum, fileName):
+    
   print("write MAZ data file")
   
   fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","DISTID","COUNTY","HH","POP","HHP",
@@ -1753,11 +1833,13 @@ if __name__== "__main__":
       loadVersion(Visum, "inputs/SOABM.ver")
       assignStopAreasToAccessNodes(Visum)
       switchZoneSystem(Visum, "maz")
+      updateMazTotals(Visum)
       calculateDensityMeasures(Visum)
       setSeqMaz(Visum)
       saveVersion(Visum, "outputs/networks/MAZ_Level_Processing_Setup.ver")
       createAltFiles(Visum, "outputs/other")
       writeMazDataFile(Visum, "inputs/maz_data_export.csv")
+      updateInputSyntheticPopulation(Visum)
       closeVisum(Visum)
     except Exception as e:
       print(runmode + " Failed")
