@@ -1,0 +1,1 @@
+Template input checker setup
