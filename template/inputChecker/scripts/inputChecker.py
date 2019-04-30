@@ -355,7 +355,7 @@ if __name__== "__main__":
         settings['self_diagnostic_na_severity'] = settings_df.value[settings_df['token'] == 'self_diagnostic_na_severity'].iloc[0]
         
         # Read in all inputs as dict of DFs (Export files that need to be exported)
-        export_Visum = False
+        export_Visum = True
         if export_Visum:
             Visum = startVisum()
             loadVersion(Visum, os.path.join(cwd,'..','inputs','SOABM.ver'))
