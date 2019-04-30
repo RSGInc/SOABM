@@ -635,7 +635,7 @@ def updateMazTotals(Visum):
   #read properties file
   properties = Properties()
   properties.loadPropertyFile("config\orramp.properties")
-  hhFilename = properties['PopulationSynthesizer.InputToCTRAMP.HouseholdFile']
+  hhFilename = properties['PopulationSynthesizer.HouseholdFile']
   
   # Read input synthetic population HH file
   hh = pd.read_csv(hhFilename.strip("/"))
