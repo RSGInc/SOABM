@@ -32,13 +32,13 @@ GOTO END
 :MODEL_ERROR
 :: Error in inputs
 IF %ERRORLEVEL% NEQ 1 (
-	ECHO Input checker found fatal error(s) in inputs. Aborting Model Run. 
+	ECHO Input checker found fatal error in inputs. Aborting Model Run. 
 	ECHO Please check log file in "inputChecker\logs" directory for more details
 	PAUSE
 	exit 2
 )
 :: Error in input checker
-ECHO Input Checker did not run successfully
+ECHO Input Checker did not run successfully. Debug Input Checker for errors.
 PAUSE
 exit 1
 

@@ -678,10 +678,10 @@ def updateInputSyntheticPopulation(Visum):
   properties = Properties()
   properties.loadPropertyFile("config\orramp.properties")
   
-  hhFilename = properties['PopulationSynthesizer.InputToCTRAMP.HouseholdFile']
+  hhFilename = properties['PopulationSynthesizer.HouseholdFile']
   hh = pd.read_csv(hhFilename.strip("/"))
   
-  perFilename = properties['PopulationSynthesizer.InputToCTRAMP.PersonFile']
+  perFilename = properties['PopulationSynthesizer.PersonFile']
   per = pd.read_csv(perFilename.strip("/"))
   
   maz_xwalk = pd.DataFrame()
@@ -701,8 +701,10 @@ def updateInputSyntheticPopulation(Visum):
   per['PERID'] = range(1, len(per.index) + 1)
   
   # Write out hh and person files
-  hh.to_csv(hhFilename, index = None)
-  per.to_csv(perFilename, index = None)
+  out_hhFilename = properties['PopulationSynthesizer.InputToCTRAMP.HouseholdFile']
+  hh.to_csv(out_hhFilename.strip("/"), index = None)
+  out_perFilename = properties['PopulationSynthesizer.InputToCTRAMP.PersonFile']
+  per.to_csv(out_perFilename.strip("/"), index = None)
 
 
 def writeMazDataFile(Visum, fileName):

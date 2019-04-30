@@ -105,7 +105,7 @@ LINK_NonInterstate_MaxFFS,link_data,NO,Logical,Test,(link_data.PLANNO != 1) & (l
 LINK_MidLinkCapAdj_LE500,link_data,NO,Warning,Test,link_data.MID_LINK_CAP_ADJ<=500,,Mid link capacity adjustment should be less than 500
 LINK_ProgressionFactorRange_Check,link_data,NO,Warning,Test,(link_data.PROGRESSION_FACTOR>=0.5) & (link_data.PROGRESSION_FACTOR<=1.2),,PROGRESSION_FACTOR is greater than 0.5 but less than 1.2
 TAP_FAREZONE_Check,tap_data,NO,Fatal,Test,tap_data.FAREZONE.apply(lambda x: True if x in set(fares.FROMFAREZONE) else False),,Each TAP should have a valid FAREZONE
-TAP_Line_Access_Check,tap_data,NO,Fatal,Test,tap_data.LINES.apply(lambda x: True if not (x.isspace()) else False),,Check if each TAP is served by a transit line
+TAP_Line_Access_Check,tap_data,NO,Fatal,Test,tap_data.LINES.fillna('').apply(lambda x: True if len(x)>0 else False),,Check if each TAP is served by a transit line
 TSYS_Availability_Check,tystems,Code,Fatal,Test,"set(tsystems[tsystems.Type==""PUT""].Code) == {'Bus', 'ComRail', 'ExpBus', 'LightRail'}",,Check if all Public Transport Systems are available
 LINE_Tsys_Coding_Check,line_data,NAME,Fatal,Test,"line_data.TSYSCODE.apply(lambda x: True if x in {'Bus', 'ComRail', 'ExpBus', 'LightRail'} else False)",,"Check if all coded lines belong to one of the following Tsys {'Bus', 'ComRail', 'ExpBus', 'LightRail'}"
 LINEROUTE_Tsys_Coding_Check,lineroute_data,NAME,Fatal,Test,"lineroute_data.TSYSCODE.apply(lambda x: True if x in {'Bus', 'ComRail', 'ExpBus', 'LightRail'} else False)",,"Check if all coded line routes belong to one of the following Tsys {'Bus', 'ComRail', 'ExpBus', 'LightRail'}"
@@ -115,7 +115,7 @@ LINEROUTE_MD_Headway_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.MD_HEAD
 LINEROUTE_PM_Headway_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.PM_HEADWAY>0,,Check if each route has a valid headway value by period (>0) 
 LINEROUTE_EV_Headway_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.EV_HEADWAY>0,,Check if each route has a valid headway value by period (>0) 
 LINEROUTE_Unique_Names_Check,lineroute_data,NAME,Fatal,Test,len(set(lineroute_data.NAME)) == len(lineroute_data.NAME),,All transit line route names must be unique
-TIMEPROFILE_LineRoute_Check,time_profiles,LINEROUTENAME,Fatal,Test,lineroute_data.NAME.apply(lambda x: True if x in set(time_profiles.LINEROUTENAME) else False),,Check if each route has a time profile
+TIMEPROFILE_LineRoute_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.NAME.apply(lambda x: True if x in set(time_profiles.LINEROUTENAME) else False),,Check if each route has a time profile
 NETWORK_EA_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_EA==4,,Check if each link has a valid pre-defined TOD factor
 NETWORK_AM_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_AM==1.5,,Check if each link has a valid pre-defined TOD factor
 NETWORK_MD_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_MD==8,,Check if each link has a valid pre-defined TOD factor

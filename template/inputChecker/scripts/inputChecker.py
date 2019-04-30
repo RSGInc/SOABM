@@ -235,7 +235,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     for item, row in inputs_list.iterrows():
         # read the input dataframe
-        #row=inputs_list.iloc[4]
+        #row=inputs_list.iloc[8]
         csv_name = row['Table']
         df = inputs[csv_name]
         
@@ -266,6 +266,8 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
             #expr = 'df[["' + column + '"]].isnull().' + column
             expr = 'pd.isnull(df.loc[:,"' + column + '"])'
             out = eval(expr)
+            # Tests must evaluate to True
+            out = ~out
             
             # check if test result is a series
             if str(type(out))=="<class 'pandas.core.series.Series'>":
@@ -299,7 +301,7 @@ def write_check_log(fh, row, problem_ids, result_list):
     # Define constants
     seperator2 = '-----------------------------------------------------------'
     cwd = os.getcwd()
-    
+    #print(row['Test'])
     # Write check summary
     fh.write('\n\n' + seperator2 + seperator2)
     fh.write("\n\t Input File Name: " + row['Table'] + '.csv')
@@ -338,7 +340,7 @@ if __name__== "__main__":
                 
         print("input checker started at: " + time.ctime())
         working_dir = sys.argv[1]
-        #os.chdir('E:/projects/clients/odot/SouthernOregonABM/Contingency/Task3/SOABM/template/inputChecker')
+        #working_dir = 'E:/projects/clients/odot/SouthernOregonABM/Contingency/Task3/SOABM/template/inputChecker'
         os.chdir(working_dir)
         cwd = os.getcwd()
         
@@ -353,7 +355,7 @@ if __name__== "__main__":
         settings['self_diagnostic_na_severity'] = settings_df.value[settings_df['token'] == 'self_diagnostic_na_severity'].iloc[0]
         
         # Read in all inputs as dict of DFs (Export files that need to be exported)
-        export_Visum = True
+        export_Visum = False
         if export_Visum:
             Visum = startVisum()
             loadVersion(Visum, os.path.join(cwd,'..','inputs','SOABM.ver'))
@@ -480,7 +482,9 @@ if __name__== "__main__":
         
         # Return code to the main model based on input checks and results
         if num_fatal >0:
+            print "at least one fatal error in the inputs"
             sys.exit(2)
+            
         
         
         print "input checker finished at: " + time.ctime()
