@@ -5,16 +5,12 @@
 :: ############################################################################
 @ECHO off
 
-:: User Inputs
-:: ###########
-SET PROJECT_DIR=%1
-::SET PROJECT_DIR=E:\projects\clients\odot\SouthernOregonABM\Contingency\Task3\SOABM\template
-SET WORKING_DIR=%PROJECT_DIR%\inputChecker
-
-
 :: Set up dependencies
 :: ###################
-SET PYTHON=%PROJECT_DIR%..\dependencies\Python27\python.exe
+SET WORKING_DIR=%~dp0
+ECHO WORKING_DIR: %WORKING_DIR%
+
+SET PYTHON=%WORKING_DIR%..\..\dependencies\Python27\python.exe
 ECHO PYTHON: %PYTHON%
 
 

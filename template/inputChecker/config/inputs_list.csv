@@ -1,17 +1,17 @@
-Table,Visum_Object,Input_ID_Column,Fields,Column_Map,Input_Description
-persons_sorted_uni,NA,PERID,All,,Synthetic population person file
-households,NA,hhid,All,,Synthetic population household file
-occFactors,NA,emp_code,All,,Factors to compute work location size from MAZ_level employment data
-maz_data_export,Visum.Net.MainZones,NO,"NO,TAZ,DISTNAME,DISTID,COUNTY,HH,POP,HHP,EMP_CONSTR,EMP_WHOLE,EMP_RETAIL,EMP_SPORT,EMP_ACCFD,EMP_AGR,EMP_MIN,EMP_UTIL,EMP_FOOD,EMP_WOOD,EMP_METAL,EMP_TRANS,EMP_POSTAL,EMP_INFO,EMP_FINANC,EMP_REALES,EMP_PROF,EMP_MGMT,EMP_ADMIN,EMP_EDUC,EMP_HEALTH,EMP_ARTS,EMP_OTHER,EMP_PUBADM,EMP_TOTAL,ENROLLK_8,ENROLL9_12,ENROLLCOLL,ENROLLCOOT,ENROLLADSC,universitySqFtClass,universitySqFtOffice,universitySqFtRec,ECH_DIST,HCH_DIST,HOTELRMTOT,PARKAREA,HSTALLSOTH,HSTALLSSAM,HPARKCOST,NUMFREEHRS,DSTALLSOTH,DSTALLSSAM,DPARKCOST,MSTALLSOTH,MSTALLSSAM,MPARKCOST,WRK_EXT_PR,SCHDIST_NA,SCHDIST,TERMTIME,PARKACRES",,MAZ data in SOABM.ver file
-taz_data,Visum.Net.Zones,NO,"NO,COUNTY",,TAZ data in SOABM.ver file
-link_data,Visum.Net.Links,NO,"NO,FROMNODENO,TONODENO,TYPENO,TSYSSET,LENGTH,V0PRT,PLANNO,NUMLANES,AUX_LANES,MEDIAN,EA_SPEED,AM_SPEED,MD_SPEED,PM_SPEED,EV_SPEED,LANES_EA,LANES_AM,LANES_MD,LANES_PM,LANES_EV,FFSPEED,PROGRESSION_FACTOR,MID_LINK_CAP_ADJ,TONODE\CONTROLTYPE,TOMAINNODE\CONTROLTYPE,LENGTHDIR,REVERSELINK\LENGTH,Network\TOD_FACTOR_EA,Network\TOD_FACTOR_AM,Network\TOD_FACTOR_MD,Network\TOD_FACTOR_PM,Network\TOD_FACTOR_EV","{""TONODE\CONTROLTYPE"": ""TONODE_CTYPE"",""TOMAINNODE\CONTROLTYPE"": ""TOMNODE_CTYPE"",""REVERSELINK\LENGTH"": ""LENGTHREV"",""Network\TOD_FACTOR_EA"":""TOD_FACTOR_EA"",""Network\TOD_FACTOR_AM"":""TOD_FACTOR_AM"",""Network\TOD_FACTOR_MD"":""TOD_FACTOR_MD"",""Network\TOD_FACTOR_PM"":""TOD_FACTOR_PM"",""Network\TOD_FACTOR_EV"":""TOD_FACTOR_EV""}",Link data in SOABM.ver file
-node_data,Visum.Net.Nodes,NO,"NO,XCOORD,YCOORD,CONTROLTYPE,MajorFlowOri1,MajorFlowOri2",,Node data in SOABM.ver file
-mnode_data,Visum.Net.MainNodes,NO,"NO,CONTROLTYPE,MajorFlowOri1,MajorFlowOri2,CONCATENATE:NODES\CONTROLTYPE","{""CONCATENATE:NODES\CONTROLTYPE"": ""NODES_CTYPE""}",Main Node data in SOABM.ver file
-tap_data,Visum.Net.StopAreas,NO,"NO,CANPNR,FAREZONE,CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\LINENAME","{""CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\LINENAME"": ""LINES""}",TAP (Stop Area) data in SOABM.ver file
-fares,NA,FAREID,All,,Input Zone fare matrix
-tsystems,Visum.Net.TSystems,Code,"Code,Name,Type",,List of transportation systems in SO-ABM network
-line_data,Visum.Net.Lines,NAME,"NAME,TSYSCODE",,Transit line data
-lineroute_data,Visum.Net.LineRoutes,NAME,"NAME,TSYSCODE,EA_HEADWAY,AM_HEADWAY,MD_HEADWAY,PM_HEADWAY,EV_HEADWAY",,Transit line route data
-time_profiles,Visum.Net.TimeProfiles,LINEROUTENAME,"LINEROUTENAME,LINENAME,NAME",,List of time profiles for each line route
-connectors_data,Visum.Net.Connectors,ID,"ZONENO,NODENO,DIRECTION,TSYSSET",,TAZ connectors data
-vdf_lookup_table,NA,ID,All,,VDF lookup table
+Table,Directory,Visum_Object,Input_ID_Column,Fields,Column_Map,Input_Description
+persons_sorted_uni,inputs,NA,PERID,All,,Synthetic population person file
+households,inputs,NA,hhid,All,,Synthetic population household file
+occFactors,uec,NA,emp_code,All,,Factors to compute work location size from MAZ_level employment data
+maz_data_export,inputs,Visum.Net.MainZones,NO,"NO,TAZ,DISTNAME,DISTID,COUNTY,HH,POP,HHP,EMP_CONSTR,EMP_WHOLE,EMP_RETAIL,EMP_SPORT,EMP_ACCFD,EMP_AGR,EMP_MIN,EMP_UTIL,EMP_FOOD,EMP_WOOD,EMP_METAL,EMP_TRANS,EMP_POSTAL,EMP_INFO,EMP_FINANC,EMP_REALES,EMP_PROF,EMP_MGMT,EMP_ADMIN,EMP_EDUC,EMP_HEALTH,EMP_ARTS,EMP_OTHER,EMP_PUBADM,EMP_TOTAL,ENROLLK_8,ENROLL9_12,ENROLLCOLL,ENROLLCOOT,ENROLLADSC,universitySqFtClass,universitySqFtOffice,universitySqFtRec,ECH_DIST,HCH_DIST,HOTELRMTOT,PARKAREA,HSTALLSOTH,HSTALLSSAM,HPARKCOST,NUMFREEHRS,DSTALLSOTH,DSTALLSSAM,DPARKCOST,MSTALLSOTH,MSTALLSSAM,MPARKCOST,WRK_EXT_PR,SCHDIST_NA,SCHDIST,TERMTIME,PARKACRES",,MAZ data in SOABM.ver file
+taz_data,inputs,Visum.Net.Zones,NO,"NO,COUNTY",,TAZ data in SOABM.ver file
+link_data,inputs,Visum.Net.Links,NO,"NO,FROMNODENO,TONODENO,TYPENO,TSYSSET,LENGTH,V0PRT,PLANNO,NUMLANES,AUX_LANES,MEDIAN,EA_SPEED,AM_SPEED,MD_SPEED,PM_SPEED,EV_SPEED,LANES_EA,LANES_AM,LANES_MD,LANES_PM,LANES_EV,FFSPEED,PROGRESSION_FACTOR,MID_LINK_CAP_ADJ,TONODE\CONTROLTYPE,TOMAINNODE\CONTROLTYPE,LENGTHDIR,REVERSELINK\LENGTH,Network\TOD_FACTOR_EA,Network\TOD_FACTOR_AM,Network\TOD_FACTOR_MD,Network\TOD_FACTOR_PM,Network\TOD_FACTOR_EV","{""TONODE\CONTROLTYPE"": ""TONODE_CTYPE"",""TOMAINNODE\CONTROLTYPE"": ""TOMNODE_CTYPE"",""REVERSELINK\LENGTH"": ""LENGTHREV"",""Network\TOD_FACTOR_EA"":""TOD_FACTOR_EA"",""Network\TOD_FACTOR_AM"":""TOD_FACTOR_AM"",""Network\TOD_FACTOR_MD"":""TOD_FACTOR_MD"",""Network\TOD_FACTOR_PM"":""TOD_FACTOR_PM"",""Network\TOD_FACTOR_EV"":""TOD_FACTOR_EV""}",Link data in SOABM.ver file
+node_data,inputs,Visum.Net.Nodes,NO,"NO,XCOORD,YCOORD,CONTROLTYPE,MajorFlowOri1,MajorFlowOri2",,Node data in SOABM.ver file
+mnode_data,inputs,Visum.Net.MainNodes,NO,"NO,CONTROLTYPE,MajorFlowOri1,MajorFlowOri2,CONCATENATE:NODES\CONTROLTYPE","{""CONCATENATE:NODES\CONTROLTYPE"": ""NODES_CTYPE""}",Main Node data in SOABM.ver file
+tap_data,inputs,Visum.Net.StopAreas,NO,"NO,CANPNR,FAREZONE,CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\LINENAME","{""CONCATENATE:STOPPOINTS\CONCATENATE:LINEROUTES\LINENAME"": ""LINES""}",TAP (Stop Area) data in SOABM.ver file
+fares,inputs,NA,FAREID,All,,Input Zone fare matrix
+tsystems,inputs,Visum.Net.TSystems,Code,"Code,Name,Type",,List of transportation systems in SO-ABM network
+line_data,inputs,Visum.Net.Lines,NAME,"NAME,TSYSCODE",,Transit line data
+lineroute_data,inputs,Visum.Net.LineRoutes,NAME,"NAME,TSYSCODE,EA_HEADWAY,AM_HEADWAY,MD_HEADWAY,PM_HEADWAY,EV_HEADWAY",,Transit line route data
+time_profiles,inputs,Visum.Net.TimeProfiles,LINEROUTENAME,"LINEROUTENAME,LINENAME,NAME",,List of time profiles for each line route
+connectors_data,inputs,Visum.Net.Connectors,ID,"ZONENO,NODENO,DIRECTION,TSYSSET",,TAZ connectors data
+vdf_lookup_table,inputs,NA,ID,All,,VDF lookup table

@@ -97,9 +97,9 @@ def export_csv(Visum, visum_obj, fieldsToExport, csv_name):
         
     #create output file
     f = open(os.path.join(cwd,'inputs',csv_name + '.csv'), 'wb')
-    f.write(header + "\n")
+    f.write(header + "\r\n")
     for i in range(len(row)):
-        f.write(row[i] + "\n")
+        f.write(row[i] + "\r\n")
     f.close()
     
 def write_log(results, problem_ids, checks_list, inputs_list, result_list, settings):
@@ -111,47 +111,47 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     # Create log file
     now = datetime.datetime.now()
-    f = open(os.path.join(cwd,'logs', ('inputChecker' + now.strftime("[%Y-%m-%d]") + '.LOG')), 'wb')
+    f = open(os.path.join(cwd,'logs', ('inputCheckerLog ' + now.strftime("[%Y-%m-%d]") + '.LOG')), 'wb')
     
     # Define re-usable elements
     seperator1 = '###########################################################'
     seperator2 = '***********************************************************'
     
     # Write out Header
-    f.write(seperator1 + seperator1 + "\n")
-    f.write(seperator1 + seperator1 + "\n\n")
-    f.write("\t SOABM Input Checker Log File \n")
-    f.write("\t ____________________________ \n\n\n")
-    f.write("\t Log created on: " + now.strftime("%Y-%m-%d %H:%M") + "\n\n")
-    f.write("\t Notes:-\n")
-    f.write("\t The SOABM Input Checker performs various QA/QC checks on SOABM inputs as specified by the user.\n")
-    f.write("\t The Input Checker allows the user to specify three severity levels for each QA/QC check:\n\n")
-    f.write("\t 1) FATAL  2) LOGICAL  3) WARNING\n\n")
-    f.write("\t FATAL Checks:   The failure of these checks would result in a FATAL errors in the SOABM run.\n")
-    f.write("\t                 In case of FATAL failure, the Input Checker returns a return code of 1 to the\n")
-    f.write("\t                 main SOABM model, cauing the model run to halt.\n")
-    f.write("\t LOGICAL Checks: The failure of these checks indicate logical inconsistencies in the inputs.\n")
-    f.write("\t                 With logical errors in inputs, the SOABM outputs may not be meaningful.\n")
-    f.write("\t WARNING Checks: The failure of Warning checks would indicate problems in data that would not.\n")
-    f.write("\t                 halt the run or affect model outputs but might indicate an issue with inputs.\n\n\n")
-    f.write("\t The results of all the checks are organized as follows: \n\n")
-    f.write("\t IMMEDIATE ACTION REQUIRED:\n")
-    f.write("\t -------------------------\n")
-    f.write("\t A log under this heading will be generated in case of failure of a FATAL check\n\n")
-    f.write("\t ACTION REQUIRED:\n")
-    f.write("\t ---------------\n")
-    f.write("\t A log under this heading will be generated in case of failure of a LOGICAL check\n\n")
-    f.write("\t WARNINGS:\n")
-    f.write("\t ---------------\n")
-    f.write("\t A log under this heading will be generated in case of failure of a WARNING check\n\n")
-    f.write("\t COMPLETE LOG:\n")
-    f.write("\t -----------\n")
-    f.write("\t A complete listing of results of all checks in a concise form\n\n")
-    f.write("\t MISSING VALUE SELF DIAGNOSTICS:\n")
-    f.write("\t -----------\n")
-    f.write("\t A complete listing of failed missing value self diagnostics tests on all inputs\n\n")
-    f.write(seperator1 + seperator1 + "\n")
-    f.write(seperator1 + seperator1 + "\n\n\n\n")
+    f.write(seperator1 + seperator1 + "\r\n")
+    f.write(seperator1 + seperator1 + "\r\n\r\n")
+    f.write("\t SOABM Input Checker Log File \r\n")
+    f.write("\t ____________________________ \r\n\r\n\r\n")
+    f.write("\t Log created on: " + now.strftime("%Y-%m-%d %H:%M") + "\r\n\r\n")
+    f.write("\t Notes:-\r\n")
+    f.write("\t The SOABM Input Checker performs various QA/QC checks on SOABM inputs as specified by the user.\r\n")
+    f.write("\t The Input Checker allows the user to specify three severity levels for each QA/QC check:\r\n\r\n")
+    f.write("\t 1) FATAL  2) LOGICAL  3) WARNING\r\n\r\n")
+    f.write("\t FATAL Checks:   The failure of these checks would result in a FATAL errors in the SOABM run.\r\n")
+    f.write("\t                 In case of FATAL failure, the Input Checker returns a return code of 1 to the\r\n")
+    f.write("\t                 main SOABM model, cauing the model run to halt.\r\n")
+    f.write("\t LOGICAL Checks: The failure of these checks indicate logical inconsistencies in the inputs.\r\n")
+    f.write("\t                 With logical errors in inputs, the SOABM outputs may not be meaningful.\r\n")
+    f.write("\t WARNING Checks: The failure of Warning checks would indicate problems in data that would not.\r\n")
+    f.write("\t                 halt the run or affect model outputs but might indicate an issue with inputs.\r\n\r\n\r\n")
+    f.write("\t The results of all the checks are organized as follows: \r\n\r\n")
+    f.write("\t IMMEDIATE ACTION REQUIRED:\r\n")
+    f.write("\t -------------------------\r\n")
+    f.write("\t A log under this heading will be generated in case of failure of a FATAL check\r\n\r\n")
+    f.write("\t ACTION REQUIRED:\r\n")
+    f.write("\t ---------------\r\n")
+    f.write("\t A log under this heading will be generated in case of failure of a LOGICAL check\r\n\r\n")
+    f.write("\t WARNINGS:\r\n")
+    f.write("\t ---------------\r\n")
+    f.write("\t A log under this heading will be generated in case of failure of a WARNING check\r\n\r\n")
+    f.write("\t COMPLETE LOG:\r\n")
+    f.write("\t -----------\r\n")
+    f.write("\t A complete listing of results of all checks in a concise form\r\n\r\n")
+    f.write("\t MISSING VALUE SELF DIAGNOSTICS:\r\n")
+    f.write("\t -----------\r\n")
+    f.write("\t A complete listing of failed missing value self diagnostics tests on all inputs\r\n\r\n")
+    f.write(seperator1 + seperator1 + "\r\n")
+    f.write(seperator1 + seperator1 + "\r\n\r\n\r\n\r\n")
     
     # Combine results, checks_list and inputs_list
     checks_list['result'] = checks_list['Test'].map(results)
@@ -171,12 +171,12 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     # Write out IMMEDIATE ACTION REQUIRED section if needed
     if num_fatal>0:
         fatal_checks = checks_df[(checks_df.Severity=='Fatal') & (checks_df.reverse_result)]
-        f.write('\n\n' + seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n\n")
-        f.write('\t' + "IMMEDIATE ACTION REQUIRED \n")
-        f.write('\t' + "------------------------- \n\n")
-        f.write(seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n")
+        f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n\r\n")
+        f.write('\t' + "IMMEDIATE ACTION REQUIRED \r\n")
+        f.write('\t' + "------------------------- \r\n\r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
         
         #write out log for each check
         for item, row in fatal_checks.iterrows():
@@ -185,12 +185,12 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     # Write out ACTION REQUIRED section if needed
     if num_logical>0:
         logical_checks = checks_df[(checks_df.Severity=='Logical') & (checks_df.reverse_result)]
-        f.write('\n\n' + seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n\n")
-        f.write('\t' + "ACTION REQUIRED \n")
-        f.write('\t' + "--------------- \n\n")
-        f.write(seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n")
+        f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n\r\n")
+        f.write('\t' + "ACTION REQUIRED \r\n")
+        f.write('\t' + "--------------- \r\n\r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
         
         #write out log for each check
         for item, row in logical_checks.iterrows():
@@ -199,12 +199,12 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     # Write out WARNINGS section if needed
     if num_warning>0:
         warning_checks = checks_df[(checks_df.Severity=='Warning') & (checks_df.reverse_result)]
-        f.write('\n\n' + seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n\n")
-        f.write('\t' + "WARNINGS \n")
-        f.write('\t' + "-------- \n")
-        f.write(seperator2 + seperator2 + "\n")
-        f.write(seperator2 + seperator2 + "\n")
+        f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n\r\n")
+        f.write('\t' + "WARNINGS \r\n")
+        f.write('\t' + "-------- \r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
+        f.write(seperator2 + seperator2 + "\r\n")
         
         #write out log for each check
         for item, row in warning_checks.iterrows():
@@ -212,12 +212,12 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     # Write out the complete listing of all checks that passed
     passed_checks = checks_df[(checks_df.result)]
-    f.write('\n\n' + seperator2 + seperator2 + "\n")
-    f.write(seperator2 + seperator2 + "\n\n")
-    f.write('\t' + "LOG OF ALL PASSED CHECKS \n")
-    f.write('\t' + "------------------------ \n")
-    f.write(seperator2 + seperator2 + "\n")
-    f.write(seperator2 + seperator2 + "\n")
+    f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n\r\n")
+    f.write('\t' + "LOG OF ALL PASSED CHECKS \r\n")
+    f.write('\t' + "------------------------ \r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
     
     #write out log for each check
     for item, row in passed_checks.iterrows():
@@ -225,13 +225,13 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         
     # Do self diagnostics on all inputs
     #  - check for presence of NAs in all columns and raise flag as per severity level  in settings file
-    f.write('\n\n' + seperator2 + seperator2 + "\n")
-    f.write(seperator2 + seperator2 + "\n\n")
-    f.write('\t' + "MISSING VALUE DIAGNOSTICS ON ALL INPUTS \n")
-    f.write('\t' + "--------------------------------------- \n\n")
-    f.write('\t' + "Only failed checks are printed \n")
-    f.write(seperator2 + seperator2 + "\n")
-    f.write(seperator2 + seperator2 + "\n")
+    f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n\r\n")
+    f.write('\t' + "MISSING VALUE DIAGNOSTICS ON ALL INPUTS \r\n")
+    f.write('\t' + "--------------------------------------- \r\n\r\n")
+    f.write('\t' + "Only failed checks are printed \r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
     
     for item, row in inputs_list.iterrows():
         # read the input dataframe
@@ -294,6 +294,15 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
             #print 'here' + column_test['Test']
         
     f.close()
+    # Write out a summary of results from input checker for main model
+    f = open(os.path.join(cwd,'logs', ('inputCheckerSummary' + '.txt')), 'wb')
+    f.write('\r\n' + seperator2 + '\r\n')
+    f.write('\t Summary of Input Checker Fails \r\n')
+    f.write(seperator2 + '\r\n\r\n')
+    f.write(' Number of Fatal Errors: ' + str(num_fatal))
+    f.write('\r\n\r\n Number of Logical Errors: ' + str(num_logical))
+    f.write('\r\n\r\n Number of Warnings: ' + str(num_warning) + '\r\n\r\n')
+    f.close()
     return(num_fatal)
     
 
@@ -303,27 +312,27 @@ def write_check_log(fh, row, problem_ids, result_list):
     cwd = os.getcwd()
     #print(row['Test'])
     # Write check summary
-    fh.write('\n\n' + seperator2 + seperator2)
-    fh.write("\n\t Input File Name: " + row['Table'] + '.csv')
-    fh.write("\n\t Input File Location: " + cwd + ('\\inputs\\SOABM.ver' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Table'] + '.csv')))
-    fh.write("\n\t Visum Object: " + (row['Visum_Object'] if not pd.isnull(row['Visum_Object']) else 'NA'))
-    fh.write("\n\t Input Description: " + (row['Input_Description'] if not pd.isnull(row['Input_Description']) else ""))
-    fh.write("\n\t Test Name: " + row['Test'])
-    fh.write("\n\t Test Description: " + (row['Test_Description'] if not pd.isnull(row['Test_Description']) else ""))
-    fh.write("\n\t Test Severity: " + row['Severity'])
-    fh.write("\n\n\t TEST RESULT: " + ('PASSED' if row['result'] else 'FAILED'))
+    fh.write('\r\n\r\n' + seperator2 + seperator2)
+    fh.write("\r\n\t Input File Name: " + row['Table'] + '.csv')
+    fh.write("\r\n\t Input File Location: " + cwd + ('\\inputs\\SOABM.ver' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Table'] + '.csv')))
+    fh.write("\r\n\t Visum Object: " + (row['Visum_Object'] if not pd.isnull(row['Visum_Object']) else 'NA'))
+    fh.write("\r\n\t Input Description: " + (row['Input_Description'] if not pd.isnull(row['Input_Description']) else ""))
+    fh.write("\r\n\t Test Name: " + row['Test'])
+    fh.write("\r\n\t Test Description: " + (row['Test_Description'] if not pd.isnull(row['Test_Description']) else ""))
+    fh.write("\r\n\t Test Severity: " + row['Severity'])
+    fh.write("\r\n\r\n\t TEST RESULT: " + ('PASSED' if row['result'] else 'FAILED'))
     # Display problem IDs for failed column checks
     if (not row['result']) & (len(problem_ids)>0) :
-        fh.write("\n\t TEST failed for following values of ID Column: " + row['ID_Column'] + " (only upto 25 IDs displayed)")
-        fh.write("\n\t " + row['ID_Column'] + ": " + ','.join(map(str, problem_ids)))
+        fh.write("\r\n\t TEST failed for following values of ID Column: " + row['ID_Column'] + " (only upto 25 IDs displayed)")
+        fh.write("\r\n\t " + row['ID_Column'] + ": " + ','.join(map(str, problem_ids)))
     # Display result for each test val if it was specified
     if not (pd.isnull(row['Test_Vals'])):
-        fh.write("\n\t TEST results for each test val")
+        fh.write("\r\n\t TEST results for each test val")
         result_tuples = zip(row['Test_Vals'].split(","), result_list[row['Test']])
-        fh.write("\n\t ")
+        fh.write("\r\n\t ")
         fh.write(','.join('[{} - {}]'.format(x[0],x[1]) for x in result_tuples))
         
-    fh.write("\n" + seperator2 + seperator2 + "\n\n")
+    fh.write("\r\n" + seperator2 + seperator2 + "\r\n\r\n")
     
     
     
@@ -369,12 +378,13 @@ if __name__== "__main__":
             #row = inputs_list.iloc[0]
             print 'Adding ' + row['Table']
             csv_name = row['Table']
+            directory = row['Directory']
             visum_obj = row['Visum_Object']
             columnMap = row['Column_Map']
             inputIDColumn = row['Input_ID_Column']
             fieldsToExport = row['Fields'].split(",")
             
-            # export the visum table
+            # export the visum table and read other csv inputs
             if not (pd.isnull(visum_obj)) :
                 if export_Visum:
                     export_csv(Visum, visum_obj, fieldsToExport, csv_name)
@@ -389,7 +399,12 @@ if __name__== "__main__":
                    exec(rename_expr)
                 inputs[csv_name] = df
             else:
-                df = pd.read_csv(os.path.join(cwd,'..','inputs',csv_name + '.csv'))
+                # CSV inputs can be in both inputs or uec directory
+                if directory == 'inputs':
+                    df = pd.read_csv(os.path.join(cwd,'..','inputs',csv_name + '.csv'))
+                else:
+                    df = pd.read_csv(os.path.join(cwd,'..','uec',csv_name + '.csv'))
+                    
                 df.to_csv(os.path.join(cwd,'inputs',csv_name + '.csv'))
                 #if ID column does not exist, cerate as DF index
                 if not (inputIDColumn in df.columns):
@@ -477,7 +492,7 @@ if __name__== "__main__":
             
         
         # Write out log file
-        print "\nWriting log file\n"
+        print "\r\nWriting log file\r\n"
         num_fatal = write_log(results, problem_ids, checks_list, inputs_list, result_list, settings)
         
         # Return code to the main model based on input checks and results

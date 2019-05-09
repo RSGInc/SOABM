@@ -51,10 +51,10 @@ SET PROJECT_DIRECTORY_FORWARD=%PROJECT_DIRECTORY:\=/%
 ECHO PROJECT_DIRECTORY_FORWARD: %PROJECT_DIRECTORY_FORWARD%
 
 :: Copy the ODOT VDF DLLs to the local VISUM DLL folder
-SET VDF_BMP=%~dp0..\dependencies\vdf
+SET VDF_BMP=%~dp0\application
 ECHO VDF_BMP: %VDF_BMP%
 
-SET VDF_DLL=%~dp0..\dependencies\vdf\x64\Release
+SET VDF_DLL=%~dp0\application
 ECHO VDF_DLL: %VDF_DLL%
 
 COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 18\UserVDF-DLLs"
@@ -206,6 +206,10 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 :: -------------------------------------------------------------------------------------------------
 
 ECHO MODEL RUN COMPLETE
+
+:: Remind user to check inputChecker LOG
+ECHO Please check log file in "inputChecker\logs" directory
+TYPE %PROJECT_DIRECTORY%\inputChecker\logs\inputCheckerSummary.txt
 PAUSE
 GOTO END
 
