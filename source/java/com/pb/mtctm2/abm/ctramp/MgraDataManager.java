@@ -184,6 +184,7 @@ public final class MgraDataManager
         float bikeMilesPerHour = Util.getFloatValueFromPropertyMap(rbMap, PROPERTIES_BIKE_MILES_PER_HOUR);
         float feetPerMile = 5280f;
         
+        
         walkMinutesPerFoot = 1.0f/(walkMilesPerHour/60.0f * feetPerMile);
         bikeMinutesPerFoot = 1.0f/(bikeMilesPerHour/60.0f * feetPerMile);
         readMgraTableData(rbMap);
@@ -192,6 +193,8 @@ public final class MgraDataManager
         readMgraWlkTaps(rbMap);
         readTapLines(rbMap);
         trimTapSet();
+        
+        
         
         readMazMazWalkDistance(rbMap);
         readMazMazBikeDistance(rbMap);

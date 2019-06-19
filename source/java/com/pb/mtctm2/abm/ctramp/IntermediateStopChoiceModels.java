@@ -2870,6 +2870,10 @@ public class IntermediateStopChoiceModels implements Serializable {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
+                        // tour orig mgra must always be available as inbound stop destination
+                        else if ( alt == t.getTourOrigMgra() ) {
+                        	accessible = true;
+                        }
                     }
                     else {
                         // if alternative location mgra is accessible by walk to any of the best origin taps, AND it's accessible by walk to the stop origin, it's available.                    
@@ -2883,6 +2887,10 @@ public class IntermediateStopChoiceModels implements Serializable {
                         else if (  mgraManager.getTapIsDriveAccessibleFromMgra(alt, (int)tapPair[1]) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
+                        }
+                        // tour orig mgra must always be available as inbound stop destination
+                        else if ( alt == t.getTourOrigMgra() ) {
+                        	accessible = true;
                         }
                     }
 
@@ -2936,6 +2944,10 @@ public class IntermediateStopChoiceModels implements Serializable {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
                         }
+                        //tour destination mgra must always be available as outboud stop alternative
+                        else if ( alt == t.getTourDestMgra() ) {
+                        	accessible = true;
+                        }
                     }
                     else {
                         // if alternative location mgra is accessible by drive to any of the best origin taps, it's available.                    
@@ -2948,6 +2960,10 @@ public class IntermediateStopChoiceModels implements Serializable {
                         else if ( mgraManager.getTapIsWalkAccessibleFromMgra(alt, (int)tapPair[1]) && mgraManager.getMgrasAreWithinWalkDistance(alt, t.getTourDestMgra()) ) {
                             accessible = true;
                             sampleMgraInAlightingTapShed[alt] = true;
+                        }
+                        //tour destination mgra must always be available as outboud stop alternative
+                        else if ( alt == t.getTourDestMgra() ) {
+                        	accessible = true;
                         }
                     }
                     
