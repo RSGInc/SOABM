@@ -52,7 +52,7 @@ def saveVersion(Visum, fileName):
 
 def closeVisum(Visum):
   print("close Visum")
-  Visum = None
+  Visum = 0
 
 def loadProcedure(Visum,parFileName,execute=True):
   print("run procedure file: " + parFileName)
