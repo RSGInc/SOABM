@@ -26,7 +26,7 @@ import VisumPy.csvHelpers
 import traceback
 import pandas as pd
 sys.path.append("scripts")
-#sys.path.append("E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/SOABM/template/scripts")
+#sys.path.append("E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template/scripts")
 from Properties import Properties
 import warnings
 import tables
@@ -714,6 +714,14 @@ def writeMazDataFile(Visum, fileName):
     
   print("write MAZ data file")
   
+  properties = Properties()
+  properties.loadPropertyFile("config\orramp.properties")
+  factor_vars = properties['MAZ.Variables.To.Factor']
+  factors = properties['MAZ.Factors']
+  
+  factor_vars = factor_vars.split(",")
+  factors = factors.split(",")
+  
   fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","DISTID","COUNTY","HH","POP","HHP",
     "EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT","EMP_ACCFD","EMP_AGR",
     "EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD","EMP_METAL","EMP_TRANS",
@@ -724,7 +732,7 @@ def writeMazDataFile(Visum, fileName):
     "ECH_DIST","HCH_DIST","HOTELRMTOT","PARKAREA","HSTALLSOTH",
     "HSTALLSSAM","HPARKCOST","NUMFREEHRS","DSTALLSOTH","DSTALLSSAM",
     "DPARKCOST","MSTALLSOTH","MSTALLSSAM","MPARKCOST","WRK_EXT_PR","SCHDIST_NA",
-    "SCHDIST","DUDEN","EMPDEN","TOTINT","POPDEN","RETDEN","TERMTIME","PARKACRES"]
+    "SCHDIST","DUDEN","EMPDEN","TOTINT","POPDEN","RETDEN","TERMTIME","PARKACRES","TE_MAZ_OWT"]
 
   #create header
   header = ",".join(fieldsToExport)
@@ -733,13 +741,23 @@ def writeMazDataFile(Visum, fileName):
   #create rows
   row = []
   for i in range(len(fieldsToExport)):
-    uda = VisumPy.helpers.GetMulti(Visum.Net.Zones, fieldsToExport[i])
-    if i==0:
-      for j in range(len(uda)):
-        row.append(str(uda[j]))
+    if fieldsToExport[i] in factor_vars:
+        var_factor = float(factors[factor_vars.index(fieldsToExport[i])])
+        uda = VisumPy.helpers.GetMulti(Visum.Net.Zones, fieldsToExport[i])
+        if i==0:
+          for j in range(len(uda)):
+            row.append(str(uda[j] * var_factor))
+        else:
+          for j in range(len(uda)):
+            row[j] = row[j] + "," + str(float(uda[j]) * var_factor)
     else:
-      for j in range(len(uda)):
-        row[j] = row[j] + "," + str(uda[j])
+        uda = VisumPy.helpers.GetMulti(Visum.Net.Zones, fieldsToExport[i])
+        if i==0:
+          for j in range(len(uda)):
+            row.append(str(uda[j]))
+        else:
+          for j in range(len(uda)):
+            row[j] = row[j] + "," + str(uda[j])
   
   #create output file
   f = open(fileName, 'wb') 
@@ -1830,7 +1848,7 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   
 def create_transit_everywhere_skims():
   warnings.simplefilter('ignore', tables.NaturalNameWarning)
-  #working_dir = 'E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/Final/SOABM/template'
+  #working_dir = 'E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template'
   #os.chdir(working_dir)
   
   # Read properties
@@ -1862,8 +1880,9 @@ def create_transit_everywhere_skims():
   
   # Origin Wait time array
   #this must exist in the MAZ data
-  #tap_owt = (numpy.ones((num_taps,num_taps)) * mazData.TE_TAP_FWT).transpose()
-  tap_owt = numpy.ones((num_taps,num_taps))
+  #tap_owt = (numpy.ones((num_taps,num_taps)) * mazData.TE_MAZ_OWT).transpose()
+  tap_owt = numpy.array([mazData.TE_MAZ_OWT,]*len(mazData.TE_MAZ_OWT)).transpose()
+  #tap_owt = numpy.ones((num_taps,num_taps))
   
   #tap to taz lookup
   tap_to_taz = dict(zip(mazData.MAZ, mazData.TAZ))
@@ -2232,7 +2251,10 @@ if __name__== "__main__":
           #create CSVs for highway and transit assignment outputs
           loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
           link_list = Visum.Lists.CreateLinkList
-          link_field_list = ['No','FromNodeNo','ToNodeNo', 'FFSPEED', 'LENGTH', 'PLANNO','vdf_int_cap','vdf_int_fc','vdf_ll','vdf_mid_link_cap','vdf_rl','vdf_tl','vdf_unc_sig_delay']
+          link_field_list = ['No','FromNodeNo','ToNodeNo', 'FFSPEED', 'LENGTH', 'PLANNO','vdf_int_cap','vdf_int_fc','vdf_ll','vdf_mid_link_cap',
+                             'vdf_rl','vdf_tl','vdf_unc_sig_delay','TSYSSET','NUMLANES','CAPPRT','TOLL_PRTSYS(BIKE)','TOLL_PRTSYS(HOV2)',
+                             'TOLL_PRTSYS(HOV2TOLL)','TOLL_PRTSYS(HOV3)','TOLL_PRTSYS(HOV3TOLL)','TOLL_PRTSYS(SOV)','TOLL_PRTSYS(SOVTOLL)',
+                             'TOLL_PRTSYS(TRUCK)','TOLL_PRTSYS(TRUCKTOLL)','TOLL_PRTSYS(WALK)']
           for out_field in link_field_list:
               link_list.AddColumn(out_field)
           for tp in ['EA','AM','MD','PM','EV','DAILY']:
@@ -2242,6 +2264,12 @@ if __name__== "__main__":
           for tp in ['EA','AM','MD','PM','EV']:
               for mode in ['AUTO','TRUCK']:
                   out_field = tp + '_Speed_' + mode
+                  link_list.AddColumn(out_field)
+          for tp in ['EA','AM','MD','PM','EV']:
+              out_field = tp + '_VOLCAPRATIOPRT'
+              link_list.AddColumn(out_field)
+              for mode in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','trkt','walk']:
+                  out_field = tp + '_tCur_' + mode
                   link_list.AddColumn(out_field)
           link_list.SaveToAttributeFile(proj_dir + "outputs//networks//HighwayAssignment_Results.csv", 44)
           
@@ -2317,6 +2345,18 @@ if __name__== "__main__":
       auto_speed = [[0]*len(dst_list) for i in range(5)]
       truck_speed = [[0]*len(dst_list) for i in range(5)]
       min_cap = [[0]*len(dst_list) for i in range(5)]
+      tcur_bike = [[0]*len(dst_list) for i in range(5)]
+      tcur_hov2 = [[0]*len(dst_list) for i in range(5)]
+      tcur_hov2t = [[0]*len(dst_list) for i in range(5)]
+      tcur_hov3 = [[0]*len(dst_list) for i in range(5)]
+      tcur_hov3t = [[0]*len(dst_list) for i in range(5)]
+      tcur_sov = [[0]*len(dst_list) for i in range(5)]
+      tcur_sovt = [[0]*len(dst_list) for i in range(5)]
+      tcur_trk = [[0]*len(dst_list) for i in range(5)]
+      tcur_trkt = [[0]*len(dst_list) for i in range(5)]
+      tcur_walk = [[0]*len(dst_list) for i in range(5)]
+      tcur_dict = {}
+      vc_ratio = [[0]*len(dst_list) for i in range(5)]
       vmt_list = [[0]*5 for i in range(6)]
       
       tod_cnt = 0
@@ -2330,6 +2370,17 @@ if __name__== "__main__":
         trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
         auto_speed[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VCUR_PRTSYS(SOV)")
         truck_speed[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VCUR_PRTSYS(TRUCK)")
+        tcur_bike[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(BIKE)")
+        tcur_hov2[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV2)")
+        tcur_hov2t[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV2TOLL)")
+        tcur_hov3[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3)")
+        tcur_hov3t[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3TOLL)")
+        tcur_sov[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOV)")
+        tcur_sovt[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOVTOLL)")
+        tcur_trk[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCK)")
+        tcur_trkt[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
+        tcur_walk[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(WALK)")
+        vc_ratio[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VOLCAPRATIOPRT(AP)")
         mlc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
         inc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
         #do not generate transit summary for transit everywhere
@@ -2369,6 +2420,17 @@ if __name__== "__main__":
             for rt in range(numRoutes):
               lineUTrips[5][rt] = lineUTrips[5][rt] + lineUTrips[tod_cnt][rt]	  
         tod_cnt = tod_cnt + 1
+      #fill tcur dictionary
+      tcur_dict['bike'] = tcur_bike
+      tcur_dict['hov2'] = tcur_hov2
+      tcur_dict['hov2t'] = tcur_hov2t
+      tcur_dict['hov3'] = tcur_hov3
+      tcur_dict['hov3t'] = tcur_hov3t
+      tcur_dict['sov'] = tcur_sov
+      tcur_dict['sovt'] = tcur_sovt
+      tcur_dict['trk'] = tcur_trk
+      tcur_dict['trkt'] = tcur_trkt
+      tcur_dict['walk'] = tcur_walk
       f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
       f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
       for i in range(len(countLocs)):
@@ -2406,6 +2468,16 @@ if __name__== "__main__":
                   transit_boardings[col] = 0
                   
           transit_boardings.to_csv('outputs/other/ABM_Summaries/transitBoardingSummary.csv', index=False)
+      # Get all user defined link attributes
+      loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_ea.ver")
+      udaNames = []
+      for i in Visum.Net.Links.Attributes.GetAll:
+        if i.category=="User-defined attributes":
+          udaNames.append(i.Name)
+      
+      closeVisum(Visum)
+      Visum = startVisum()
+              
       # write out final congested auto and truck speeds to each period version files
       for tp in ['ea','am','md','pm','ev']:
           loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
@@ -2419,11 +2491,40 @@ if __name__== "__main__":
               tod_cnt = 0
               for tod_var in ['EA','AM','MD','PM','EV']:
                   field_name = tod_var + "_Speed_" + mode_var
-                  Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+                  if field_name not in udaNames:
+                      Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
                   VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
                   tod_cnt = tod_cnt + 1
               mode_count = mode_count + 1
               saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+      # write out final congested travel time by demand segment to each period version files
+      for tp in ['ea','am','md','pm','ev']:
+          loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+          #mode_count = 0
+          for mode_var in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','trkt','walk']:
+              set_list=tcur_dict[mode_var]
+              #loop through all periods for each version file
+              tod_cnt = 0
+              for tod_var in ['EA','AM','MD','PM','EV']:
+                  field_name = tod_var + "_tCur_" + mode_var
+                  if field_name not in udaNames:
+                      Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+                  VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
+                  tod_cnt = tod_cnt + 1
+              #mode_count = mode_count + 1
+              saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+      # write out vc ratio to each period version files
+      for tp in ['ea','am','md','pm','ev']:
+          loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+          tod_cnt = 0
+          for tod_var in ['EA','AM','MD','PM','EV']:
+              field_name = tod_var + "_VOLCAPRATIOPRT" 
+              if field_name not in udaNames:
+                  Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+              VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, vc_ratio[tod_cnt])
+              tod_cnt = tod_cnt + 1
+          #mode_count = mode_count + 1
+          saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
       # write out final volumes to each period version files
       for tp in ['ea','am','md','pm','ev']:
         loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
@@ -2438,7 +2539,8 @@ if __name__== "__main__":
           tod_cnt = 0
           for tod_var in ['EA','AM','MD','PM','EV','DAILY']:
             field_name = tod_var + "_Vol_" + mode_var
-            Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+            if field_name not in udaNames:
+                Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
             VisumPy.helpers.SetMulti(Visum.Net.Links, field_name, set_list[tod_cnt])
             tod_cnt = tod_cnt + 1
           mode_count = mode_count + 1	

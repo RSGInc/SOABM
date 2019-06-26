@@ -209,7 +209,7 @@ ECHO MODEL RUN COMPLETE
 
 :: Remind user to check inputChecker LOG
 ECHO Please check log file in "inputChecker\logs" directory
-TYPE %PROJECT_DIRECTORY%\inputChecker\logs\inputCheckerSummary.txt
+TYPE %PROJECT_DIRECTORY:/=\%inputChecker\logs\inputCheckerSummary.txt
 PAUSE
 GOTO END
 

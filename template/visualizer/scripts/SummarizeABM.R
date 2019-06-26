@@ -6,7 +6,7 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
-#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Contingency/SOABM/template/visualizer/runtime/parameters.csv"
+#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template/visualizer/runtime/parameters.csv"
 
 SYSTEM_REPORT_PKGS <- c("reshape", "omxr", "data.table", "plyr", "weights")
 lib_sink <- suppressWarnings(suppressMessages(lapply(SYSTEM_REPORT_PKGS, library, character.only = TRUE))) 
@@ -684,6 +684,12 @@ jtrips$stops[is.na(jtrips$stops)] <- 0
 
 jtrips$OTAZ <- xwalk$TAZ[match(jtrips$orig_mgra, xwalk$MAZ)]
 jtrips$DTAZ <- xwalk$TAZ[match(jtrips$dest_mgra, xwalk$MAZ)]
+
+# Edited BMP [06/21/19]
+# OD distnaces were not getting computed for joint trips
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp$Lookup)
+jtrips$od_dist<-skimMat3[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
 
 jtrips$TOUROTAZ <- unique_joint_tours$OTAZ[match(jtrips$hh_id*1000+jtrips$tour_id, 
 										unique_joint_tours$hh_id*1000+unique_joint_tours$tour_id)]
@@ -2120,10 +2126,14 @@ trips$num_travel[trips$TRIPMODE==2] <- 2
 trips$num_travel[trips$TRIPMODE==3] <- 3.33
 trips$num_travel[is.na(trips$num_travel)] <- 0
 
-jtrips$num_travel[jtrips$TRIPMODE==1] <- 1
-jtrips$num_travel[jtrips$TRIPMODE==2] <- 2
-jtrips$num_travel[jtrips$TRIPMODE==3] <- 3.33
-jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
+# Edit by BMP [06/21/19]
+# Only on record per trip for joint trips [household level model], therefore 
+# no need to convert from person to vehicles
+jtrips$num_travel <- 1
+#jtrips$num_travel[jtrips$TRIPMODE==1] <- 1
+#jtrips$num_travel[jtrips$TRIPMODE==2] <- 2
+#jtrips$num_travel[jtrips$TRIPMODE==3] <- 3.33
+#jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
 
 total_vmt <- sum((trips$od_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIPMODE<=3]) + 
   sum((jtrips$od_dist[jtrips$TRIPMODE<=3])/jtrips$num_travel[jtrips$TRIPMODE<=3])
@@ -2134,6 +2144,11 @@ totals_val <- c(total_population,total_households, total_tours, total_trips, tot
 totals_df <- data.frame(name = totals_var, value = totals_val)
 
 write.csv(totals_df, "totals.csv", row.names = F)
+
+# Edited BMP [06/21/2019]
+# export trip lists with od distances to be used for EMAT attribute computation
+write.csv(trips, "individualTripsCTRAMP.csv", row.names = F)
+write.csv(jtrips, "jointTripsCTRAMP.csv", row.names = F)
 
 # HH Size distribution
 hhSizeDist <- count(hh, c("HHSIZE"))
