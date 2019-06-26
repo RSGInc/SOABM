@@ -2271,7 +2271,7 @@ if __name__== "__main__":
               for mode in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','trkt','walk']:
                   out_field = tp + '_tCur_' + mode
                   link_list.AddColumn(out_field)
-          link_list.SaveToAttributeFile(proj_dir + "outputs//networks//HighwayAssignment_Results.csv", 44)
+          link_list.SaveToAttributeFile(proj_dir + "outputs//networks//HighwayAssignment_Results.txt", 9)
           
           if Transit_Everywhere_Switch=='false':
               line_list = Visum.Lists.CreateLineRouteList
