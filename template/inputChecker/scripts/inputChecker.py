@@ -102,7 +102,7 @@ def export_csv(Visum, visum_obj, fieldsToExport, csv_name):
         f.write(row[i] + "\r\n")
     f.close()
     
-def write_log(results, problem_ids, checks_list, inputs_list, result_list, settings):
+def write_log(results, problem_ids, checks_list, inputs_list, result_list, settings, report_stat):
     # function to write out the input checker log file
     # There are three blocks
     #   - Introduction
@@ -155,7 +155,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     # Combine results, checks_list and inputs_list
     checks_list['result'] = checks_list['Test'].map(results)
-    checks_df = pd.merge(checks_list, inputs_list, on='Table')
+    checks_df = pd.merge(checks_list, inputs_list, on='Input_Table')
     checks_df = checks_df[checks_df.Type=='Test']
     checks_df['reverse_result'] = [not i for i in checks_df.result]
     
@@ -180,7 +180,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         
         #write out log for each check
         for item, row in fatal_checks.iterrows():
-            write_check_log(f, row, problem_ids[row['Test']], result_list)
+            write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
     
     # Write out ACTION REQUIRED section if needed
     if num_logical>0:
@@ -194,7 +194,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         
         #write out log for each check
         for item, row in logical_checks.iterrows():
-            write_check_log(f, row, problem_ids[row['Test']], result_list)
+            write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
     
     # Write out WARNINGS section if needed
     if num_warning>0:
@@ -208,7 +208,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         
         #write out log for each check
         for item, row in warning_checks.iterrows():
-            write_check_log(f, row, problem_ids[row['Test']], result_list)
+            write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
     
     # Write out the complete listing of all checks that passed
     passed_checks = checks_df[(checks_df.result)]
@@ -221,7 +221,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     #write out log for each check
     for item, row in passed_checks.iterrows():
-        write_check_log(f, row, problem_ids[row['Test']], result_list)
+        write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
         
     # Do self diagnostics on all inputs
     #  - check for presence of NAs in all columns and raise flag as per severity level  in settings file
@@ -236,8 +236,8 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     for item, row in inputs_list.iterrows():
         # read the input dataframe
         #row=inputs_list.iloc[8]
-        csv_name = row['Table']
-        df = inputs[csv_name]
+        table_name = row['Input_Table']
+        df = inputs[table_name]
         
         #replace all 'None' with nan
         df.replace('None', np.nan)
@@ -250,12 +250,14 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
             # create a self diagnostic test for the column
             column_test = {}
             column_test['Test'] = 'Self Diagnostic: Missing values in ' + column
-            column_test['Table'] = row['Table']
+            column_test['Input_Table'] = row['Input_Table']
+            column_test['Input_Filename'] = row['Input_Filename']
             column_test['ID_Column'] = row['Input_ID_Column']
             column_test['Severity'] = settings['self_diagnostic_na_severity']
             column_test['Type'] = 'Test'
             column_test['Test_Vals'] = np.NaN
-            column_test['Test_Description'] = 'Check for missing values in ' + column + ' field of ' + csv_name 
+            column_test['Report_Statistic'] = np.NaN
+            column_test['Test_Description'] = 'Check for missing values in ' + column + ' field of ' + table_name 
             
             #from input list
             column_test['Visum_Object'] = row['Visum_Object']
@@ -276,7 +278,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
                 column_test['result'] = not (False in out.values)
                 # reverse results list [since we need all False IDs]
                 reverse_results = [not i for i in out.values]
-                error_expr = column_test['Table'] + "." + column_test['ID_Column'] + "[reverse_results]"
+                error_expr = column_test['Input_Table'] + "." + column_test['ID_Column'] + "[reverse_results]"
                 error_id_list = eval(error_expr)
                 # report first 25 roblem IDs in the log
                 if error_id_list.size>25:
@@ -289,7 +291,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
                 
             # write log if the check failed
             if not column_test['result']:
-                write_check_log(f, column_test, problem_id_list, result_list)
+                write_check_log(f, column_test, problem_id_list, result_list, report_stat)
             
             #print 'here' + column_test['Test']
         
@@ -306,15 +308,17 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     return(num_fatal)
     
 
-def write_check_log(fh, row, problem_ids, result_list):
+def write_check_log(fh, row, problem_ids, result_list, report_stat):
     # Define constants
     seperator2 = '-----------------------------------------------------------'
     cwd = os.getcwd()
     #print(row['Test'])
+    # Integerize problem ID list
+    problem_ids = [int(x) for x in problem_ids]
     # Write check summary
     fh.write('\r\n\r\n' + seperator2 + seperator2)
-    fh.write("\r\n\t Input File Name: " + row['Table'] + '.csv')
-    fh.write("\r\n\t Input File Location: " + cwd + ('\\inputs\\SOABM.ver' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Table'] + '.csv')))
+    fh.write("\r\n\t Input File Name: " + row['Input_Filename'] + '.csv')
+    fh.write("\r\n\t Input File Location: " + cwd + ('\\inputs\\SOABM.ver' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Input_Filename'] + '.csv')))
     fh.write("\r\n\t Visum Object: " + (row['Visum_Object'] if not pd.isnull(row['Visum_Object']) else 'NA'))
     fh.write("\r\n\t Input Description: " + (row['Input_Description'] if not pd.isnull(row['Input_Description']) else ""))
     fh.write("\r\n\t Test Name: " + row['Test'])
@@ -324,7 +328,14 @@ def write_check_log(fh, row, problem_ids, result_list):
     # Display problem IDs for failed column checks
     if (not row['result']) & (len(problem_ids)>0) :
         fh.write("\r\n\t TEST failed for following values of ID Column: " + row['ID_Column'] + " (only upto 25 IDs displayed)")
-        fh.write("\r\n\t " + row['ID_Column'] + ": " + ','.join(map(str, problem_ids)))
+        fh.write("\r\n\t " + row['ID_Column'] + ": " + ','.join(map(str, problem_ids[0:25])))
+        if not (pd.isnull(row['Report_Statistic'])):
+            report_stat = report_stat[row['Test']]
+            fh.write("\r\n\t Test Stastics: " + ','.join(map(str, report_stat[0:25])))
+        fh.write("\r\n\t Total number of failures: " + str(len(problem_ids)))
+    else:
+        if not (pd.isnull(row['Report_Statistic'])):
+            fh.write("\r\n\t Test Statistic: " + str(report_stat[row['Test']]))
     # Display result for each test val if it was specified
     if not (pd.isnull(row['Test_Vals'])):
         fh.write("\r\n\t TEST results for each test val")
@@ -349,7 +360,7 @@ if __name__== "__main__":
                 
         print("input checker started at: " + time.ctime())
         working_dir = sys.argv[1]
-        #working_dir = 'E:/projects/clients/odot/SouthernOregonABM/Contingency/Task3/SOABM/template/inputChecker'
+        #working_dir = 'E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template/inputChecker'
         os.chdir(working_dir)
         cwd = os.getcwd()
         
@@ -370,15 +381,16 @@ if __name__== "__main__":
             loadVersion(Visum, os.path.join(cwd,'..','inputs','SOABM.ver'))
         
         # Remove all commented checks from the checks list
-        inputs_list = inputs_list.loc[[not i for i in (inputs_list['Table'].str.startswith('#'))]]
+        inputs_list = inputs_list.loc[[not i for i in (inputs_list['Input_Table'].str.startswith('#'))]]
                                                        
         inputs = {}
         for item, row in inputs_list.iterrows():
             
             #row = inputs_list.iloc[0]
-            print 'Adding ' + row['Table']
-            csv_name = row['Table']
-            directory = row['Directory']
+            print 'Adding ' + row['Input_Table']
+            csv_name = row['Input_Filename']
+            table_name = row['Input_Table']
+            directory = row['Input_Directory']
             visum_obj = row['Visum_Object']
             columnMap = row['Column_Map']
             inputIDColumn = row['Input_ID_Column']
@@ -397,7 +409,7 @@ if __name__== "__main__":
                 if not (pd.isnull(columnMap)):
                    rename_expr = 'df.rename(columns=' + columnMap + ', inplace=True)'
                    exec(rename_expr)
-                inputs[csv_name] = df
+                inputs[table_name] = df
             else:
                 # CSV inputs can be in both inputs or uec directory
                 if directory == 'inputs':
@@ -413,8 +425,8 @@ if __name__== "__main__":
                 if not (pd.isnull(columnMap)):
                    rename_expr = 'df.rename(columns=' + columnMap + ', inplace=True)'
                    exec(rename_expr)
-                   
-                inputs[csv_name] = df
+                print(table_name)   
+                inputs[table_name] = df
                 
             
         if export_Visum:
@@ -434,12 +446,13 @@ if __name__== "__main__":
         results = {}
         result_list = {}
         problem_ids = {}
+        report_stat = {}
         for item, row in checks_list.iterrows():
             
             #row = checks_list.iloc[0]
             
             test = row['Test']
-            table = row['Table']
+            table = row['Input_Table']
             id_col = row['ID_Column']
             expr = row['Expression']
             test_vals = row['Test_Vals']
@@ -448,6 +461,7 @@ if __name__== "__main__":
                 test_vals = [txt.strip() for txt in test_vals]
             test_type = row['Type']
             Severity = row['Severity']
+            stat_expr = row['Report_Statistic']
             
             if test_type == 'Test':
                 print 'Performing check: ' + row['Test']
@@ -455,6 +469,7 @@ if __name__== "__main__":
                     
                     # perform test
                     out = eval(expr)
+                    
                     # check if test result is a series
                     if str(type(out))=="<class 'pandas.core.series.Series'>":
                         # for series the test must be evaluated across all items
@@ -464,20 +479,36 @@ if __name__== "__main__":
                         reverse_results = [not i for i in out.values]
                         error_expr = table + "." + id_col + "[reverse_results]"
                         error_id_list = eval(error_expr)
-                        # report first 25 roblem IDs in the log
-                        if error_id_list.size>25:
-                            problem_ids[test] = error_id_list.iloc[range(25)]
+                        # report first 25 problem IDs in the log
+                        problem_ids[test] = error_id_list if error_id_list.size>0 else []
+                        # compute report statistic
+                        if (pd.isnull(stat_expr)):
+                            report_stat[test] = ''
                         else:
-                            problem_ids[test] = error_id_list if error_id_list.size>0 else []
+                            stat_list = eval(stat_expr)
+                            report_stat[test] = stat_list[reverse_results]
+#                        if error_id_list.size>25:
+#                            problem_ids[test] = error_id_list.iloc[range(25)]
+#                        else:
+#                            problem_ids[test] = error_id_list if error_id_list.size>0 else []
                     else:
                         results[test] = out
                         problem_ids[test] = []
+                        if (pd.isnull(stat_expr)):
+                            report_stat[test] = ''
+                        else:
+                            report_stat[test] = eval(stat_expr)
                 else:
                     # loop through test_vals and perform test for each test_val
                     result_list[test] = []
                     for test_val in test_vals:
                         # perform test [The tests must not result in series]
                         out = eval(expr)
+                        # compute report statistic
+                        if (pd.isnull(stat_expr)):
+                            report_stat[test] = ''
+                        else:
+                            report_stat[test] = eval(stat_expr)
                         # append to list
                         result_list[test].append(out)
                     results[test] = not (False in result_list[test])
@@ -493,7 +524,7 @@ if __name__== "__main__":
         
         # Write out log file
         print "\r\nWriting log file\r\n"
-        num_fatal = write_log(results, problem_ids, checks_list, inputs_list, result_list, settings)
+        num_fatal = write_log(results, problem_ids, checks_list, inputs_list, result_list, settings, report_stat)
         
         # Return code to the main model based on input checks and results
         if num_fatal >0:
