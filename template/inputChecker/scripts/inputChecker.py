@@ -331,7 +331,7 @@ def write_check_log(fh, row, problem_ids, result_list, report_stat):
         fh.write("\r\n\t " + row['ID_Column'] + ": " + ','.join(map(str, problem_ids[0:25])))
         if not (pd.isnull(row['Report_Statistic'])):
             report_stat = report_stat[row['Test']]
-            fh.write("\r\n\t Test Stastics: " + ','.join(map(str, report_stat[0:25])))
+            fh.write("\r\n\t Test Statistics: " + ','.join(map(str, report_stat[0:25])))
         fh.write("\r\n\t Total number of failures: " + str(len(problem_ids)))
     else:
         if not (pd.isnull(row['Report_Statistic'])):
