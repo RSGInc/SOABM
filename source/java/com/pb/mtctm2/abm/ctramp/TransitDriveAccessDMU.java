@@ -33,6 +33,9 @@ public class TransitDriveAccessDMU
     int                                 accessMode;
     int 								period;
     int 								set;
+    //HH-level Auto Operating Cost [Edit: bmp @ July 2019]
+    double                              fuelCost = 12.40;
+    double                              maintainCost = 5.60;
     
     //default values for generic application
     int                                 applicationType = 0;
@@ -43,7 +46,9 @@ public class TransitDriveAccessDMU
 
     public TransitDriveAccessDMU()
     {
-        setupMethodIndexMap();
+    	
+    	setupMethodIndexMap();
+    	
     }
 
     /**
@@ -250,6 +255,22 @@ public class TransitDriveAccessDMU
     public int getApplicationType() {
     	return applicationType;
     }
+    //HH-level auto operating cost [Edit bmp @ July 2019]
+    public void setFuelCost(double fc) {
+    	this.fuelCost = fc;
+    }
+    
+    public double getFuelCost() {
+    	return fuelCost;
+    }
+    
+    public void setMaintainCost(double mc) {
+    	this.maintainCost = mc;
+    }
+    
+    public double getMaintainCost() {
+    	return maintainCost;
+    }
     
     public void setTourCategoryIsJoint(int tourCateogryIsJoint) {
     	this.tourCateogryIsJoint = tourCateogryIsJoint;
@@ -327,6 +348,10 @@ public class TransitDriveAccessDMU
         methodIndexMap.put("getTourCategoryIsJoint", 13);
         methodIndexMap.put("getPersonType", 14);
         methodIndexMap.put("getValueOfTime", 15);
+        
+        //HH-level auto operating cost [Edit bmp @ July 2019]
+        methodIndexMap.put("getCostPerMileFuel", 16);
+        methodIndexMap.put("getCostPerMileMaintenance", 17);
 
     }
 
@@ -366,6 +391,12 @@ public class TransitDriveAccessDMU
                 return getPersonType();
             case 15:
                 return getValueOfTime();
+            case 16:
+                return getFuelCost();
+            case 17:
+                return getMaintainCost();
+                
+            
 
 
             default:

@@ -88,6 +88,7 @@ public class McLogsumsCalculator implements Serializable
     
     public void setupSkimCalculators(HashMap<String, String> rbMap)
     {
+        
         bestPathUEC = new BestTransitPathCalculator(rbMap);
         anm = new AutoAndNonMotorizedSkimsCalculator(rbMap);
     }
@@ -313,6 +314,9 @@ public class McLogsumsCalculator implements Serializable
     	//setup best path dmu variables
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(mcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(mcDmuObject.getMaintainCost());
     	    	
     	// walk access, walk egress transit, outbound
         int skimPeriodIndexOut = ModelStructure.getSkimPeriodIndex(departPeriod);
@@ -333,6 +337,7 @@ public class McLogsumsCalculator implements Serializable
         	driveDmu.setTourCategoryIsJoint(mcDmuObject.getTourCategoryJoint());
         	driveDmu.setPersonType(mcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : mcDmuObject.getPersonType());
         	driveDmu.setValueOfTime((float)mcDmuObject.getValueOfTime());
+        	
 
         	bestWtwTapPairsOut = bestPathUEC.calcPersonSpecificUtilities(bestWtwTapPairsOut, walkDmu, driveDmu, WTW, origMgra, destMgra, skimPeriodIndexOut, loggingEnabled, autoSkimLogger);
         	double logsumOut = bestPathUEC.calcTripLogSum(bestWtwTapPairsOut, loggingEnabled, autoSkimLogger);
@@ -342,6 +347,9 @@ public class McLogsumsCalculator implements Serializable
         //setup best path dmu variables
     	walkDmu =  new TransitWalkAccessDMU();
     	driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(mcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(mcDmuObject.getMaintainCost());
         
         // walk access, walk egress transit, inbound
         int skimPeriodIndexIn = ModelStructure.getSkimPeriodIndex(arrivePeriod);
@@ -362,6 +370,7 @@ public class McLogsumsCalculator implements Serializable
         	driveDmu.setTourCategoryIsJoint(mcDmuObject.getTourCategoryJoint());
         	driveDmu.setPersonType(mcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : mcDmuObject.getPersonType());
         	driveDmu.setValueOfTime((float)mcDmuObject.getValueOfTime());
+        	
         	
         	bestWtwTapPairsIn = bestPathUEC.calcPersonSpecificUtilities(bestWtwTapPairsIn, walkDmu, driveDmu, WTW, destMgra, origMgra, skimPeriodIndexIn, loggingEnabled, autoSkimLogger);
         	double logsumIn = bestPathUEC.calcTripLogSum(bestWtwTapPairsIn, loggingEnabled, autoSkimLogger);             
@@ -408,6 +417,9 @@ public class McLogsumsCalculator implements Serializable
         //setup best path dmu variables
     	walkDmu =  new TransitWalkAccessDMU();
     	driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(mcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(mcDmuObject.getMaintainCost());
     	
         // walk access, drive egress transit, inbound
         int skimPeriodIndexIn = ModelStructure.getSkimPeriodIndex(arrivePeriod);
@@ -429,6 +441,7 @@ public class McLogsumsCalculator implements Serializable
         	driveDmu.setPersonType(mcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : mcDmuObject.getPersonType());
         	driveDmu.setValueOfTime((float)mcDmuObject.getValueOfTime());
         	
+        	
         	bestWtdTapPairsIn = bestPathUEC.calcPersonSpecificUtilities(bestWtdTapPairsIn, walkDmu, driveDmu, WTD, destMgra, origMgra, skimPeriodIndexIn, loggingEnabled, autoSkimLogger);
         	double logsumIn = bestPathUEC.calcTripLogSum(bestWtdTapPairsIn, loggingEnabled, autoSkimLogger);
         	mcDmuObject.setTransitLogSum( WTD, true, logsumIn);
@@ -440,6 +453,9 @@ public class McLogsumsCalculator implements Serializable
     	//setup best path dmu variables
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(mcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(mcDmuObject.getMaintainCost());
     	
     	// drive access, walk egress transit, outbound
         int skimPeriodIndexOut = ModelStructure.getSkimPeriodIndex(departPeriod);
@@ -460,6 +476,7 @@ public class McLogsumsCalculator implements Serializable
         	driveDmu.setTourCategoryIsJoint(mcDmuObject.getTourCategoryJoint());
         	driveDmu.setPersonType(mcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : mcDmuObject.getPersonType());
         	driveDmu.setValueOfTime((float)mcDmuObject.getValueOfTime());
+        	
         	
         	bestDtwTapPairsOut = bestPathUEC.calcPersonSpecificUtilities(bestDtwTapPairsOut, walkDmu, driveDmu, DTW, origMgra, destMgra, skimPeriodIndexOut, loggingEnabled, autoSkimLogger);
         	double logsumOut = bestPathUEC.calcTripLogSum(bestDtwTapPairsOut, loggingEnabled, autoSkimLogger);
@@ -577,6 +594,9 @@ public class McLogsumsCalculator implements Serializable
     	//setup best path dmu variables
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(tripMcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(tripMcDmuObject.getMaintainCost());
     	
         // walk access and walk egress for transit segment
         int skimPeriodIndex = ModelStructure.getSkimPeriodIndex(departPeriod);
@@ -594,6 +614,7 @@ public class McLogsumsCalculator implements Serializable
     	driveDmu.setPersonType(tripMcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : tripMcDmuObject.getPersonType());
     	driveDmu.setValueOfTime((float)tripMcDmuObject.getValueOfTime());
     	
+    	
         // calculate logsum
     	bestWtwTripTapPairs = bestPathUEC.calcPersonSpecificUtilities(bestWtwTripTapPairs, walkDmu, driveDmu, WTW, origMgra, destMgra, skimPeriodIndex, loggingEnabled, autoSkimLogger);
         double logsum = bestPathUEC.calcTripLogSum(bestWtwTripTapPairs, loggingEnabled, autoSkimLogger);
@@ -606,6 +627,9 @@ public class McLogsumsCalculator implements Serializable
     	//setup best path dmu variables
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(tripMcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(tripMcDmuObject.getMaintainCost());
     	
         // walk access, drive egress transit, outbound
         int skimPeriodIndex = ModelStructure.getSkimPeriodIndex(departPeriod);
@@ -623,6 +647,7 @@ public class McLogsumsCalculator implements Serializable
     	driveDmu.setPersonType(tripMcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : tripMcDmuObject.getPersonType());
     	driveDmu.setValueOfTime((float)tripMcDmuObject.getValueOfTime());
     	
+    	
         // calculate logsum
     	bestWtdTripTapPairs = bestPathUEC.calcPersonSpecificUtilities(bestWtdTripTapPairs, walkDmu, driveDmu, WTD, origMgra, destMgra, skimPeriodIndex, loggingEnabled, autoSkimLogger);
         double logsum = bestPathUEC.calcTripLogSum(bestWtdTripTapPairs, loggingEnabled, autoSkimLogger);
@@ -635,6 +660,9 @@ public class McLogsumsCalculator implements Serializable
     	//setup best path dmu variables
     	TransitWalkAccessDMU walkDmu =  new TransitWalkAccessDMU();
     	TransitDriveAccessDMU driveDmu  = new TransitDriveAccessDMU();
+    	//HH-level auto operating cost [Edit bmp @ July 2019]
+    	driveDmu.setFuelCost(tripMcDmuObject.getFuelCost());
+    	driveDmu.setMaintainCost(tripMcDmuObject.getMaintainCost());
     	
         // drive access, walk egress transit, outbound
         int skimPeriodIndex = ModelStructure.getSkimPeriodIndex(departPeriod);
@@ -651,6 +679,7 @@ public class McLogsumsCalculator implements Serializable
     	driveDmu.setTourCategoryIsJoint(tripMcDmuObject.getTourCategoryJoint());
     	driveDmu.setPersonType(tripMcDmuObject.getTourCategoryJoint()==1 ? driveDmu.personType : tripMcDmuObject.getPersonType());
     	driveDmu.setValueOfTime((float)tripMcDmuObject.getValueOfTime());
+    	
     	
         // calculate logsum
     	bestDtwTripTapPairs = bestPathUEC.calcPersonSpecificUtilities(bestDtwTripTapPairs, walkDmu, driveDmu, DTW, origMgra, destMgra, skimPeriodIndex, loggingEnabled, autoSkimLogger);

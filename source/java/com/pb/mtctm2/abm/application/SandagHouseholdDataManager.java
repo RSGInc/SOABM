@@ -159,7 +159,7 @@ public class SandagHouseholdDataManager
                 // 9=building with 50 or more apartments, 10=Boat,RV,van,etc.
                 int bldgsz = (int) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_BLDGSZ_FIELD_NAME));
                 hh.setHhBldgsz(bldgsz);
-
+                
                 hh.initializeWindows();
                 hhArray[index] = hh;
 

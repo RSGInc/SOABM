@@ -54,7 +54,7 @@ public class SandagTourModeChoiceDMU
     {
         return hh.getNumPersons18plus();
     }
-
+    
     public int getFemale()
     {
         return person.getPersonIsFemale();
@@ -173,7 +173,10 @@ public class SandagTourModeChoiceDMU
         methodIndexMap.put("getPersonType", 27);
         methodIndexMap.put("getFreeParkingEligibility", 28);
         methodIndexMap.put("getValueOfTime", 29);
-        
+        //HH-level auto operating cost [Edit bmp @ July 2019]
+        methodIndexMap.put("getCostPerMileFuel", 30);
+        methodIndexMap.put("getCostPerMileMaintenance", 31);
+                
         methodIndexMap.put("getNm_walkTime_out", 90);
         methodIndexMap.put("getNm_walkTime_in", 91);
         methodIndexMap.put("getNm_bikeTime_out", 92);
@@ -284,6 +287,12 @@ public class SandagTourModeChoiceDMU
                 break;
             case 29:
                 returnValue = getValueOfTime();
+                break;
+            case 30:
+                returnValue = getFuelCost();
+                break;
+            case 31:
+                returnValue = getMaintainCost();
                 break;
             case 90:
                 returnValue = getNmWalkTimeOut();

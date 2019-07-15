@@ -236,6 +236,13 @@ public class SandagHouseholdDataManager2
                 int bldgsz = (int) hhTable.getValueAt(r, hhTable
                         .getColumnPosition(HH_BLDGSZ_FIELD_NAME));
                 hh.setHhBldgsz(bldgsz);
+                
+                //HH-level auto operating cost [Edit bmp @ July 2019]
+                double fuelCost = (double) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_FUEL_COST_FIELD_NAME));
+                hh.setFuelCost(fuelCost);
+                
+                double maintainCost = (double) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_MAINTAIN_COST_FIELD_NAME));
+                hh.setMaintainCost(maintainCost);
 
                 hh.initializeWindows();
                 hhArray[newIndex] = hh;

@@ -61,6 +61,9 @@ public abstract class HouseholdDataManager
     public static final String        HH_GQTYPE_FIELD_NAME                   = "GQTYPE";
     public static final String        HH_BLDGSZ_FIELD_NAME                   = "BLD";
     public static final String        HH_GQFLAG_FIELD_NAME                   = "GQFLAG";
+    //HH-level Auto Operating Cost [Edit: bmp @ July 2019]
+    public static final String        HH_FUEL_COST_FIELD_NAME                = "FUELCOST";
+    public static final String        HH_MAINTAIN_COST_FIELD_NAME            = "MAINTAINCOST";
 
     //HHID,PERID,AGE,SEX,OCCCEN1,INDCEN,PEMPLOY,PSTUDENT,PTYPE,EDUC,GRADE
     public static final String        PERSON_HH_ID_FIELD_NAME                = "HHID";

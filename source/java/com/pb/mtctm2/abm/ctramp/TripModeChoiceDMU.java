@@ -564,6 +564,17 @@ public class TripModeChoiceDMU
         return hh.getAutoOwnershipModelResult();
     }
     
+    //HH-level auto operating cost [Edit bmp @ July 2019]
+    public double getFuelCost()
+    {
+        return hh.getFuelCost();
+    }
+    
+    public double getMaintainCost()
+    {
+        return hh.getMaintainCost();
+    }
+
     public int getAge()
     {
         return person.getAge();

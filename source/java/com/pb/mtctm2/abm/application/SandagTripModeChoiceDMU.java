@@ -111,7 +111,7 @@ public class SandagTripModeChoiceDMU
     public int getTpChoice() {
     	return hh.getTpChoice();
     }
-
+    
     public int getDepartPeriod()
     {
         return departPeriod;
@@ -234,6 +234,9 @@ public class SandagTripModeChoiceDMU
         methodIndexMap.put("getFreeOnsite", 46);
         methodIndexMap.put("getPersonType", 47);
         methodIndexMap.put("getValueOfTime", 48);
+        //HH-level auto operating cost [Edit bmp @ July 2019]
+        methodIndexMap.put("getCostPerMileFuel", 49);
+        methodIndexMap.put("getCostPerMileMaintenance", 50);
         methodIndexMap.put("getNm_walkTime", 90);
         methodIndexMap.put("getNm_bikeTime", 91);
 
@@ -393,6 +396,12 @@ public class SandagTripModeChoiceDMU
                 break;                
             case 48:
                 returnValue = getValueOfTime();
+                break;
+            case 49:
+                returnValue = getFuelCost();
+                break;
+            case 50:
+                returnValue = getMaintainCost();
                 break;
             case 90:
                 returnValue = getNmWalkTime();

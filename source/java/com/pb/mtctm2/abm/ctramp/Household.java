@@ -23,6 +23,10 @@ public class Household
     private int                       unitType;
     private int                       hhBldgsz;
     private int                       hhWorkers;
+    
+    //HH Level Auto Operating Cost [Edit: bmp, July 2019]
+    private double                    fuelCost;
+    private double                    maintainCost;
 
     private int                       homeTaz;
     private int                       homeMgra;
@@ -317,6 +321,28 @@ public class Household
     public int getHhBldgsz()
     {
         return hhBldgsz;
+    }
+    
+    //getter and setter method for HH-level auto operating cost
+    //[Edit: bmp @ July 2019]
+    public void setFuelCost(double fc)
+    {
+        this.fuelCost = fc;
+    }
+
+    public double getFuelCost()
+    {
+        return this.fuelCost;
+    }
+    
+    public void setMaintainCost(double mc)
+    {
+        this.maintainCost = mc;
+    }
+
+    public double getMaintainCost()
+    {
+        return this.maintainCost;
     }
 
     public void setHhSize(int numPersons)
