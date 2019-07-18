@@ -2007,6 +2007,73 @@ def create_transit_everywhere_skims():
   #f.write(dummy_record + "\n")
   #f.close()
   
+  
+def msaPrep(Visum, iteration):
+    
+    dst_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "Length")
+    iter_array = [iteration]*len(dst_list)
+    
+    tcur_sov = [0]*len(dst_list)
+    tcur_sovt = [0]*len(dst_list)
+    tcur_hov2 = [0]*len(dst_list)
+    tcur_hov2t = [0]*len(dst_list)
+    tcur_hov3 = [0]*len(dst_list)
+    tcur_hov3t = [0]*len(dst_list)
+    tcur_trk = [0]*len(dst_list)
+    tcur_trkt = [0]*len(dst_list)
+    
+    # Get all user defined link attributes
+    udaNames = []
+    for i in Visum.Net.Links.Attributes.GetAll:
+        if i.category=="User-defined attributes":
+            udaNames.append(i.Name)
+    
+    #create tCur fields to store previous iteration values if they do not exist        
+    for mode_var in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','TRUCK','TRUCKToll']:
+        field_name = "tCur_" + mode_var
+        if field_name not in udaNames:
+            Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
+            
+    #create a field to store iteration count
+    if "iter_count" not in udaNames:
+        Visum.Net.Links.AddUserDefinedAttribute("iter_count","iter_count","iter_count",2,3)
+        
+        
+    #set iteration count
+    VisumPy.helpers.SetMulti(Visum.Net.Links, "iter_count", iter_array)
+            
+    #set to zero if 1st iteration otherwise previous iteration tCur
+    if iteration==1:
+        #set previous iteration times to zero for 1st iteration
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_SOV", tcur_sov)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_SOVToll", tcur_sovt)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV2", tcur_hov2)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV2Toll", tcur_hov2t)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3", tcur_hov3)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3Toll", tcur_hov3t)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCK", tcur_trk)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
+    else:
+        #copy previous iteration times
+        tcur_sov = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOV)")
+        tcur_sovt = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOVTOLL)")
+        tcur_hov2 = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV2)")
+        tcur_hov2t = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV2TOLL)")
+        tcur_hov3 = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3)")
+        tcur_hov3t = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3TOLL)")
+        tcur_trk = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCK)")
+        tcur_trkt = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
+        
+        #set tCur UDAs to previou iteration times
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_SOV", tcur_sov)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_SOVToll", tcur_sovt)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV2", tcur_hov2)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV2Toll", tcur_hov2t)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3", tcur_hov3)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3Toll", tcur_hov3t)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCK", tcur_trk)
+        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
+  
    
 ############################################################
 
@@ -2117,9 +2184,13 @@ if __name__== "__main__":
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
       
+      #iteration number
+      iteration = int(sys.argv[2].lower())
+      
       Visum = startVisum()
       for tp in ['ea','am','md','pm','ev']:
         loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+        msaPrep(Visum, iteration)
         loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
         saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
       loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
