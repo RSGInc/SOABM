@@ -189,7 +189,7 @@ public class HouseholdAtWorkSubtourFrequencyModel
                     // compute the utilities
                     IndexValues index = dmuObject.getDmuIndexValues();
                     index.setHHIndex(household.getHhId());
-                    index.setZoneIndex(household.getHhTaz());
+                    index.setZoneIndex(workTour.getTourDestMgra());
                     index.setOriginZone(workTour.getTourOrigMgra());
                     index.setDestZone(workTour.getTourDestMgra());
                     index.setDebug(household.getDebugChoiceModels());

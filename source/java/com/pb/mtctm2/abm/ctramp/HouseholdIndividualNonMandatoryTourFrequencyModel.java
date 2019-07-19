@@ -351,8 +351,8 @@ public class HouseholdIndividualNonMandatoryTourFrequencyModel
                     Arrays.fill(sampleArray, 1);
 
                     // compute the utilities
-                    dmuObject.setDmuIndexValues(household.getHhId(), household.getHhTaz(),
-                            household.getHhTaz(), -1);
+                    dmuObject.setDmuIndexValues(household.getHhId(), household.getHhMgra(),
+                            household.getHhMgra(), -1);
 
                     if (household.getDebugChoiceModels())
                     {

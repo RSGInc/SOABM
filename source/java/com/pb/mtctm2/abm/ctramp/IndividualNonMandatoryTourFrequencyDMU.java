@@ -61,12 +61,12 @@ public class IndividualNonMandatoryTourFrequencyDMU
     // DMU methods - define one of these for every @var in the mode choice control
     // file.
 
-    public void setDmuIndexValues(int hhId, int zoneId, int origTaz, int destTaz)
+    public void setDmuIndexValues(int hhId, int zoneId, int origMaz, int destMaz)
     {
         dmuIndex.setHHIndex(hhId);
         dmuIndex.setZoneIndex(zoneId);
-        dmuIndex.setOriginZone(origTaz);
-        dmuIndex.setDestZone(destTaz);
+        dmuIndex.setOriginZone(origMaz);
+        dmuIndex.setDestZone(destMaz);
 
         dmuIndex.setDebug(false);
         dmuIndex.setDebugLabel("");
