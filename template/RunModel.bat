@@ -6,11 +6,11 @@
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: setup iteration sample rate
-SET MAX_ITER=3
-SET SAMPLERATE_ITERATION1=0.25
-SET SAMPLERATE_ITERATION2=0.50
-SET SAMPLERATE_ITERATION3=1.0
-SET SAMPLERATE_ITERATION4=1.0
+SET MAX_ITER=5
+SET SAMPLERATE_ITERATION1=0.10
+SET SAMPLERATE_ITERATION2=0.20
+SET SAMPLERATE_ITERATION3=0.40
+SET SAMPLERATE_ITERATION4=0.70
 SET SAMPLERATE_ITERATION5=1.0
 
 :: -------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ CALL application\killjava
 %PYTHON% scripts\SOABM.py build_trip_matrices %SAMPLERATE% %ITERATION%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-%PYTHON% scripts\SOABM.py taz_skim
+%PYTHON% scripts\SOABM.py taz_skim %ITERATION%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 %PYTHON% scripts\SOABM.py tap_skim
