@@ -96,8 +96,9 @@ rem # generate maz skims
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # generate tap skims using tomtom speeds
+:RETRY
 %PYTHON% scripts\SOABM.py tap_skim_speed
-IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
+IF %ERRORLEVEL% NEQ 0 GOTO RETRY
 
 :: -------------------------------------------------------------------------------------------------
 :: Run Commercial Vehicle Model and External Model
