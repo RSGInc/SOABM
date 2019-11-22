@@ -144,12 +144,12 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     f.write("\t WARNINGS:\r\n")
     f.write("\t ---------------\r\n")
     f.write("\t A log under this heading will be generated in case of failure of a WARNING check\r\n\r\n")
-    f.write("\t COMPLETE LOG:\r\n")
-    f.write("\t -----------\r\n")
-    f.write("\t A complete listing of results of all checks in a concise form\r\n\r\n")
     f.write("\t MISSING VALUE SELF DIAGNOSTICS:\r\n")
     f.write("\t -----------\r\n")
     f.write("\t A complete listing of failed missing value self diagnostics tests on all inputs\r\n\r\n")
+    f.write("\t LOG OF ALL PASSED CHECKS:\r\n")
+    f.write("\t -----------\r\n")
+    f.write("\t A complete listing of results of all passed checks\r\n\r\n")
     f.write(seperator1 + seperator1 + "\r\n")
     f.write(seperator1 + seperator1 + "\r\n\r\n\r\n\r\n")
     
@@ -210,19 +210,6 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         for item, row in warning_checks.iterrows():
             write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
     
-    # Write out the complete listing of all checks that passed
-    passed_checks = checks_df[(checks_df.result)]
-    f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
-    f.write(seperator2 + seperator2 + "\r\n\r\n")
-    f.write('\t' + "LOG OF ALL PASSED CHECKS \r\n")
-    f.write('\t' + "------------------------ \r\n")
-    f.write(seperator2 + seperator2 + "\r\n")
-    f.write(seperator2 + seperator2 + "\r\n")
-    
-    #write out log for each check
-    for item, row in passed_checks.iterrows():
-        write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
-        
     # Do self diagnostics on all inputs
     #  - check for presence of NAs in all columns and raise flag as per severity level  in settings file
     f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
@@ -294,6 +281,21 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
                 write_check_log(f, column_test, problem_id_list, result_list, report_stat)
             
             #print 'here' + column_test['Test']
+            
+    # Write out the complete listing of all checks that passed
+    passed_checks = checks_df[(checks_df.result)]
+    f.write('\r\n\r\n' + seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n\r\n")
+    f.write('\t' + "LOG OF ALL PASSED CHECKS \r\n")
+    f.write('\t' + "------------------------ \r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
+    f.write(seperator2 + seperator2 + "\r\n")
+    
+    #write out log for each check
+    for item, row in passed_checks.iterrows():
+        write_check_log(f, row, problem_ids[row['Test']], result_list, report_stat)
+        
+
         
     f.close()
     # Write out a summary of results from input checker for main model
@@ -318,7 +320,7 @@ def write_check_log(fh, row, problem_ids, result_list, report_stat):
     # Write check summary
     fh.write('\r\n\r\n' + seperator2 + seperator2)
     fh.write("\r\n\t Input File Name: " + row['Input_Filename'] + '.csv')
-    fh.write("\r\n\t Input File Location: " + cwd + ('\\inputs\\SOABM.ver' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Input_Filename'] + '.csv')))
+    fh.write("\r\n\t Input File Location: " + cwd + ('Input Visum Version File' if not pd.isnull(row['Visum_Object']) else ('\\inputs\\' + row['Input_Filename'] + '.csv')))
     fh.write("\r\n\t Visum Object: " + (row['Visum_Object'] if not pd.isnull(row['Visum_Object']) else 'NA'))
     fh.write("\r\n\t Input Description: " + (row['Input_Description'] if not pd.isnull(row['Input_Description']) else ""))
     fh.write("\r\n\t Test Name: " + row['Test'])
@@ -373,12 +375,13 @@ if __name__== "__main__":
         #get all settings
         settings = {}
         settings['self_diagnostic_na_severity'] = settings_df.value[settings_df['token'] == 'self_diagnostic_na_severity'].iloc[0]
+        settings['input_version_file'] = settings_df.value[settings_df['token'] == 'input_version_file'].iloc[0]
         
         # Read in all inputs as dict of DFs (Export files that need to be exported)
         export_Visum = True
         if export_Visum:
             Visum = startVisum()
-            loadVersion(Visum, os.path.join(cwd,'..','inputs','SOABM.ver'))
+            loadVersion(Visum, os.path.join(cwd,'..','inputs',settings['input_version_file']))
         
         # Remove all commented checks from the checks list
         inputs_list = inputs_list.loc[[not i for i in (inputs_list['Input_Table'].str.startswith('#'))]]
