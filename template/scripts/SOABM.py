@@ -17,7 +17,7 @@
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 18/Exe/PythonModules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
 import win32com.client as com
 import VisumPy.helpers, omx, numpy
 import VisumPy.csvHelpers
@@ -36,7 +36,7 @@ warnings.simplefilter('ignore', tables.NaturalNameWarning)
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(18)
+  Visum = VisumPy.helpers.CreateVisum(20)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)): 
     Visum.SetPath(pathNo[i], os.getcwd())
@@ -871,6 +871,12 @@ def reviseDuplicateSkims(Visum, omxFile1, omxFile2, omxFile3):
   timeSet1 = numpy.array(omxFile1["1"]) + numpy.array(omxFile1["2"]) + numpy.array(omxFile1["3"]) + numpy.array(omxFile1["4"])
   timeSet2 = numpy.array(omxFile2["1"]) + numpy.array(omxFile2["2"]) + numpy.array(omxFile2["3"]) + numpy.array(omxFile2["4"])
   timeSet3 = numpy.array(omxFile3["1"]) + numpy.array(omxFile3["2"]) + numpy.array(omxFile3["3"]) + numpy.array(omxFile3["4"])
+
+  # round to six sigificant digits
+  # temporary code to deal with Visum 2020 producing non identical transit matrices.
+  timeSet1 = numpy.around(timeSet1,decimals=-2)
+  timeSet2 = numpy.around(timeSet2,decimals=-2)
+  timeSet3 = numpy.around(timeSet3,decimals=-2)
   
   #compare sets
   for skim in skims:

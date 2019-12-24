@@ -1,13 +1,13 @@
     
-    # Create External Trip Tables for JEMnR from SWIM subarea
-    # Converts SDT, LDT, CT and ET trip lists into JEMnr trip tables by
+    # Create External Trip Tables for Local Urban Models from SWIM subarea
+    # Converts SDT, LDT, CT and ET trip lists into trip tables by
     #   class type, time-of-day, tour purpose, trip purpose, Ext type (II,IE,EI,EE).
     #
     # Inputs: 
     # 1. SL outputs from SWIM (SDT,LDT,CT and ET)
     #       Trip list  ex: Trips_LDTPerson_select_link.csv
-    #       Zonal data ex: Employment.csv
-    # 2. SWIM to Local Zone Crosswalk (SWIM_JEMnR_TAZ_CW.csv)
+    #       Zonal data ex: Employment.csv                                                                                          
+    # 2. SWIM to Local Zone Crosswalk (SWIM_Local_TAZ_CW.csv)
     # 3. Local zonal data (TAZ.csv)
     # 4. SWIM select link file wiht count data (SelectLinks.csv)
     #
@@ -42,6 +42,11 @@
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 9/19/18 - Corrected for the condition that a night OD by purpose could be totally empty - reporting back to the user if controls don't match in general
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/23/19 - Corrected a spelling error in the IPF warning message
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 3/13/19 - Updating some small typos in messages to the screen
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 12/11/19 - (started in 4/5/19, but finsihed in Dec) - Improving the ablity of the ipf process to fill hours with missing information with shoulder hours that do have information, added in the ability for user/model specified ipf MaxIter, corrected an error in how multiple databases are tabulated (had to zero out the starting point in the getVol function)
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 12/12/19 - Adding back-in corrections from 1/31/18 that got lost somehow
+    # Line from 1-31-18:
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/31/18 - Corrected EI/IE Pct Output to properly tabulate trips by home zone. (updated a couple of comments that incorrectly focused on JEMnR as well - just comment updates, not code).
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 12/12/19 - Also had to correct logic from 1/31/18, in the case where more than one dataset is used the "Out" object needs to be averaged across the number of datasets                                                                   
           
       ############################ CREATE EXTERNAL OD MATRICES ############################################      
       #create external PA matrices (for multiple SWIM select link output scenarios)
@@ -53,7 +58,7 @@
       # 1.1: Reads trip lists, filters out non-auto trips and applies vehicle occupancy factors and determines if trip is made by a local household or truck tour produced locally
       # 1.2: Checks link percent on all records (although multiple paths exists for an od pair, the sum of link percents should equal to 100%)
       # 1.3: Computes time period and flags PA and AP formats
-      # 1.5: Codes JEMnR trip purposes based on "tripPurpose" and "FROM_TRIP_TYPE" and "tourPurpose"
+      # 1.4: Codes trip purposes based on "tripPurpose" and "FROM_TRIP_TYPE" and "tourPurpose"
       # 2: Creates trip matrices by vehicle class and trip purpose
       # 2.1: Reshapes matrix to a square matrix and then converts into local zone matrix 
       # 2.2: Truck trips are computed in similar way as total auto trips
@@ -68,7 +73,7 @@
     
     ##################################### MAIN CALLING FUNCTION ##############################################
     
-    fun$extModelSWIM <- function(IPF=TRUE) {
+    fun$extModelSWIM <- function(IPF=TRUE,maxiter=100) { # 12-11-19 AB updated with maxiter input 
                           
                             #Process SWIM select link datasets to create RData files
                          	  procSLDataSets(SWIM_SL_Filename_Pattern, inputLoc)
@@ -80,7 +85,7 @@
                          	  out <- createExtMats(disaggregateMethod, inputLoc, storeLoc)
                               	
                            	#IPF external matrix to counts   
-                            ipfExtMatsToCounts(IPF,storeLoc) #set to FALSE to skip IPF and just collapse on purpose
+                            ipfExtMatsToCounts(IPF,storeLoc,maxiter=maxiter) #set to FALSE to skip IPF and just collapse on purpose # 12-11-19 AB updated with maxiter input 
                                   
                             #Return ee, ie, ei trips to the R workspace
                             out
@@ -182,7 +187,7 @@
                                   emp.AzIn$County <- a[rownames(emp.AzIn), "COUNTY"]
                                       
                                   #=================================================================================================
-                                  # Build land use controls with SWIM distributions where needed (needed for zones outside JEMnR area).
+                                  #  Build land use controls with SWIM distributions where needed (needed for zones outside local model area).
                                   #=================================================================================================
                               
                                   #Sum SWIM population by county
@@ -338,7 +343,7 @@
 
                               
                                   #=================================================================================================
-                                  # Prep, Add Weights, and Combine SWIM trip tables to be used with JEMnR, Create Auto Table
+                                  # Prep, Add Weights, and Combine SWIM trip tables to be used with local model, Create Auto Table
                                   #=================================================================================================
                                      
                                   #Create AutoAdd trip lists by auto classes, remove non-auto modes, factor by veh occupancy
@@ -353,7 +358,7 @@
                                   rm(auto_modes_veh_occ)
                                        
                                   #=================================================================================================
-                                  # Compute JEMnR trip purpose (based on From / To trip purposes) 
+                                  # Compute trip purpose (based on From / To trip purposes) 
                                   #=================================================================================================
                                   
                                   #Add missing FROM_TRIP_TYPE based on tourPurpose     
@@ -465,7 +470,6 @@
                                   data[(1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_ORIGIN"])) & !(1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_DESTINATION"])),"ext"] <- "EI"
                                   data[!(1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_ORIGIN"])) & (1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_DESTINATION"])),"ext"]  <- "IE"
                                   data[(1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_ORIGIN"])) & (1:nrow(data) %in% grep("_", data[,"EXTERNAL_ZONE_DESTINATION"])),"ext"]  <- "EE"
-                                  rm(auto, truck, sdt.., ldt.., ct.., et..)
                                   
                                   #=================================================================================================
                                   #  create a blank matrix for OD output (only on first data set) 
@@ -483,26 +487,89 @@
                                         }
                                         #Creating a blank matrices with all zone-to-zone, time-of-day, and mode (auto / truck) information
                                         ext.ZnZnTdMd <- array(0, dim=c(length(zoneNames), length(zoneNames), nrow(TOD_periods), length(extPurposes)),dimnames=list(zoneNames, zoneNames, TOD_periods$Period, extPurposes)) 
+                                  
+                                  #############################################
+                                  # create empty place holder table, called out to
+                                  # kickout summary results to the R-workspace, for OSUM, but also of interest to JEMnR
+                                  # 1/31/18 AB - Updated to correctly calculate EI / IE / EE totals 
+                                  ##########################################
+                                  out <- list()
+                                  out$total <- 0
+                                  out$auto <- 0
+                                  out$truck <- 0
                                   }
                                      
-                                  #=================================================================================================
-                                  # Add link percent check (if there are multiple paths to OD, they all must sum to 100%)
-                                  #=================================================================================================  
+                                  #############################################
+                                  # save summary results to the R-workspace, for OSUM, but also of interest to JEMnR
+                                  # 1/31/18 AB - Updated to correctly calculate EI / IE / EE totals 
+                                  ##########################################
+                                  
+                                  #Create a list of SWIM zones in the local area model
+                                  LocalZones <- unique(Crosswalk$SWIMZONE)
+                                  
+                                  # complete calc for Auto
+                                  auto$TripE <- (1:nrow(auto) %in% grep("_", auto[,"EXTERNAL_ZONE_ORIGIN"])) |  (1:nrow(auto) %in% grep("_", auto[,"EXTERNAL_ZONE_DESTINATION"]))
+                                  auto$ext <- "ii"
+                                  auto$ext[auto$HOME_ZONE %in% LocalZones & auto$TripE] <- "ie"
+                                  auto$ext[(!(auto$HOME_ZONE %in% LocalZones)) & auto$TripE] <- "ei" 
+                                  auto$ext[(1:nrow(auto) %in% grep("_", auto[,"EXTERNAL_ZONE_ORIGIN"])) &  (1:nrow(auto) %in% grep("_", auto[,"EXTERNAL_ZONE_DESTINATION"]))] <- "ee"
+                                  auto <- auto[auto$ext %in% c("ee", "ie", "ei"),]
+                                  auto$extSt <- "0"
+                                  auto[auto$ext %in% c("ie","ei"),"extSt"] <- apply(auto[auto$ext %in% c("ie","ei"),c("EXTERNAL_ZONE_ORIGIN","EXTERNAL_ZONE_DESTINATION")],1,function(x) gsub("_","",x[grep("_",x)]))                                 
+                                  EEO <- auto[auto$ext =="ee",]
+                                  EEO$extSt <- gsub("_","",EEO$EXTERNAL_ZONE_ORIGIN)
+                                  EED <- auto[auto$ext =="ee",]
+                                  EED$extSt <- gsub("_","",EEO$EXTERNAL_ZONE_DESTINATION)
+                                  auto <- rbind(auto[auto$ext %in% c("ie", "ei"),],EEO,EED)
+                                  
+                                  vehSum <- tapply(auto$Weight,list(auto$extSt,auto$ext),sum)[as.character(sort(as.numeric(externalZones))),c("ee", "ie", "ei")]
+                                  vehSum[is.na(vehSum)] <- 0
+                                  out$auto <- out$auto + vehSum
+                    
+                                  # complete calc for truck
+                                  truck$TripE <- (1:nrow(truck) %in% grep("_", truck[,"EXTERNAL_ZONE_ORIGIN"])) |  (1:nrow(truck) %in% grep("_", truck[,"EXTERNAL_ZONE_DESTINATION"]))
+                                  truck$ext <- "ii"
+                                  truck$ext[truck$HOME_ZONE %in% LocalZones & truck$TripE] <- "ie"
+                                  truck$ext[(!(truck$HOME_ZONE %in% LocalZones)) & truck$TripE] <- "ei" 
+                                  truck$ext[(1:nrow(truck) %in% grep("_", truck[,"EXTERNAL_ZONE_ORIGIN"])) &  (1:nrow(truck) %in% grep("_", truck[,"EXTERNAL_ZONE_DESTINATION"]))] <- "ee"
+                                  truck <- truck[truck$ext %in% c("ee", "ie", "ei"),]
+                                  truck$extSt <- "0"
+                                  truck[truck$ext %in% c("ie","ei"),"extSt"] <- apply(truck[truck$ext %in% c("ie","ei"),c("EXTERNAL_ZONE_ORIGIN","EXTERNAL_ZONE_DESTINATION")],1,function(x) gsub("_","",x[grep("_",x)]))                                 
+                                  EEO <- truck[truck$ext =="ee",]
+                                  EEO$extSt <- gsub("_","",EEO$EXTERNAL_ZONE_ORIGIN)
+                                  EED <- truck[truck$ext =="ee",]
+                                  EED$extSt <- gsub("_","",EEO$EXTERNAL_ZONE_DESTINATION)
+                                  truck <- rbind(truck[truck$ext %in% c("ie", "ei"),],EEO,EED)
+                                  
+                                  truckSum <- tapply(truck$Weight,list(truck$extSt,truck$ext),sum)
+                                  vehSum[]<- 0
+                                  vehSum[rownames(truckSum)[rownames(truckSum) %in% rownames(vehSum)],colnames(truckSum)] <- truckSum[rownames(truckSum)[rownames(truckSum) %in% rownames(vehSum)],]
+                                  vehSum[is.na(vehSum)] <- 0
+                                  
+                                  out$truck <- out$truck + vehSum
+                                  
+                                  # clean up space
+                                  rm(auto, truck, sdt.., ldt.., ct.., et.., EEO,EED, vehSum, truckSum)
+
                     
                                   data$od <- paste(data$origin,data$destination,sep="-")
                                      
                                   #=================================================================================================
-                                  # Fill JEMnR external array with disaggregated SWIM trip information
+                                  # Fill external array with disaggregated SWIM trip information
                                   #=================================================================================================                                                   
-                          
-                                  #Create a list of SWIM zones in the local area model
-                                  LocalZones <- unique(Crosswalk$SWIMZONE)
+                                  
+                                  # create OD vector 
+                                  data$od <- paste(data$origin,data$destination,sep="-") 
+                                  
+                                  # build table of just unique od pairs (to reduce procing time slightly
                                   Vol <- tapply(data$Weight, paste(data$EXTERNAL_ZONE_ORIGIN, data$EXTERNAL_ZONE_DESTINATION, data$HOME_ZONE, data$purpose, data$TOD, data$ext), sum)
                                   rm(data)
 
                                   #Function To Fill Array
                                   getVol <- function(curVol) {
-                                              curExt.ZnZnTdMd <- ext.ZnZnTdMd
+                                              # 12-11-19 AB, need to ensure this is zero'd out each time
+                                              #Creating a blank matrices with all zone-to-zone, time-of-day, and mode (auto / truck) information
+                                              curExt.ZnZnTdMd <- array(0, dim=dim(ext.ZnZnTdMd),dimnames=dimnames(ext.ZnZnTdMd)) 
                                               for(i in 1:length(curVol)){
                                                     #Pull Adjusted vehicle volume
                                                     v <- curVol[i] 
@@ -544,7 +611,7 @@
                                   sapply(c("ext.ZnZnTdMd","LocalZones","Crosswalk"),function(x)assign(x, get(x), envir = e1))
                                   clusterExport(cl,c("ext.ZnZnTdMd","LocalZones","Crosswalk"),envir=e1)           
                                   
-                                  #Work through each record to disaggrate to JEMnR zones
+                                  #Work through each record to disaggrate to local zones
                                   splitDF <- split(Vol,rep(1:7,length(Vol))[1:length(Vol)])   
                                   matLst <- parLapply(cl,splitDF,getVol)
                                   for(x in 1:(length(matLst)-1)) matLst[[x +1]] <- matLst[[x]] + matLst[[x +1]]
@@ -554,6 +621,7 @@
                             
                             ########### END LOOP FOR MULTIPLE DATA SETS ##################################
       
+                            # clean up clusters
                             stopCluster(cl)
                             rm(cl)
                             gc()  
@@ -561,6 +629,12 @@
                             #Averages multiple external PA matrices and writes output
                             ext.ZnZnTdMd <- ext.ZnZnTdMd/length(datasets)
                             save(ext.ZnZnTdMd, file=paste(storeLoc, "externalOD_ZnZnTdMd.RData", sep=""))
+                            
+                            # 12-12-19 AB - add a processing step to divide Out by the number of datasets
+                            out$auto <- out$auto/length(datasets) 
+                            out$truck <- out$truck/length(datasets)
+                            # total auto and truck
+                            out$total <- out$auto + out$truck
                           
                             ########### OSUM REQUIRED STEP ###############################################
 
@@ -578,17 +652,6 @@
   
                             #MODIFY CODE FOR JEMNR
                             # kickout summary results to the R-workspace, for OSUM, but also of interest to JEMnR
-                            out <- list()
-                            out$total <- cbind(apply(ext.ZnZnTdMd[externalZones,externalZones,"daily",],1,sum) + apply(ext.ZnZnTdMd[externalZones,externalZones,"daily",],2,sum),
-                                               apply(ext.ZnZnTdMd[internalZones,externalZones,"daily",],2,sum), apply(ext.ZnZnTdMd[externalZones,internalZones,"daily",],1,sum))
-  
-                            out$auto <- cbind(apply(ext.ZnZnTdMd[externalZones,externalZones,"daily",!(dimnames(ext.ZnZnTdMd)[[4]] %in% "truck")],1,sum) + apply(ext.ZnZnTdMd[externalZones,externalZones,"daily",!(dimnames(ext.ZnZnTdMd)[[4]] %in% "truck")],2,sum),
-                                              apply(ext.ZnZnTdMd[internalZones,externalZones,"daily",!(dimnames(ext.ZnZnTdMd)[[4]] %in% "truck")],2,sum), apply(ext.ZnZnTdMd[externalZones,internalZones,"daily",!(dimnames(ext.ZnZnTdMd)[[4]] %in% "truck")],1,sum))
-  
-                            out$truck <- cbind(apply(ext.ZnZnTdMd[externalZones,externalZones,"daily","truck"],1,sum) + apply(ext.ZnZnTdMd[externalZones,externalZones,"daily","truck"],2,sum),
-                                               apply(ext.ZnZnTdMd[internalZones,externalZones,"daily","truck"],2,sum), apply(ext.ZnZnTdMd[externalZones,internalZones,"daily","truck"],1,sum))
-                            colnames(out$total) <- colnames(out$auto) <- colnames(out$truck) <- c("ee", "ie", "ei")
-  
                             if(exists("runUniversityModel")){
                                if(runUniversityModel) taz  <- tempTaz
                             }
@@ -602,13 +665,15 @@
                     #if(sum(rowcontrol) != sum(colcontrol)) stop("sum of rowcontrol must equal sum of colcontrol")
                     if(any(rowcontrol==0)){
                           numzero <- sum(rowcontrol==0)
-                          rowcontrol[rowcontrol==0] <- 0.001
-                          warning(paste(numzero, "zeros in rowcontrol argument replaced with 0.001 for period =", period, sep=" "))
+                          rowcontrol[rowcontrol==0] <- 0.001   
+                          # 12-10-19 removing this warning, the user should be aware that they requested a zero control in the inputs
+                          #warning(paste(numzero, "zeros in rowcontrol argument replaced with 0.001 for period =", period, sep=" "))
                     }
                     if(any(colcontrol==0)){
                           numzero <- sum(colcontrol==0)
-                          colcontrol[colcontrol==0] <- 0.001
-                            warning(paste(numzero, "zeros in colcontrol argument replaced with 0.001 for period =", period, sep=" "))
+                          colcontrol[colcontrol==0] <- 0.001   
+                          # 12-10-19 removing this warning, the user should be aware that they requested a zero control in the inputs
+                          #warning(paste(numzero, "zeros in colcontrol argument replaced with 0.001 for period =", period, sep=" "))
                     }
                  
                     #Set initial values
@@ -641,8 +706,10 @@
             	            colcheck <- sum(abs(1-colfactor))
             	            iter <- iter + 1
                     }
-                    if(iter == maxiter) cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClosure Criteria = ", closure, "\n\n",sep=""))  # AB 1-23-19, corrected Clouser , 3-13-19 - corrected again, had changed it Closuer, third times the charm
-
+                    if(iter == maxiter){
+                       cat(paste( "\nThe maximum (", iter, ") number of iterations was reached the externalModel ipf did NOT close for period=", period,"\nSum of abs of Row Differences to Row Controls = ",rowcheck,"\nSum of abs of Col Differences to Col Controls = ", colcheck, "\nClosure Criteria = ", closure, "\n\n",sep=""))  # AB 1-23-19, corrected Clouser , 3-13-19 - corrected again, had changed it Closuer, third times the charm
+                       #print(cbind(RowFactor=rowfactor,ColFactor=colfactor))  #12-11-19 AB - Alex can make up his mind about what diagnostics are vaulable.  Turning this off for now.
+                    }
                     #Repack the EE, EI, and IE into the full matrix
                     result[extSta, extSta] <- ee
                     result[extSta, !(colnames(result) %in% extSta)] <- ei
@@ -651,7 +718,7 @@
                   }
     
     #IPF external matrices (auto and truck) to counts
-    fun$ipfExtMatsToCounts <- function(IPF,storeLoc) {
+    fun$ipfExtMatsToCounts <- function(IPF,storeLoc,maxiter=100) {   # 12-11-19 AB updated with maxiter input 
                   
                   	             #get OD array 
                                 load(paste(storeLoc, "externalOD_ZnZnTdMd.RData", sep=""))
@@ -659,7 +726,7 @@
                                 #Create the truck and auto AWDTs to be used
                                 
                                 #Adjust volumes to analysis year
-                                # only run from JEMnR, in OSUM this is handeled externally to address special generators
+                                # don't run for OSUM, in OSUM this is handeled externally to address special generators
                                 if(!exists("osumFun")){
                                    externals$daily_auto <- externals$AutoAWDT * (1 + (externals$GrowthRate*(year  - externals$AWDT_YEAR)))
                                    externals$daily_truck <- externals$TruckAWDT * (1 + (externals$GrowthRate*(year  - externals$AWDT_YEAR)))
@@ -682,6 +749,7 @@
       
                                 if(IPF){
                                       print("IPF external matrix to counts")
+                                      
                                       # Create all the period external matrices
                                       for(p in TOD_periods$Period){
                                             # create an auto seed for the period      
@@ -690,13 +758,31 @@
                                              if(any(rowSums(seed[as.character(externalZones),])==0) | any(colSums(seed[,as.character(externalZones)])==0)){        
                                                 seed <- apply(ext.ZnZnTdMd[,,"daily",!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"],1:2,sum)
                                                 puSplit <- apply(ext.ZnZnTdMd[,,p,!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"],3,sum)/sum(ext.ZnZnTdMd[,,p,!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"])
-                                                ipfResult <-  extIPF(externals[externals$DIRECTION=="IN", paste(p,"auto",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"auto",sep="_")],seed, as.character(externalZones),p)
+                                                ipfResult <-  extIPF(externals[externals$DIRECTION=="IN", paste(p,"auto",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"auto",sep="_")],seed, as.character(externalZones),p,maxiter=maxiter) # 12-11-19 AB adding maxiter setting input
                                         	      for(pu in names(puSplit)){ 
                                                    ext.ZnZnTdMd[,,p,pu] <- ipfResult*puSplit[pu]
                                                 }   
                                              } else {
+                                                # 12-11-19 AB plugging up low information sections of the seed matrix
+                                                # check if EE / IE or EI has holes
+                                                Check <- rowSums(seed[as.character(externalZones),as.character(externalZones)])>0 &
+                                                         colSums(seed[as.character(externalZones),as.character(externalZones)])>0 &
+                                                         rowSums(seed[as.character(externalZones),!colnames(seed) %in% as.character(externalZones)])>0 &
+                                                         colSums(seed[!rownames(seed) %in% as.character(externalZones),as.character(externalZones)])>0
+                                                         
+                                                if(any(!Check)){ # 12-11-19 AB if any need more information, use daily trends adjusted by control demand
+                                                   RowFill <- ext.ZnZnTdMd[as.character(externalZones),,"daily",!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"]
+                                                   RowFill <- sweep(RowFill, 1,externals[externals$DIRECTION=="IN", paste(p,"auto",sep="_")]/rowSums(RowFill),"*")
+                                                   ColFill <- ext.ZnZnTdMd[,as.character(externalZones),"daily",!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"]
+                                                   ColFill <- sweep(ColFill, 2,externals[externals$DIRECTION=="OUT", paste(p,"auto",sep="_")]/apply(ColFill,2,sum),"*")
+                                                   CheckNames <- names(Check)[!Check]
+                                                   ext.ZnZnTdMd[CheckNames,,"daily",!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"] <- RowFill[CheckNames,,]
+                                                   ext.ZnZnTdMd[,CheckNames,"daily",!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"] <- ColFill[,CheckNames,]
+                                                   seed <- apply(ext.ZnZnTdMd[,,p,!dimnames(ext.ZnZnTdMd)[[4]] %in% "truck"],1:2,sum)
+                                                }         
+                                                
                                                 # run the ipf for auto
-                                                ipfResult <-  extIPF(externals[externals$DIRECTION=="IN", paste(p,"auto",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"auto",sep="_")],seed, as.character(externalZones),p)
+                                                ipfResult <-  extIPF(externals[externals$DIRECTION=="IN", paste(p,"auto",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"auto",sep="_")],seed, as.character(externalZones),p,maxiter=maxiter) # 12-11-19 AB adding maxiter setting input
                                         	      # fill the ipf information back into the array
                                                 sweepStat <- ipfResult/seed
                                                 sweepStat[is.nan(sweepStat)] <- 0 
@@ -708,10 +794,27 @@
                                              # check to ensure that the seed has enough information for the period - if not, use daily
                                              if(any(rowSums(seed[as.character(externalZones),])==0) | any(colSums(seed[,as.character(externalZones)])==0)){        
                                                 seed <- ext.ZnZnTdMd[,,"daily","truck"]
-                                             }
+                                             } else {
+                                                # 12-11-19 AB plugging up low information sections of the seed matrix
+                                                # check if EE / IE or EI has holes
+                                                Check <- rowSums(seed[as.character(externalZones),as.character(externalZones)])>0 &
+                                                         colSums(seed[as.character(externalZones),as.character(externalZones)])>0 &
+                                                         rowSums(seed[as.character(externalZones),!colnames(seed) %in% as.character(externalZones)])>0 &
+                                                         colSums(seed[!rownames(seed) %in% as.character(externalZones),as.character(externalZones)])>0
+                                                         
+                                                if(any(!Check)){ # 12-11-19 AB if any need more information, use daily trends adjusted by control demand
+                                                   RowFill <- ext.ZnZnTdMd[,,"daily","truck"][as.character(externalZones),]
+                                                   RowFill <- sweep(RowFill, 1,externals[externals$DIRECTION=="IN", paste(p,"truck",sep="_")]/rowSums(RowFill),"*")
+                                                   ColFill <- ext.ZnZnTdMd[,,"daily","truck"][,as.character(externalZones)]
+                                                   ColFill <- sweep(ColFill, 2,externals[externals$DIRECTION=="OUT", paste(p,"truck",sep="_")]/colSums(ColFill),"*")
+                                                   CheckNames <- names(Check)[!Check]
+                                                   seed[CheckNames,] <- RowFill[CheckNames,]
+                                                   seed[,CheckNames] <- ColFill[,CheckNames]
+                                                } 
+                                             }   
                                         	   # run the ipf for truck
-                                   ext.ZnZnTdMd[,,p,"truck"] <- extIPF(externals[externals$DIRECTION=="IN", paste(p,"truck",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"truck",sep="_")],seed, as.character(externalZones),p) 	  
-                                }
+                                             ext.ZnZnTdMd[,,p,"truck"] <- extIPF(externals[externals$DIRECTION=="IN", paste(p,"truck",sep="_")], externals[externals$DIRECTION=="OUT", paste(p,"truck",sep="_")],seed, as.character(externalZones),p,maxiter=maxiter) # 12-11-19 AB adding maxiter setting input 	  
+                                      }
                                 
                                 externals <<- externals[,extNames]    
                               	
