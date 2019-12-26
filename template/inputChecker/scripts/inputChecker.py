@@ -20,7 +20,7 @@ Feb 2018
 ########################################################################################################################
 
 import os, shutil, sys, time, csv, logging
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 18/Exe/PythonModules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
 import win32com.client as com
 import VisumPy.helpers, omx
 import numpy as np
@@ -35,7 +35,7 @@ import datetime
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(18)
+  Visum = VisumPy.helpers.CreateVisum(20)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)): 
     Visum.SetPath(pathNo[i], os.getcwd())
