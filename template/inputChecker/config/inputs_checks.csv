@@ -97,6 +97,7 @@ LINK_FWY_MNODE_CONTROL_Check,link_data,NO,Logical,Test,"link_tsys.apply(lambda r
 LINK_MEDIAN_valueCheck,link_data,NO,Fatal,Test,"link_data.MEDIAN.apply(lambda x: True if x in [0,1,2,3] else False)",,,“MEDIAN” should be populated with an integer between 0 and 4
 LINK_AUX_LANES_valueCheck,link_data,NO,Fatal,Test,"link_data.AUX_LANES.apply(lambda x: True if x in [0,1,2] else False)",,,“AUX_LANES” should be populated with an integer representing the number of auxiliary lanes (between 0-2)
 LINK_FUNCTIONAL_CLASS_valueCheck,link_data,NO,Fatal,Test,"link_data.PLANNO.apply(lambda x: True if x in [1,3,4,5,6,7,30,998] else False)",,,All links should have a valid functional class
+LINK_FUNCTIONAL_CLASS_useCheck,link_data,NO,Warning,Test,"link_tsys.apply(lambda row: False if ({'HOV2','HOV2Toll','HOV3','HOV3Toll','SOV','SOVToll','Truck','TruckToll'}.issubset(set(row.TSYSSET.split(',')))) & (row.PLANNO==998) else True, axis=1)",,,PLANNO 998 is not allowed to have auto modes
 LINK_NUMLANES_Sanity_Check,link_data,NO,Warning,Test,link_data.NUMLANES<=6,,,Check for extreme number of links
 LINK_POSITIVE_LENGTH,link_data,NO,Logical,Test,link_data.LENGTH>0,,,All link length should be greater than zero
 LINK_LENGTH_POLY_Comparison,link_data,NO,Logical,Test,(link_data.LENGTH/link_data.LENGTHPOLY >= 0.75) & (link_data.LENGTH/link_data.LENGTHPOLY <= 1.25),,link_data.LENGTH/link_data.LENGTHPOLY,Check against the internal length field in Visum (Length Poly) and ensure that the length field is in some reasonable bound of the Visum internal calculated length. Within 25%
@@ -119,11 +120,11 @@ LINEROUTE_PM_Headway_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.PM_HEAD
 LINEROUTE_EV_Headway_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.EV_HEADWAY>0,,,Check if each route has a valid headway value by period (>0) 
 LINEROUTE_Unique_Names_Check,lineroute_data,NAME,Fatal,Test,len(set(lineroute_data.NAME)) == len(lineroute_data.NAME),,,All transit line route names must be unique
 TIMEPROFILE_LineRoute_Check,lineroute_data,NAME,Fatal,Test,lineroute_data.NAME.apply(lambda x: True if x in set(time_profiles.LINEROUTENAME) else False),,,Check if each route has a time profile
-NETWORK_EA_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_EA==4,,,Check if each link has a valid pre-defined TOD factor
-NETWORK_AM_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_AM==1.5,,,Check if each link has a valid pre-defined TOD factor
-NETWORK_MD_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_MD==8,,,Check if each link has a valid pre-defined TOD factor
-NETWORK_PM_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_PM==2,,,Check if each link has a valid pre-defined TOD factor
-NETWORK_EV_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_EV==8.5,,,Check if each link has a valid pre-defined TOD factor
+NETWORK_EA_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_EA<=4,,,Check if each link has a valid pre-defined TOD factor
+NETWORK_AM_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_AM<=1.5,,,Check if each link has a valid pre-defined TOD factor
+NETWORK_MD_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_MD<=8,,,Check if each link has a valid pre-defined TOD factor
+NETWORK_PM_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_PM<=2,,,Check if each link has a valid pre-defined TOD factor
+NETWORK_EV_TOD_Factor_Check,link_data,NO,Warning,Test,link_data.TOD_FACTOR_EV<=8.5,,,Check if each link has a valid pre-defined TOD factor
 VDF_GC4LEG_Range_Check,vdf_lookup_table,ID,Fatal,Test,"(min(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='gc4leg') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())>0) & (max(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='gc4leg') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())<=1)","3,4,5,6,7,30",,Check if GC ratio is in the right range for 4 leg intersections
 VDF_GC3LEG_Range_Check,vdf_lookup_table,ID,Fatal,Test,"(min(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='gc3leg') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())>0) & (max(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='gc3leg') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())<=1)","3,4,5,6,7,30",,Check if GC ratio is in the right range for 3 leg intersections
 VDF_STOP_Range_Check,vdf_lookup_table,ID,Fatal,Test,"(min(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='stop') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())>0) & (max(vdf_lookup_table.loc[(vdf_lookup_table.VALUE=='stop') & (vdf_lookup_table.PLANNO==int(test_val)),['1','3','4','5','6','7','30']].squeeze())<=1)","3,4,5,6,7,30",,Check if GC ratio is in the right range for stop intersections
