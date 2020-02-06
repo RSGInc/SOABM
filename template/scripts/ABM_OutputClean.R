@@ -1,10 +1,11 @@
 # Alex Bettinardi
 # 6-13-19
+# 2-5-20 - revised with review from Jin Ren and Alex Bettinardi
 
 # Script to remove interim and duplicative files from the ABM run:
 
 # clean all working version files under "networks"
-file.remove(paste("outputs/networks/Highway_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
+file.remove(paste("outputs/networks/Highway_Assignment_Results_",c("pm"),".ver",sep=""))  # just get rid of PM, because it's saved in the final copy, keep other periods, but get rid of skims
 file.remove(paste("outputs/networks/Transit_Assignment_Results_",apply(expand.grid(c("ea","am","md","pm","ev"),paste0("set",1:3)),1,paste,collapse="_"),".ver",sep=""))  
 file.remove(paste("outputs/networks/",c("Bike_MAZ_Skim","Walk_MAZ_Skim","Highway_Skimming_Assignment","Transit_Skimming_Assignment","MAZ_Level_Processing"),"_Setup.ver",sep=""))
 
@@ -42,3 +43,9 @@ if(length(iters)>0){
    
    } # end iters if statement
 rm(iters)
+
+# remove skim data which is already stored in the visum version files
+file.remove(list.files(path="outputs/skims/", pattern="omx",full.names = T))
+
+# remove largest trip matrix set (the Commercial Vehicle Result)
+file.remove("outputs/trips/cvmTrips.omx")

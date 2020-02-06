@@ -43,12 +43,12 @@ def startVisum():
   return(Visum)
   
 def loadVersion(Visum, fileName):
-  print("load version file: " + fileName)
-  Visum.LoadVersion(fileName)
+  print("load version file: " + os.getcwd() + "/" + fileName)
+  Visum.LoadVersion(os.getcwd() + "/" + fileName)
 
 def saveVersion(Visum, fileName):
-  print("save version file: " + fileName)
-  Visum.SaveVersion(fileName)
+  print("save version file: " + os.getcwd() + "/" + fileName)
+  Visum.SaveVersion(os.getcwd() + "/" +fileName)
 
 def closeVisum(Visum):
   print("close Visum")
