@@ -1070,7 +1070,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   tapParks = [0] * len(tapIds)
   
   timePeriods =      ["EV1","EA","AM","MD","PM","EV2"]
-  timePeriodStarts = [0    ,1   ,7   ,10  ,26  ,30   ]
+  timePeriodStarts = [0    ,1   ,6   ,9  ,25  ,29   ]
   timePeriodStarts = numpy.array(timePeriodStarts)
   
   #build taz lookup for quick access later
