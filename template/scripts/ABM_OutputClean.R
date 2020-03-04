@@ -45,7 +45,7 @@ if(length(iters)>0){
 rm(iters)
 
 # remove skim data which is already stored in the visum version files
-file.remove(list.files(path="outputs/skims/", pattern="omx",full.names = T))
+#file.remove(list.files(path="outputs/skims/", pattern="omx",full.names = T)) # need to keep taz_skim_sov_pm.omx
 
 # remove largest trip matrix set (the Commercial Vehicle Result)
 file.remove("outputs/trips/cvmTrips.omx")
