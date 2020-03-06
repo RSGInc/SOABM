@@ -1,6 +1,7 @@
 # Alex Bettinardi
 # 6-13-19
 # 2-5-20 - revised with review from Jin Ren and Alex Bettinardi
+# 3-5-20 - revised to remove all OMX files except for - taz_skim_sov_pm.omx - as that file is needed to re-run a specific period assignment (re-run CVM)
 
 # Script to remove interim and duplicative files from the ABM run:
 
@@ -45,7 +46,10 @@ if(length(iters)>0){
 rm(iters)
 
 # remove skim data which is already stored in the visum version files
-#file.remove(list.files(path="outputs/skims/", pattern="omx",full.names = T)) # need to keep taz_skim_sov_pm.omx
+OMX_Files <- list.files(path="outputs/skims/", pattern="omx",full.names = T)
+OMX_Files <- OMX_Files[!tolower(OMX_Files) %in% "outputs/skims/taz_skim_sov_pm.omx"]
+file.remove(OMX_Files) # need to keep taz_skim_sov_pm.omx
+rm(OMX_Files)
 
 # remove largest trip matrix set (the Commercial Vehicle Result)
 file.remove("outputs/trips/cvmTrips.omx")
