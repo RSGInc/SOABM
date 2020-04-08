@@ -20,7 +20,8 @@ Feb 2018
 ########################################################################################################################
 
 import os, shutil, sys, time, csv, logging
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
+#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules/Lib/site-packages")
 import win32com.client as com
 import VisumPy.helpers, omx
 import numpy as np

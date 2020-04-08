@@ -17,7 +17,7 @@
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules/Lib/site-packages")
 import win32com.client as com
 import VisumPy.helpers, omx, numpy
 import VisumPy.csvHelpers
@@ -45,6 +45,9 @@ def startVisum():
 def loadVersion(Visum, fileName):
   print("load version file: " + os.getcwd() + "/" + fileName)
   Visum.LoadVersion(os.getcwd() + "/" + fileName)
+  pathNo = [8,69,2,37,12]
+  for i in range(0,len(pathNo)): 
+    Visum.SetPath(pathNo[i], os.getcwd())
 
 def saveVersion(Visum, fileName):
   print("save version file: " + os.getcwd() + "/" + fileName)
