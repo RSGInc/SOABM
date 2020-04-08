@@ -1156,7 +1156,8 @@ private void calculateMgraAvgParkingCosts( HashMap<String,String> propertyMap ) 
             out = new PrintWriter( new BufferedWriter( new FileWriter( new File( outFile ) ) ) );
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.fatal("Cannot create mgraParkingCost output file " + outFile);
+        	e.printStackTrace();
         }
 
         // write the header record
