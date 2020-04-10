@@ -943,10 +943,10 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
       ct_hov2toll = numpy.array(ctrampTazTrips["hov2toll_" + aMatTP])
       ct_hov3toll = numpy.array(ctrampTazTrips["hov3toll_" + aMatTP])
       
-      sov = sov + cvm_car + ext_hbw + ext_nhbnw + ext_hbo + ext_hbcoll + ext_hbr + ext_hbs + ext_hbsch + ext_nhbw + ct_sov
+      sov = sov + ct_sov
       hov2 = hov2 + ct_hov2
       hov3 = hov3 + ct_hov3
-      sovtoll = sovtoll + ct_sovtoll
+      sovtoll = sovtoll + cvm_car + ext_hbw + ext_nhbnw + ext_hbo + ext_hbcoll + ext_hbr + ext_hbs + ext_hbsch + ext_nhbw + ct_sovtoll
       hov2toll = hov2toll + ct_hov2toll
       hov3toll = hov3toll + ct_hov3toll
       truck = truck + cvm_su + cvm_mu + ext_truck
