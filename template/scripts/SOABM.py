@@ -160,12 +160,12 @@ def codeTAZConnectors(Visum):
         
           conObj = Visum.Net.AddConnector(zoneObj, nodeObj)
           lenMiles = conObj.AttValue("Length")
-          for mode in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','Truck','TruckToll']:
+          for mode in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','Truck']: #,'TruckToll'
             conObj.SetAttValue("T0_TSys(" + mode + ")",lenMiles * (60.0 / defaultSpeed) * 60)
         
           conObj = Visum.Net.Connectors.DestItemByKey(nodeObj, zoneObj)
           lenMiles = conObj.AttValue("Length")
-          for mode in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','Truck','TruckToll']:
+          for mode in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','Truck']: #,'TruckToll'
             conObj.SetAttValue("T0_TSys(" + mode + ")",lenMiles * (60.0 / defaultSpeed) * 60)
   
   #delete connectors if too close to one another
@@ -877,6 +877,9 @@ def reviseDuplicateSkims(Visum, omxFile1, omxFile2, omxFile3):
 
   # round to six sigificant digits
   # temporary code to deal with Visum 2020 producing non identical transit matrices.
+  # AB 4-21-20
+  # The visum 2020 issue is no corrected (turned off demand rounding in procedure files)
+  # But keeping rounding in just as added protection since this the set1-3 aspect of SOABM really isn't functional anyway.  
   timeSet1 = numpy.around(timeSet1,decimals=-2)
   timeSet2 = numpy.around(timeSet2,decimals=-2)
   timeSet3 = numpy.around(timeSet3,decimals=-2)
@@ -2029,7 +2032,7 @@ def msaPrep(Visum, iteration):
     tcur_hov3 = [0]*len(dst_list)
     tcur_hov3t = [0]*len(dst_list)
     tcur_trk = [0]*len(dst_list)
-    tcur_trkt = [0]*len(dst_list)
+    #tcur_trkt = [0]*len(dst_list)
     
     # Get all user defined link attributes
     udaNames = []
@@ -2038,7 +2041,7 @@ def msaPrep(Visum, iteration):
             udaNames.append(i.Name)
     
     #create tCur fields to store previous iteration values if they do not exist        
-    for mode_var in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','TRUCK','TRUCKToll']:
+    for mode_var in ['SOV','SOVToll','HOV2','HOV2Toll','HOV3','HOV3Toll','TRUCK']: #,'TRUCKToll'
         field_name = "tCur_" + mode_var
         if field_name not in udaNames:
             Visum.Net.Links.AddUserDefinedAttribute(field_name,field_name,field_name,2,3)
@@ -2061,7 +2064,7 @@ def msaPrep(Visum, iteration):
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3", tcur_hov3)
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3Toll", tcur_hov3t)
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCK", tcur_trk)
-        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
+       # VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
     else:
         #copy previous iteration times
         tcur_sov = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOV)")
@@ -2071,7 +2074,7 @@ def msaPrep(Visum, iteration):
         tcur_hov3 = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3)")
         tcur_hov3t = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(HOV3TOLL)")
         tcur_trk = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCK)")
-        tcur_trkt = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
+       # tcur_trkt = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
         
         #set tCur UDAs to previou iteration times
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_SOV", tcur_sov)
@@ -2081,7 +2084,7 @@ def msaPrep(Visum, iteration):
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3", tcur_hov3)
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_HOV3Toll", tcur_hov3t)
         VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCK", tcur_trk)
-        VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
+       # VisumPy.helpers.SetMulti(Visum.Net.Links, "tCur_TRUCKToll", tcur_trkt)
   
    
 ############################################################
@@ -2334,7 +2337,7 @@ if __name__== "__main__":
           link_field_list = ['No','FromNodeNo','ToNodeNo', 'FFSPEED', 'LENGTH', 'PLANNO','vdf_int_fc','vdf_ll',
                              'vdf_rl','vdf_tl','vdf_unc_sig_delay','TSYSSET','NUMLANES','CAPPRT','TOLL_PRTSYS(BIKE)','TOLL_PRTSYS(HOV2)',
                              'TOLL_PRTSYS(HOV2TOLL)','TOLL_PRTSYS(HOV3)','TOLL_PRTSYS(HOV3TOLL)','TOLL_PRTSYS(SOV)','TOLL_PRTSYS(SOVTOLL)',
-                             'TOLL_PRTSYS(TRUCK)','TOLL_PRTSYS(TRUCKTOLL)','TOLL_PRTSYS(WALK)']
+                             'TOLL_PRTSYS(TRUCK)','TOLL_PRTSYS(WALK)']  #,'TOLL_PRTSYS(TRUCKTOLL)'
           for out_field in link_field_list:
               link_list.AddColumn(out_field)
           for tp in ['EA','AM','MD','PM','EV','DAILY']:
@@ -2355,7 +2358,7 @@ if __name__== "__main__":
               link_list.AddColumn(out_field)
               out_field = tp + '_VOLCAPRATIOPRT'
               link_list.AddColumn(out_field)
-              for mode in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','trkt','walk']:
+              for mode in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','walk']: #,'trkt'
                   out_field = tp + '_tCur_' + mode
                   link_list.AddColumn(out_field)
           link_list.SaveToAttributeFile(proj_dir + "outputs//networks//HighwayAssignment_Results.txt", 9)
@@ -2442,7 +2445,7 @@ if __name__== "__main__":
       tcur_sov = [[0]*len(dst_list) for i in range(5)]
       tcur_sovt = [[0]*len(dst_list) for i in range(5)]
       tcur_trk = [[0]*len(dst_list) for i in range(5)]
-      tcur_trkt = [[0]*len(dst_list) for i in range(5)]
+      #tcur_trkt = [[0]*len(dst_list) for i in range(5)]
       tcur_walk = [[0]*len(dst_list) for i in range(5)]
       tcur_dict = {}
       vc_ratio = [[0]*len(dst_list) for i in range(5)]
@@ -2467,7 +2470,7 @@ if __name__== "__main__":
         tcur_sov[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOV)")
         tcur_sovt[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(SOVTOLL)")
         tcur_trk[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCK)")
-        tcur_trkt[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
+        #tcur_trkt[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(TRUCKTOLL)")
         tcur_walk[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "TCUR_PRTSYS(WALK)")
         mlc[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
         inc[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
@@ -2519,7 +2522,7 @@ if __name__== "__main__":
       tcur_dict['sov'] = tcur_sov
       tcur_dict['sovt'] = tcur_sovt
       tcur_dict['trk'] = tcur_trk
-      tcur_dict['trkt'] = tcur_trkt
+      #tcur_dict['trkt'] = tcur_trkt
       tcur_dict['walk'] = tcur_walk
       f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
       f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
@@ -2591,7 +2594,7 @@ if __name__== "__main__":
       for tp in ['ea','am','md','pm','ev']:
           loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
           #mode_count = 0
-          for mode_var in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','trkt','walk']:
+          for mode_var in ['bike','hov2','hov2t','hov3','hov3t','sov','sovt','trk','walk']:  #'trkt'
               set_list=tcur_dict[mode_var]
               #loop through all periods for each version file
               tod_cnt = 0

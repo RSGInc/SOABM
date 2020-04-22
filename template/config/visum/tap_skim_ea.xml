@@ -1,224 +1,5 @@
 <?xml  version = "1.0"  encoding = "UTF-8"?>
-<PROCEDURES  VERSION = "20">
-  <OPERATIONS>
-    <OPERATION
-      NO = "1"
-      CODE = ""
-      OPERATIONTYPE = "EditAttribute"
-      ACTIVE = "1"
-      COMMENT = "Calculate link transit run time"
-      EXECUTED = "0"
-      STARTTIME = ""
-      ENDTIME = ""
-      DURATION = ""
-      MESSAGES = ""
-      RESULTMESSAGE = ""
-      SUCCESS = "0"
-      COMPUTENODE = "">
-      <ATTRIBUTEFORMULAPARA
-        NETOBJECTTYPE = "LINK"
-        INCLUDESUBCATEGORIES = "0"
-        RESULTATTRNAME = "ADDVAL1"
-        ONLYACTIVE = "0"
-        FORMULA = "Floor((([TCUR_PRTSYS(HOV3TOLL)] / 0.9) * [PLANNO]=1)  * 60&#xA;&#xA;+&#xA;&#xA;(([TCUR_PRTSYS(HOV3TOLL)] / 0.75) * [PLANNO]!=1) * 60&#xA;)"
-      />      
-    </OPERATION>
-    <OPERATION
-      NO = "2"
-      CODE = ""
-      OPERATIONTYPE = "UpdateTravelTimes"
-      ACTIVE = "1"
-      COMMENT = ""
-      EXECUTED = "0"
-      STARTTIME = ""
-      ENDTIME = ""
-      DURATION = ""
-      MESSAGES = ""
-      RESULTMESSAGE = ""
-      SUCCESS = "0"
-      COMPUTENODE = "">
-      <UPDATETIMEPROFILETRAVELTIMESPARA
-        ONLYACTIVETIMEPROFILEITEMS = "0"
-        ADDVALUES = "0"
-        MODEFORUNUSEDTIMEPROFILEITEMS = "ALLTIMEPROFILES"
-        UPDATERUNTIME = "1"
-        RUNTIMEMETHOD = "FROMLINKATTR"
-        RUNTIMELINKATTRID = "ADDVAL1"
-        RUNTIMELINKFACTOR = "1"
-        RUNTIMETIMEPROFILEITEMATTRID = "ADDVAL"
-        RUNTIMETIMEPROFILEITEMFACTOR = "1"
-        RUNTIMETURNATTRID = "TCUR_PRTSYS(Bike)"
-        RUNTIMETURNFACTOR = "1"
-        RUNTIMECONSTANT = "0"
-        RUNTIMEROUNDINGMETHOD = "ROUNDINGTIME_1S"
-        RUNTIMEREGARDONLYACTIVELINKS = "0"
-        RUNTIMEREGARDSYSROUTEONLYIFVEHCOMBFITS = "0"
-        RUNTIMEREGARDTURNSANDMAINTURNS = "0"
-        UPDATESTOPTIME = "1"
-        STOPTIMEMETHOD = "FROMTPIATTR"
-        STOPTIMESTOPPOINTATTRID = "NO"
-        STOPTIMESTOPPOINTFACTOR = "1"
-        STOPTIMETIMEPROFILEITEMATTRID = "PRELENGTH"
-        STOPTIMETIMEPROFILEITEMFACTOR = "120"
-        STOPTIMECONSTANT = "0"
-        STOPTIMEROUNDINGMETHOD = "ROUNDINGTIME_1S"
-      />      
-    </OPERATION>
-    <OPERATION
-      NO = "3"
-      CODE = ""
-      OPERATIONTYPE = "PuTAssignment"
-      ACTIVE = "1"
-      COMMENT = "EA"
-      EXECUTED = "0"
-      STARTTIME = ""
-      ENDTIME = ""
-      DURATION = ""
-      MESSAGES = ""
-      RESULTMESSAGE = ""
-      SUCCESS = "0"
-      COMPUTENODE = "">
-      <PUTASSIGNMENTPARABASE        PUTASSIGNMENTVARIANT = "Headway-based"        DSEGSET = "Transit">
-        <HEADWAYBASEDASSIGNMENTPARAMETERS>
-          <HEADWAYBASEDBASEPARA
-            CALCULATEASSIGNMENT = "1"
-            CALCULATESKIMMATRICES = "1"
-            MPAISACTIVE = "0"
-            CALCULATESFFORPUTODPAIRLIST = "0"
-            FROMDESTZONENO = ""
-            TODESTZONENO = ""
-            SELECTODRELATIONTYPE = "All"
-            TIMEINTERVALSTARTTIME = "00:00:00"
-            TIMEINTERVALSTARTDAYINDEX = "1"
-            TIMEINTERVALENDTIME = "24:00:00"
-            TIMEINTERVALENDDAYINDEX = "1"
-            CALCULATIONMODE = "TimeProfileAttribute">
-            <HEADWAYBASEDINTERVALDATA
-              TIMEINTERVALDAYINDEX = "1"
-              TIMEINTERVALSTARTTIME = "00:00:00"
-              ATTRIBUTE = "LINEROUTE\EA_HEADWAY"
-            />            
-          </HEADWAYBASEDBASEPARA>
-          <HEADWAYBASEDDSEGPARA            DSEGSETFORSKIMMATRICES = ""          />          
-          <HEADWAYBASEDSEARCHPARA
-            ONLYACTIVETIMEPROFILES = "0"
-            COORDINATIONTYPE = "CoordByGroups"
-            INTERCHANGETYPE = "Use"
-            COORDINATEDTPSUNDISTINGUISHABLE = "1"
-            PASSENGERINFORMATIONTYPE = "None_ExpDistRib_HW"
-            USEDISCRCHOICEAMONGSTOPAREAS = "1"
-            DISCRCHOICEAMONGSTOPAREASFACTOR = "0.25"
-            USEDISCRCHOICEBETWEENBOARDANDALIGHT = "1"
-            DISCRCHOICEBETWEENBOARDANDALIGHTFACTOR = "0.25"
-            INFOFORDIFFERENTSTOPAREAS = "0"
-            INFOINVEHICLE = "0"
-            SHARELOWERBOUNDABS = "0.001"
-            SHAREUPPERBOUNDREL = "1"
-            REMOVEDOMINATEDPATHS = "0"
-            MAXPOLYNOMDEGREEFORINTEGRATION = "50"
-            NUMSIMULATIONS = "100"
-            USECALCULATIONTIMEOPTIMIZEDALGORITHM = "0"
-          />          
-          <HEADWAYBASEDIMPEDANCEPARA
-            PJTVAL = "1"
-            FAREPOINTVAL = "0"
-            USEFAREMODEL = "0"
-            INVEHTIMEVAL = "1"
-            INVEHTIMEWEIGHTATTR = ""
-            PUTAUXTIMEVAL = "2"
-            ACCESSTIMEVAL = "2"
-            EGRESSTIMEVAL = "2"
-            WALKTIMEVAL = "2"
-            ORIGINWAITTIMEVAL = "2"
-            ORIGINWAITTIMESTOPAREAWEIGHTATTR = ""
-            ORIGINWAITTIMETIMEPROFILEWEIGHTATTR = ""
-            ORIGINSTOPAREAPENALTYATTR = ""
-            ORIGINTIMEPROFILEPENALTYATTR = ""
-            TRANSFERWAITTIMEVAL = "2"
-            TRANSFERWAITTIMEWEIGHTATTR = ""
-            BOARDINGPENALTYPUTATTR = ""
-            BOARDINGPENALTYPUTAUXATTR = ""
-            MEANDELAYATTR = ""
-            NUMTRANSFERSVAL = "10min"
-          />          
-          <PUTSKIMMATRIXPARA
-            FILENAME = ""
-            FORMAT = "V-Format"
-            SEPARATOR = "Blank"
-            USEVISEMMODE = "1"
-            VISEMMODE = "3"
-            CONFIRMOVERWRITE = "1"
-            FUNCTION = "AggregateMean"
-            VOLUMEWEIGHTED = "1"
-            QUANTILE = "50"
-            LOWIMPCONNSHARE = "50"
-            SELECTODRELATIONTYPE = "All"
-            CALCULATEANALYSISTIMEINTERVALSKIMS = "0">
-            <SINGLESKIMMATRIXPARA
-              NAME = "FARE"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "INVEHTIME"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "INVEHTIMEBYTSYS(Bus)"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "INVEHTIMEBYTSYS(ComRail)"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "INVEHTIMEBYTSYS(ExpBus)"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "INVEHTIMEBYTSYS(LightRail)"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "NUMTRANSFERS"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "ORIGINWAITTIME"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "TRANSFERWAITTIME"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-            <SINGLESKIMMATRIXPARA
-              NAME = "WALKTIME"
-              CALCULATE = "1"
-              SAVETOFILE = "0"
-              OPEN = "0"
-            />            
-          </PUTSKIMMATRIXPARA>
-        </HEADWAYBASEDASSIGNMENTPARAMETERS>
-      </PUTASSIGNMENTPARABASE>
-    </OPERATION>
-  </OPERATIONS>
+<PROCEDURES  VERSION = "1902">
   <FUNCTIONS>
     <PUTSKIMMATRIXSETTINGS
       USELONGLENGTH = "1"
@@ -230,7 +11,7 @@
       DISCOMFORTPARAB = "4.5">
       <SINGLESKIMMATRIXSETTINGS
         NAME = "JOURNEYTIME"
-        FILEEXTENSION = "JRT"
+        CODE = "JRT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -244,7 +25,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "JOURNEYTIMEADAPTED"
-        FILEEXTENSION = "JRTA"
+        CODE = "JRTA"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -258,7 +39,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "RIDETIME"
-        FILEEXTENSION = "RIT"
+        CODE = "RIT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -272,7 +53,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "RIDETIMEADAPTED"
-        FILEEXTENSION = "RITA"
+        CODE = "RITA"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -286,7 +67,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "INVEHTIME"
-        FILEEXTENSION = "IVT"
+        CODE = "IVT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -300,7 +81,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "PUTAUXTIME"
-        FILEEXTENSION = "AXT"
+        CODE = "AXT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -314,7 +95,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ORIGINWAITTIME"
-        FILEEXTENSION = "OWT"
+        CODE = "OWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -328,7 +109,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ORIGINWAITTIMEADAPTED"
-        FILEEXTENSION = "OWTA"
+        CODE = "OWTA"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -342,7 +123,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "TRANSFERWAITTIME"
-        FILEEXTENSION = "TWT"
+        CODE = "TWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -356,7 +137,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "TRANSFERWAITTIMEADAPTED"
-        FILEEXTENSION = "TWTA"
+        CODE = "TWTA"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -370,7 +151,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EXTTRANSFERWAITTIME"
-        FILEEXTENSION = "XTWT"
+        CODE = "XTWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -384,7 +165,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "WEIGHTEDORIGINWAITTIME"
-        FILEEXTENSION = "WOWT"
+        CODE = "WOWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -398,7 +179,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "WEIGHTEDTRANSFERWAITTIME"
-        FILEEXTENSION = "WTWT"
+        CODE = "WTWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -412,7 +193,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "WALKTIME"
-        FILEEXTENSION = "WKT"
+        CODE = "WKT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -426,7 +207,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ACCESSTIME"
-        FILEEXTENSION = "ACT"
+        CODE = "ACT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -440,7 +221,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EGRESSTIME"
-        FILEEXTENSION = "EGT"
+        CODE = "EGT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -454,7 +235,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "PERCEIVEDJOURNEYTIME"
-        FILEEXTENSION = "PJT"
+        CODE = "PJT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -468,7 +249,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "NUMTRANSFERS"
-        FILEEXTENSION = "NTR"
+        CODE = "NTR"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -482,7 +263,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EXTIMPEDANCE"
-        FILEEXTENSION = "XIMP"
+        CODE = "XIMP"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -496,7 +277,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "SERVICEFREQUENCY"
-        FILEEXTENSION = "SFQ"
+        CODE = "SFQ"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -510,7 +291,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "SHARINGTRAVELTIME"
-        FILEEXTENSION = "SHTT"
+        CODE = "SHTT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -523,8 +304,8 @@
         NUMDECPLACES = "2"
       />      
       <SINGLESKIMMATRIXSETTINGS
-        NAME = "SHARINGACCESSTIME"
-        FILEEXTENSION = "SHAT"
+        NAME = "DRTTIME"
+        CODE = "DRTT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -537,8 +318,8 @@
         NUMDECPLACES = "2"
       />      
       <SINGLESKIMMATRIXSETTINGS
-        NAME = "SHARINGTRAVELDISTANCE"
-        FILEEXTENSION = "SHTD"
+        NAME = "DRTWAITTIME"
+        CODE = "DRTWT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -551,8 +332,78 @@
         NUMDECPLACES = "2"
       />      
       <SINGLESKIMMATRIXSETTINGS
-        NAME = "SHARINGEGRESSTIME"
-        FILEEXTENSION = "SHET"
+        NAME = "SHARINGRENTALPROCESSTIME"
+        CODE = "SHAT"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "0"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "2"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
+        NAME = "SHARINGTRAVELDIST"
+        CODE = "SHTD"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "0"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "2"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
+        NAME = "DRTDIST"
+        CODE = "DRTD"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "0"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "2"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
+        NAME = "SHARINGRETURNPROCESSTIME"
+        CODE = "SHET"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "0"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "2"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
+        NAME = "SHAREOFODTRIPSWITHRELEVANTDELAY"
+        CODE = "STRD"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "0"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "2"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
+        NAME = "RISKOFDELAYPERPERSON"
+        CODE = "RDP"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -566,7 +417,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "DIRECTDIST"
-        FILEEXTENSION = "DID"
+        CODE = "DID"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -580,7 +431,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "JOURNEYDIST"
-        FILEEXTENSION = "JRD"
+        CODE = "JRD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -594,7 +445,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "RIDEDIST"
-        FILEEXTENSION = "RID"
+        CODE = "RID"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -608,7 +459,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "INVEHDIST"
-        FILEEXTENSION = "IVD"
+        CODE = "IVD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -622,7 +473,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "PUTAUXDIST"
-        FILEEXTENSION = "AXD"
+        CODE = "AXD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -636,7 +487,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "WALKDIST"
-        FILEEXTENSION = "WKD"
+        CODE = "WKD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -650,7 +501,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ACCESSDIST"
-        FILEEXTENSION = "ACD"
+        CODE = "ACD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -664,7 +515,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EGRESSDIST"
-        FILEEXTENSION = "EGD"
+        CODE = "EGD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -678,7 +529,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "JOURNEYSPEED"
-        FILEEXTENSION = "JRS"
+        CODE = "JRS"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -692,7 +543,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "DIRECTDISTSPEED"
-        FILEEXTENSION = "DIS"
+        CODE = "DIS"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -706,7 +557,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "FARE"
-        FILEEXTENSION = "FAR"
+        CODE = "FAR"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -720,7 +571,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "NUMFZ"
-        FILEEXTENSION = "NFZ"
+        CODE = "NFZ"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -734,7 +585,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "NUMOPERATORCHANGES"
-        FILEEXTENSION = "NOC"
+        CODE = "NOC"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -748,7 +599,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "INVEHDISTBYTSYS"
-        FILEEXTENSION = "IVTD"
+        CODE = "IVTD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -762,7 +613,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "INVEHDISTPERCBYTSYS"
-        FILEEXTENSION = "IVTP"
+        CODE = "IVTP"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -776,7 +627,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "INVEHTIMEBYTSYS"
-        FILEEXTENSION = "IVTT"
+        CODE = "IVTT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -790,7 +641,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "IMPEDANCE"
-        FILEEXTENSION = "IPD"
+        CODE = "IPD"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -803,8 +654,22 @@
         NUMDECPLACES = "3"
       />      
       <SINGLESKIMMATRIXSETTINGS
+        NAME = "IMPEDANCELOGSUM"
+        CODE = "ILS"
+        IGNOREDODVALUE = "999999"
+        NOPATHSFOUNDVALUE = "999999"
+        DIAGONALTYPE = "CONST"
+        DIAGONALVALUE = "0"
+        DIAGONALATTR = "1.0"
+        DIAGONALNUMZONES = "3"
+        DIAGONALFACTOR = "1"
+        MINVALUE = "-999999"
+        MAXVALUE = "999999"
+        NUMDECPLACES = "3"
+      />      
+      <SINGLESKIMMATRIXSETTINGS
         NAME = "UTILITY"
-        FILEEXTENSION = "UTL"
+        CODE = "UTL"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -818,7 +683,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "PATHLEGATTRIBUTE"
-        FILEEXTENSION = "PLA"
+        CODE = "PLA"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -832,7 +697,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ADAPTATIONTIME"
-        FILEEXTENSION = "ADT"
+        CODE = "ADT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -846,7 +711,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EXTADAPTATIONTIME"
-        FILEEXTENSION = "XADT"
+        CODE = "XADT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -860,7 +725,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "EQUIVALENTJOURNEYTIME"
-        FILEEXTENSION = "EJT"
+        CODE = "EJT"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -874,7 +739,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "DISCOMFORT"
-        FILEEXTENSION = "DISC"
+        CODE = "DISC"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -932,7 +797,7 @@
       </USERDEFSKIM>
       <SINGLESKIMMATRIXSETTINGS
         NAME = "T0"
-        FILEEXTENSION = "TT0"
+        CODE = "TT0"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -946,7 +811,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "TCUR"
-        FILEEXTENSION = "TTC"
+        CODE = "TTC"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -960,7 +825,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "V0"
-        FILEEXTENSION = "VP0"
+        CODE = "VP0"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -974,7 +839,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "VCUR"
-        FILEEXTENSION = "VPC"
+        CODE = "VPC"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -988,7 +853,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "IMPEDANCE"
-        FILEEXTENSION = "IMP"
+        CODE = "IMP"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1002,7 +867,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "TRIPDIST"
-        FILEEXTENSION = "DIS"
+        CODE = "DIS"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1016,7 +881,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "DIRECTDIST"
-        FILEEXTENSION = "DID"
+        CODE = "DID"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1030,7 +895,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ADDVAL1"
-        FILEEXTENSION = "AD1"
+        CODE = "AD1"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1044,7 +909,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ADDVAL2"
-        FILEEXTENSION = "AD2"
+        CODE = "AD2"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1058,7 +923,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ADDVAL3"
-        FILEEXTENSION = "AD3"
+        CODE = "AD3"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1072,7 +937,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "ADDVAL_TSYS"
-        FILEEXTENSION = "ADS"
+        CODE = "ADS"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1086,7 +951,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "TOLL"
-        FILEEXTENSION = "TOL"
+        CODE = "TOL"
         IGNOREDODVALUE = "999999"
         NOPATHSFOUNDVALUE = "999999"
         DIAGONALTYPE = "CONST"
@@ -1100,7 +965,7 @@
       />      
       <SINGLESKIMMATRIXSETTINGS
         NAME = "USERDEF"
-        FILEEXTENSION = "UDS"
+        CODE = "UDS"
         IGNOREDODVALUE = "0"
         NOPATHSFOUNDVALUE = "0"
         DIAGONALTYPE = "CONST"
@@ -1116,7 +981,8 @@
     <VDFUNCTIONSPARAMETERS>
       <CONNECTORVDFUNCTIONSPARAMETERS>
         <VDFUNCTION
-          VDFUNCTIONNUMBER = "1"
+          NO = "1"
+          NAME = ""
           VDFUNCTIONTYPE = "BPR"
           BLOCKED = "0"
           HARDBLOCKING = "0"
@@ -1184,7 +1050,8 @@
       </CONNECTORVDFUNCTIONSPARAMETERS>
       <LINKVDFUNCTIONSPARAMETERS>
         <VDFUNCTION
-          VDFUNCTIONNUMBER = "1"
+          NO = "1"
+          NAME = ""
           VDFUNCTIONTYPE = "BPR"
           BLOCKED = "0"
           HARDBLOCKING = "0"
@@ -1887,6 +1754,10 @@
       ICAIDEALSATURATIONFLOWRATE = "1900"
       ICAIDEALSATURATIONFLOWRATEICU1 = "1600"
       ICAIDEALSATURATIONFLOWRATEICU2 = "1600"
+      ICAIDEALSATURATIONFLOWRATECCG = "1850"
+      ICAPCULENGTH = "19.685039370078737ft"
+      ICAPEDESTRIANWALKINGSPEED = "236.22047244094492fpm"
+      ICARIGHTTURNPEDESTRIANFACTOR = "Toronto"
       USEMAXICATWOWAYSTOP = "1"
       MAXICATWOWAYSTOP = "10min"
       USEMAXICAROUNDABOUT = "1"
@@ -1904,7 +1775,8 @@
       ICAMETHODALLWAYSTOP = "HCM 2000">
       <UNCONTROLLEDNODEVDFUNCTIONPARAMETERS>
         <VDFUNCTION
-          VDFUNCTIONNUMBER = "1"
+          NO = "1"
+          NAME = ""
           VDFUNCTIONTYPE = "BPR2"
           BLOCKED = "0"
           HARDBLOCKING = "0"
@@ -1972,7 +1844,8 @@
       </UNCONTROLLEDNODEVDFUNCTIONPARAMETERS>
       <NODEVDFUNCTIONSPARAMETERS>
         <VDFUNCTION
-          VDFUNCTIONNUMBER = "1"
+          NO = "1"
+          NAME = ""
           VDFUNCTIONTYPE = "TMODEL_NODES"
           BLOCKED = "0"
           HARDBLOCKING = "0"
@@ -2144,7 +2017,8 @@
       </NODEVDFUNCTIONSPARAMETERS>
       <TURNVDFUNCTIONSPARAMETERS>
         <VDFUNCTION
-          VDFUNCTIONNUMBER = "1"
+          NO = "1"
+          NAME = ""
           VDFUNCTIONTYPE = "Constant"
           BLOCKED = "0"
           HARDBLOCKING = "0"
@@ -2267,7 +2141,7 @@
     />    
     <PUTVOLUMESPARA
       NUMDECPLACES = "3"
-      ROUNDDEMANDANDVOLUME = "1"
+      ROUNDDEMANDANDVOLUME = "0"
       PATHSSTORAGE = "StoragePathsRoutes"
       VOLUMESTORAGE = "StorageVolumesTimeProfiles"
       FARESSTORAGE = "StorageFaresNone"
@@ -2277,8 +2151,12 @@
       PUTWALKFROMORTOCONNECTORS = "WALKFROMORTOCONNECTORS_FREE"
       MAXWALKTIME = "30min"
       MAXPUTAUXTIME = "2h"
+      MAXDRTTIME = "2h"
       STOPPOINTVOLUMEMATRIXPATHSTORAGE = "0"
-      STOPPOINTVOLUMEMATRIXPATHLEGSTORAGE = "0">
+      STOPPOINTVOLUMEMATRIXPATHLEGSTORAGE = "0"
+      USENUMDECPLACES = "1"
+      MULTIPLEOF = "0.025"
+      STOREVOLUMEFORDEMANDINTERVALS = "0">
       <ATTRIBUTE        NAME = "MAXSHARINGTIME"      />      
     </PUTVOLUMESPARA>
     <PUTREVENUESPARA
@@ -2299,17 +2177,12 @@
       USETURNCAP = "1"
       TURNCAPMODEL = "BBACKTURNCAPMODEL_CAPPRT"
       SCALINGFACTOR = "1"
-      AVERAGESPACEPERCARUNIT = "22.965879265091857ft"
+      AVERAGESPACEPERCARUNIT = "22.965879265091854ft"
       DURATIONPHASE1 = "1h"
       NUMBEROFVOLUMESLICESPHASE1 = "10"
       CALCULATIONVARIANT = "SEQUENTIALROUTEPROCESSING"
     />    
-    <ANALYSISTIMES
-      USEONPUTRESULTS = "0"
-      USEONPRTRESULTS = "0"
-      STARTDAYINDEX = "1"
-      ENDDAYINDEX = "1"
-    />    
+    <PATHSEQUENCESKIMMATRIXSETTINGS    />    
     <VOLUMESPARA      ORIGDSEG = "Transit"      SAVEASDSEG = "Transit"    />    
     <VOLUMEMATRIXPARA
       CREATEFLOWBUNDLEFORMULAMATRICES = "1"
@@ -2317,5 +2190,348 @@
       CREATEASSIGNEDVOLUMEFORMULAMATRICES = "0"
       ASSIGNEDVOLUMEFORMULAMATRIXCODE = "AssignedVol"
     />    
+    <REMOTEOPERATIONFLOWPARA      DELETETEMPFILESONCALCULATIONSERVER = "1">
+      <ATTRIBUTE        NAME = "UPLOAD">
+        <ATTRITEM          SUBATTR1 = "VERSION"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ATTRIBUTE"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "FILTER"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "SURVEYDATA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "EXTERNAL_SC"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "VBS"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "CONNECTIONIO"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ROUTEIMPORT"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ICA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "USERVDFDLLS"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "VISUMADDIN"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "MATRIX"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "OTHERINPUTDATA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "OTHEROUTPUTDATA"          VALUE = "0"        />        
+      </ATTRIBUTE>
+      <ATTRIBUTE        NAME = "DOWNLOAD">
+        <ATTRITEM          SUBATTR1 = "VERSION"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ATTRIBUTE"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "FILTER"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "SURVEYDATA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "EXTERNAL_SC"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "VBS"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "CONNECTIONIO"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ROUTEIMPORT"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "ICA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "USERVDFDLLS"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "VISUMADDIN"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "MATRIX"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "OTHERINPUTDATA"          VALUE = "0"        />        
+        <ATTRITEM          SUBATTR1 = "OTHEROUTPUTDATA"          VALUE = "0"        />        
+      </ATTRIBUTE>
+    </REMOTEOPERATIONFLOWPARA>
   </FUNCTIONS>
+  <OPERATIONS>
+    <OPERATION
+      NO = "1"
+      CODE = ""
+      OPERATIONTYPE = "EditAttribute"
+      ACTIVE = "1"
+      COMMENT = "Calculate link transit run time"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODES = ""
+      WARNINGCOUNT = ""
+      ERRORCOUNT = ""
+      INFORMATIONCOUNT = ""
+      OPERATIONVARIABLECOUNT = "">
+      <ATTRIBUTEFORMULAPARA
+        NETOBJECTTYPE = "LINK"
+        INCLUDESUBCATEGORIES = "0"
+        RESULTATTRNAME = "ADDVAL1"
+        ONLYACTIVE = "0"
+        FORMULA = "Floor((([TCUR_PRTSYS(HOV3TOLL)] / 0.9) * [PLANNO]=1)  * 60&#xA;&#xA;+&#xA;&#xA;(([TCUR_PRTSYS(HOV3TOLL)] / 0.75) * [PLANNO]!=1) * 60&#xA;)"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "2"
+      CODE = ""
+      OPERATIONTYPE = "UpdateTravelTimes"
+      ACTIVE = "1"
+      COMMENT = ""
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODES = ""
+      WARNINGCOUNT = ""
+      ERRORCOUNT = ""
+      INFORMATIONCOUNT = ""
+      OPERATIONVARIABLECOUNT = "">
+      <UPDATETIMEPROFILETRAVELTIMESPARA
+        ONLYACTIVETIMEPROFILEITEMS = "0"
+        ADDVALUES = "0"
+        MODEFORUNUSEDTIMEPROFILEITEMS = "ALLTIMEPROFILES"
+        UPDATERUNTIME = "1"
+        RUNTIMEMETHOD = "FROMLINKATTR"
+        RUNTIMELINKATTRID = "ADDVAL1"
+        RUNTIMELINKFACTOR = "1"
+        RUNTIMETIMEPROFILEITEMATTRID = "ADDVAL"
+        RUNTIMETIMEPROFILEITEMFACTOR = "1"
+        RUNTIMETURNATTRID = "TCUR_PRTSYS(Bike)"
+        RUNTIMETURNFACTOR = "1"
+        RUNTIMECONSTANT = "0"
+        RUNTIMEROUNDINGMETHOD = "ROUNDINGTIME_1S"
+        RUNTIMEREGARDONLYACTIVELINKS = "0"
+        RUNTIMEREGARDSYSROUTEONLYIFVEHCOMBFITS = "0"
+        RUNTIMEREGARDTURNSANDMAINTURNS = "0"
+        UPDATESTOPTIME = "1"
+        STOPTIMEMETHOD = "FROMTPIATTR"
+        STOPTIMESTOPPOINTATTRID = "NO"
+        STOPTIMESTOPPOINTFACTOR = "1"
+        STOPTIMETIMEPROFILEITEMATTRID = "PRELENGTH"
+        STOPTIMETIMEPROFILEITEMFACTOR = "120"
+        STOPTIMECONSTANT = "0"
+        STOPTIMEROUNDINGMETHOD = "ROUNDINGTIME_1S"
+      />      
+    </OPERATION>
+    <OPERATION
+      NO = "3"
+      CODE = ""
+      OPERATIONTYPE = "PuTAssignment"
+      ACTIVE = "1"
+      COMMENT = "EA"
+      EXECUTED = "0"
+      STARTTIME = ""
+      ENDTIME = ""
+      DURATION = ""
+      MESSAGES = ""
+      RESULTMESSAGE = ""
+      SUCCESS = "0"
+      COMPUTENODES = ""
+      WARNINGCOUNT = ""
+      ERRORCOUNT = ""
+      INFORMATIONCOUNT = ""
+      OPERATIONVARIABLECOUNT = "">
+      <PUTASSIGNMENTPARABASE        PUTASSIGNMENTVARIANT = "Headway-based"        DSEGSET = "Transit">
+        <HEADWAYBASEDASSIGNMENTPARAMETERS>
+          <HEADWAYBASEDBASEPARA
+            CALCULATEASSIGNMENT = "1"
+            CALCULATESKIMMATRICES = "1"
+            MPAISACTIVE = "0"
+            CALCULATESFFORPUTODPAIRLIST = "0"
+            FROMDESTZONENO = ""
+            TODESTZONENO = ""
+            SELECTODRELATIONTYPE = "All"
+            TIMEINTERVALSTARTTIME = "00:00:00"
+            TIMEINTERVALSTARTDAYINDEX = "1"
+            TIMEINTERVALENDTIME = "24:00:00"
+            TIMEINTERVALENDDAYINDEX = "1"
+            HEADWAYCALCULATION = "TimeProfileAttribute">
+            <HEADWAYBASEDINTERVALDATA
+              TIMEINTERVALDAYINDEX = "1"
+              TIMEINTERVALSTARTTIME = "00:00:00"
+              ATTRIBUTE = "LINEROUTE\EA_HEADWAY"
+            />            
+          </HEADWAYBASEDBASEPARA>
+          <HEADWAYBASEDDSEGPARA            DSEGSETFORSKIMMATRICES = ""          />          
+          <HEADWAYBASEDSEARCHPARA
+            ONLYACTIVETIMEPROFILES = "0"
+            COORDINATIONTYPE = "CoordByGroups"
+            INTERCHANGETYPE = "Use"
+            COORDINATEDTPSUNDISTINGUISHABLE = "1"
+            PASSENGERINFORMATIONTYPE = "None_ExpDistRib_HW"
+            USEDISCRCHOICEAMONGSTOPAREAS = "1"
+            DISCRCHOICEAMONGSTOPAREASFACTOR = "0.25"
+            USEDISCRCHOICEBETWEENBOARDANDALIGHT = "1"
+            DISCRCHOICEBETWEENBOARDANDALIGHTFACTOR = "0.25"
+            INFOFORDIFFERENTSTOPAREAS = "0"
+            INFOINVEHICLE = "0"
+            SHARELOWERBOUNDABS = "0.001"
+            SHAREUPPERBOUNDREL = "1"
+            REMOVEDOMINATEDPATHS = "0"
+            MAXPOLYNOMDEGREEFORINTEGRATION = "50"
+            NUMSIMULATIONS = "100"
+            USECALCULATIONTIMEOPTIMIZEDALGORITHM = "0"
+          />          
+          <HEADWAYBASEDIMPEDANCEPARA
+            PJTVAL = "1"
+            FAREPOINTVAL = "0"
+            USEFAREMODEL = "0"
+            INVEHTIMEVAL = "1"
+            INVEHTIMEWEIGHTATTR = ""
+            PUTAUXTIMEVAL = "2"
+            ACCESSTIMEVAL = "2"
+            EGRESSTIMEVAL = "2"
+            WALKTIMEVAL = "2"
+            ORIGINWAITTIMEVAL = "2"
+            ORIGINWAITTIMESTOPAREAWEIGHTATTR = ""
+            ORIGINWAITTIMETIMEPROFILEWEIGHTATTR = ""
+            ORIGINSTOPAREAPENALTYATTR = ""
+            ORIGINTIMEPROFILEPENALTYATTR = ""
+            TRANSFERWAITTIMEVAL = "2"
+            TRANSFERWAITTIMEWEIGHTATTR = ""
+            BOARDINGPENALTYPUTATTR = ""
+            BOARDINGPENALTYPUTAUXATTR = ""
+            MEANDELAYATTR = ""
+            NUMTRANSFERSVAL = "10min"
+          />          
+          <PUTSKIMMATRIXPARA
+            FILENAME = ""
+            FORMAT = "V-Format"
+            SEPARATOR = "Blank"
+            USEVISEMMODE = "1"
+            VISEMMODE = "3"
+            CONFIRMOVERWRITE = "1"
+            FUNCTION = "AggregateMean"
+            VOLUMEWEIGHTED = "1"
+            QUANTILE = "50"
+            LOWIMPCONNSHARE = "50"
+            SELECTODRELATIONTYPE = "All"
+            CALCULATEANALYSISTIMEINTERVALSKIMS = "0">
+            <SINGLESKIMMATRIXPARA
+              NAME = "FARE"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "INVEHTIME"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "INVEHTIMEBYTSYS(Bus)"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "INVEHTIMEBYTSYS(ComRail)"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "INVEHTIMEBYTSYS(ExpBus)"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "INVEHTIMEBYTSYS(LightRail)"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "NUMTRANSFERS"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "ORIGINWAITTIME"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "TRANSFERWAITTIME"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <SINGLESKIMMATRIXPARA
+              NAME = "WALKTIME"
+              CALCULATE = "1"
+              SAVETOFILE = "0"
+              OPEN = "0"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "1"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "2"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "3"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "4"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "5"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "6"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "7"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+            <EQUIVALENTJOURNEYTIMELINEPARA
+              LINENO = "8"
+              POSITIVE = "1"
+              ATTRIBUTE = ""
+              EXPONENT = "1"
+              FACTOR = "1"
+              MIN = "0"
+              MAX = "999999"
+            />            
+          </PUTSKIMMATRIXPARA>
+        </HEADWAYBASEDASSIGNMENTPARAMETERS>
+      </PUTASSIGNMENTPARABASE>
+    </OPERATION>
+  </OPERATIONS>
+  <OPERATIONVARIABLES>
+    <DEFINITIONS    />    
+    <VALUES>
+      <OPERATIONVARIABLES      />      
+    </VALUES>
+  </OPERATIONVARIABLES>
 </PROCEDURES>
