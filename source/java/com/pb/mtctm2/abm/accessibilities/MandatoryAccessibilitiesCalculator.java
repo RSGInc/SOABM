@@ -416,7 +416,8 @@ public class MandatoryAccessibilitiesCalculator
                 if (walkTransitWalkUtilities[bestAlt] <= MIN_EXP_FUNCTION_ARGUMENT)
                 {
                     logger.fatal("Error:  Best walk transit alt " + bestAlt + " found for origin mgra "
-                        + oMgra + " to destination mgra " + dMgra + " but Utility = "
+                        + oMgra + " to destination mgra " + dMgra + " boarding tap "+bestTaps[0]+
+                        " alighting tap "+ bestTaps[1] + " but Utility = "
                         + walkTransitWalkUtilities[bestAlt]);
                     throw new RuntimeException();
                 }

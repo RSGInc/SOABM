@@ -8,6 +8,7 @@ import com.pb.common.util.PropertyMap;
 import com.pb.mtctm2.abm.ctramp.Household;
 import com.pb.mtctm2.abm.ctramp.HouseholdDataManager;
 import com.pb.mtctm2.abm.ctramp.Person;
+import com.pb.mtctm2.abm.ctramp.Util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -152,6 +153,30 @@ public class SandagHouseholdDataManager2
 
         long[] seedCol = hhTable.getColumnAsLong(hhTable.getColumnPosition("seed"));
         
+        boolean readAOCFromHHTable = false;
+        if(hhTable.containsColumn(HH_FUEL_COST_FIELD_NAME) && hhTable.containsColumn(HH_MAINTAIN_COST_FIELD_NAME))
+        	readAOCFromHHTable = true;
+        
+        float fuelCost=0;
+        float maintainCost=0;
+        if(!readAOCFromHHTable) {
+        	
+        	if(!propertyMap.containsKey("aoc.fuel")||!propertyMap.containsKey("aoc.maintenance")) {
+        		
+        		logger.fatal("Household table does not include auto operating cost field(s) "+ HH_FUEL_COST_FIELD_NAME +
+        				" and/or "+ HH_MAINTAIN_COST_FIELD_NAME );
+        		logger.fatal(" and properties file does not include aoc.fuel and/or aoc.maintenance ");
+        		logger.fatal(" please revise input files to include AOC in either HH table or properties file");
+        		throw new RuntimeException();
+        	}
+        
+        	logger.info("Reading auto operating costs from properties file");
+        	fuelCost = Util.getFloatValueFromPropertyMap(propertyMap,"aoc.fuel");
+        	maintainCost = Util.getFloatValueFromPropertyMap(propertyMap,"aoc.maintenance");
+        }else {
+        	logger.info("Reading auto operating costs from household table" );
+        }
+       
         // for each household in the sample
         for (int i = 0; i < numHouseholdsInSample; i++)
         {
@@ -238,10 +263,11 @@ public class SandagHouseholdDataManager2
                 hh.setHhBldgsz(bldgsz);
                 
                 //HH-level auto operating cost [Edit bmp @ July 2019]
-                double fuelCost = (double) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_FUEL_COST_FIELD_NAME));
+                if(readAOCFromHHTable) {
+                	 fuelCost = hhTable.getValueAt(r, hhTable.getColumnPosition(HH_FUEL_COST_FIELD_NAME));
+                     maintainCost = hhTable.getValueAt(r, hhTable.getColumnPosition(HH_MAINTAIN_COST_FIELD_NAME));
+                }
                 hh.setFuelCost(fuelCost);
-                
-                double maintainCost = (double) hhTable.getValueAt(r, hhTable.getColumnPosition(HH_MAINTAIN_COST_FIELD_NAME));
                 hh.setMaintainCost(maintainCost);
 
                 hh.initializeWindows();

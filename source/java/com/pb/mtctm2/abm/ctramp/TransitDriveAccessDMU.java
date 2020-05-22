@@ -256,7 +256,7 @@ public class TransitDriveAccessDMU
     	return applicationType;
     }
     //HH-level auto operating cost [Edit bmp @ July 2019]
-    public void setFuelCost(double fc) {
+    public void setFuelCost(float fc) {
     	this.fuelCost = fc;
     }
     
@@ -264,7 +264,7 @@ public class TransitDriveAccessDMU
     	return fuelCost;
     }
     
-    public void setMaintainCost(double mc) {
+    public void setMaintainCost(float mc) {
     	this.maintainCost = mc;
     }
     

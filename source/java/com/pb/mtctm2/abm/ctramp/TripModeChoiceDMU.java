@@ -565,12 +565,12 @@ public class TripModeChoiceDMU
     }
     
     //HH-level auto operating cost [Edit bmp @ July 2019]
-    public double getFuelCost()
+    public float getFuelCost()
     {
         return hh.getFuelCost();
     }
     
-    public double getMaintainCost()
+    public float getMaintainCost()
     {
         return hh.getMaintainCost();
     }

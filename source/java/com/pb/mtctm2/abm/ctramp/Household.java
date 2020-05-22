@@ -25,8 +25,8 @@ public class Household
     private int                       hhWorkers;
     
     //HH Level Auto Operating Cost [Edit: bmp, July 2019]
-    private double                    fuelCost;
-    private double                    maintainCost;
+    private float                    fuelCost;
+    private float                    maintainCost;
 
     private int                       homeTaz;
     private int                       homeMgra;
@@ -325,22 +325,22 @@ public class Household
     
     //getter and setter method for HH-level auto operating cost
     //[Edit: bmp @ July 2019]
-    public void setFuelCost(double fc)
+    public void setFuelCost(float fc)
     {
         this.fuelCost = fc;
     }
 
-    public double getFuelCost()
+    public float getFuelCost()
     {
         return this.fuelCost;
     }
     
-    public void setMaintainCost(double mc)
+    public void setMaintainCost(float mc)
     {
         this.maintainCost = mc;
     }
 
-    public double getMaintainCost()
+    public float getMaintainCost()
     {
         return this.maintainCost;
     }
