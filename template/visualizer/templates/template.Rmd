@@ -461,7 +461,7 @@ valueBox(prettyNum(round(base_df$value[base_df$name=="total_stops"]/BASE_SAMPLE_
 
 ### Base VMT
 ```{r VMT1_ValueBox}
-valueBox(prettyNum(round(base_df$value[base_df$name=="total_vmt"]/BASE_SAMPLE_RATE), big.mark = ","), "Total VMT", icon = "ion-android-car")
+valueBox(prettyNum(round(base_df$value[base_df$name=="total_vmt"]/BASE_SAMPLE_RATE), big.mark = ","), "Total Resident VMT", icon = "ion-android-car")
 ```
 
 
@@ -510,7 +510,7 @@ valueBox(prettyNum(round(build_df$value[build_df$name=="total_stops"]/BUILD_SAMP
 
 ### Build VMT
 ```{r VMT2_ValueBox}
-valueBox(prettyNum(round(build_df$value[build_df$name=="total_vmt"]/BUILD_SAMPLE_RATE), big.mark = ","), "Total VMT", icon = "ion-android-car")
+valueBox(prettyNum(round(build_df$value[build_df$name=="total_vmt"]/BUILD_SAMPLE_RATE), big.mark = ","), "Total Resident VMT", icon = "ion-android-car")
 ```
 
 

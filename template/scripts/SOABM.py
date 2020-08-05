@@ -1173,9 +1173,9 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if dpnum==0:
         tripsToAdd = expansionFactor / hov2occ
       elif dpnum!=epnum:
-        tripsToAdd = 0
-      elif dpnum==epnum:
         tripsToAdd = expansionFactor
+      elif dpnum==epnum:
+        tripsToAdd = 0
         
       hov2[tod][o,d] = hov2[tod][o,d] + tripsToAdd
       
@@ -1198,9 +1198,9 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if dpnum==0:
         tripsToAdd = expansionFactor / hov2occ
       elif dpnum!=epnum:
-        tripsToAdd = 0
-      elif dpnum==epnum:
         tripsToAdd = expansionFactor
+      elif dpnum==epnum:
+        tripsToAdd = 0
         
       hov2toll[tod][o,d] = hov2toll[tod][o,d] + tripsToAdd
       
@@ -1223,9 +1223,9 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if dpnum==0:
         tripsToAdd = expansionFactor / hov3occ
       elif dpnum!=epnum:
-        tripsToAdd = 0
-      elif dpnum==epnum:
         tripsToAdd = expansionFactor
+      elif dpnum==epnum:
+        tripsToAdd = 0
         
       hov3[tod][o,d] = hov3[tod][o,d] + tripsToAdd
     
@@ -1248,9 +1248,9 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if dpnum==0:
         tripsToAdd = expansionFactor / hov3occ
       elif dpnum!=epnum:
-        tripsToAdd = 0
-      elif dpnum==epnum:
         tripsToAdd = expansionFactor
+      elif dpnum==epnum:
+        tripsToAdd = 0
         
       hov3toll[tod][o,d] = hov3toll[tod][o,d] + tripsToAdd
       
@@ -2457,6 +2457,7 @@ if __name__== "__main__":
         vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.CountLocations, "Link\VolVehPrT(AP)")
         all_vol_list[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVehPrT(AP)")
         sov_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(SOV,AP)")
+        sovt_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(SOVTOLL,AP)")
         hv2_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV2,AP)")
         hv3_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(HOV3,AP)")
         trk_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "VolVeh_TSys(Truck,AP)")
@@ -2485,7 +2486,7 @@ if __name__== "__main__":
           vol_list[5][i] = vol_list[5][i] + vol_list[tod_cnt][i]
         for i in range(len(linkID)):
           all_vol_list[5][i] = all_vol_list[5][i] + all_vol_list[tod_cnt][i]
-          auto_vol_list[tod_cnt][i] = sov_list[i] + hv2_list[i] + hv3_list[i]
+          auto_vol_list[tod_cnt][i] = sov_list[i] + sovt_list[i] + hv2_list[i] + hv3_list[i]
           auto_vol_list[5][i] = auto_vol_list[5][i] + auto_vol_list[tod_cnt][i]
           truck_vol_list[tod_cnt][i] = trk_list[i]
           truck_vol_list[5][i] = truck_vol_list[5][i] + truck_vol_list[tod_cnt][i]
@@ -2498,7 +2499,7 @@ if __name__== "__main__":
         saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
         #get vc ratio after setting the CapPrt with mlc for the current period
         vc_ratio[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VOLCAPRATIOPRT(AP)")
-        vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list)
+        vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list) + numpy.dot(dst_list, sovt_list)
         vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
         vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)
         vmt_list[tod_cnt][3] = numpy.dot(dst_list, trk_list)

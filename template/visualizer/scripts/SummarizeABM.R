@@ -6,7 +6,7 @@
 ### Read Command Line Arguments
 args                <- commandArgs(trailingOnly = TRUE)
 Parameters_File     <- args[1]
-#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template/visualizer/runtime/parameters.csv"
+#Parameters_File <- "E:/projects/clients/odot/SouthernOregonABM/Contingency525/Model/SOABM/template/visualizer/runtime/parameters.csv"
 
 SYSTEM_REPORT_PKGS <- c("reshape", "omxr", "data.table", "plyr", "weights")
 lib_sink <- suppressWarnings(suppressMessages(lapply(SYSTEM_REPORT_PKGS, library, character.only = TRUE))) 
@@ -26,7 +26,11 @@ TripDir       <- file.path(PROJECT_DIR, "outputs/trips")
 cvmFile       <- paste(TripDir, "cvmTrips.omx", sep = "/")
 extFile       <- paste(TripDir, "externalOD.omx", sep = "/")
 SkimDir       <- file.path(PROJECT_DIR, "outputs/skims")
-SkimFile      <- paste(SkimDir, "taz_skim_sov_am.omx", sep = "/")
+SkimFile_ea   <- paste(SkimDir, "taz_skim_sov_ea.omx", sep = "/")
+SkimFile_am   <- paste(SkimDir, "taz_skim_sov_am.omx", sep = "/")
+SkimFile_md   <- paste(SkimDir, "taz_skim_sov_md.omx", sep = "/")
+SkimFile_pm   <- paste(SkimDir, "taz_skim_sov_pm.omx", sep = "/")
+SkimFile_ev   <- paste(SkimDir, "taz_skim_sov_ev.omx", sep = "/")
 
 setwd(ABMOutputDir)
 hh                 <- fread(paste("householdData_",MAX_ITER, ".csv", sep = ""))
@@ -41,8 +45,23 @@ aoResults_Pre      <- fread("aoResults_Pre.csv")
 xwalk              <- fread(paste(geogXWalkDir, "maz_data_export.csv", sep = "/"), stringsAsFactors = F)
 
 ## skim
-skimMat3 <- read_omx(SkimFile, "3", ,)
-skimLookUp <- read_lookup(SkimFile, "NO")
+skimMat3_ea <- read_omx(SkimFile_ea, "3", ,)
+skimLookUp_ea <- read_lookup(SkimFile_ea, "NO")
+
+skimMat3_am <- read_omx(SkimFile_am, "3", ,)
+skimLookUp_am <- read_lookup(SkimFile_am, "NO")
+
+skimMat3_md <- read_omx(SkimFile_md, "3", ,)
+skimLookUp_md <- read_lookup(SkimFile_md, "NO")
+
+skimMat3_ev <- read_omx(SkimFile_ev, "3", ,)
+skimLookUp_ev <- read_lookup(SkimFile_ev, "NO")
+
+skimMat3_pm <- read_omx(SkimFile_pm, "3", ,)
+skimLookUp_pm <- read_lookup(SkimFile_pm, "NO")
+
+skimMat3 <- read_omx(SkimFile_md, "3", ,)
+skimLookUp <- read_lookup(SkimFile_md, "NO")
 
 districtList         <- sort(unique(xwalk$DISTNAME))
 
@@ -65,7 +84,20 @@ cvm_vmt   <- c()
 for(mtx in cvm_mtx){
   #cat(mtx,"\n")
   cvmTrips  <- read_omx(cvmFile, mtx, ,)
-  cvmVMT    <- cvmTrips * skimMat3
+  diag(cvmTrips) <- 0
+  tod <- cvm_tod[match(mtx, cvm_mtx)]
+  if(tod=="EV1" | tod=="EV2"){
+    cvmVMT    <- cvmTrips * skimMat3_ev
+  }else if(tod=="EA"){
+    cvmVMT    <- cvmTrips * skimMat3_ea
+  }else if(tod=="AM"){
+    cvmVMT    <- cvmTrips * skimMat3_am
+  }else if(tod=="MD"){
+    cvmVMT    <- cvmTrips * skimMat3_md
+  }else if(tod=="PM"){
+    cvmVMT    <- cvmTrips * skimMat3_pm
+  }
+  
   cvm_trips <- c(cvm_trips, sum(cvmTrips))
   cvm_vmt   <- c(cvm_vmt, sum(cvmVMT))
 }
@@ -122,7 +154,20 @@ ext_vmt   <- c()
 for(mtx in ext_mtx){
   #cat(mtx,"\n")
   extTrips  <- read_omx(extFile, mtx, ,)
-  extVMT    <- extTrips * skimMat3
+  diag(extTrips) <- 0
+  tod <- ext_tod[match(mtx, ext_mtx)]
+  if(tod=="EV1" | tod=="EV2"){
+    extVMT    <- extTrips * skimMat3_ev
+  }else if(tod=="EA"){
+    extVMT    <- extTrips * skimMat3_ea
+  }else if(tod=="AM"){
+    extVMT    <- extTrips * skimMat3_am
+  }else if(tod=="MD"){
+    extVMT    <- extTrips * skimMat3_md
+  }else if(tod=="PM"){
+    extVMT    <- extTrips * skimMat3_pm
+  }
+  
   ext_trips <- c(ext_trips, sum(extTrips))
   ext_vmt   <- c(ext_vmt, sum(extVMT))
 }
@@ -582,11 +627,32 @@ trips$TOUROTAZ <- tours$OTAZ[match(trips$hh_id*1000+trips$person_num*100+trips$T
 trips$TOURDTAZ <- tours$DTAZ[match(trips$hh_id*1000+trips$person_num*100+trips$TOURCAT*10+trips$tour_id, 
 										tours$hh_id*1000+tours$person_num*100+tours$TOURCAT*10+tours$tour_id)]
 
-trips$tripoindex<-match(trips$OTAZ, skimLookUp$Lookup)
-trips$tripdindex<-match(trips$DTAZ, skimLookUp$Lookup)
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_ea$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_ea$Lookup)
+trips$od_dist_ea<-skimMat3_ea[cbind(trips$tripoindex, trips$tripdindex)]	
 
-trips$od_dist<-skimMat3[cbind(trips$tripoindex, trips$tripdindex)]	
-										
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_am$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_am$Lookup)
+trips$od_dist_am<-skimMat3_am[cbind(trips$tripoindex, trips$tripdindex)]	
+
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_md$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_md$Lookup)
+trips$od_dist_md<-skimMat3_md[cbind(trips$tripoindex, trips$tripdindex)]	
+
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_pm$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_pm$Lookup)
+trips$od_dist_pm<-skimMat3_pm[cbind(trips$tripoindex, trips$tripdindex)]	
+
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_ev$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_ev$Lookup)
+trips$od_dist_ev<-skimMat3_ev[cbind(trips$tripoindex, trips$tripdindex)]	
+
+trips$od_dist <- 0
+trips$od_dist[trips$stop_period<=5] <- trips$od_dist_ea[trips$stop_period<=5]
+trips$od_dist[trips$stop_period>=6 & trips$stop_period<=8] <- trips$od_dist_am[trips$stop_period>=6 & trips$stop_period<=8]
+trips$od_dist[trips$stop_period>=9 & trips$stop_period<=24] <- trips$od_dist_md[trips$stop_period>=9 & trips$stop_period<=24]
+trips$od_dist[trips$stop_period>=25 & trips$stop_period<=28] <- trips$od_dist_pm[trips$stop_period>=25 & trips$stop_period<=28]
+trips$od_dist[trips$stop_period>=29] <- trips$od_dist_ev[trips$stop_period>=29]
 
 
 # Copy school escorting fields from tour to trip file
@@ -687,9 +753,32 @@ jtrips$DTAZ <- xwalk$TAZ[match(jtrips$dest_mgra, xwalk$MAZ)]
 
 # Edited BMP [06/21/19]
 # OD distnaces were not getting computed for joint trips
-jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp$Lookup)
-jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp$Lookup)
-jtrips$od_dist<-skimMat3[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_ea$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_ea$Lookup)
+jtrips$od_dist_ea<-skimMat3_ea[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_am$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_am$Lookup)
+jtrips$od_dist_am<-skimMat3_am[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_md$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_md$Lookup)
+jtrips$od_dist_md<-skimMat3_md[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_pm$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_pm$Lookup)
+jtrips$od_dist_pm<-skimMat3_pm[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_ev$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_ev$Lookup)
+jtrips$od_dist_ev<-skimMat3_ev[cbind(jtrips$tripoindex, jtrips$tripdindex)]	
+
+jtrips$od_dist <- 0
+jtrips$od_dist[jtrips$stop_period<=5] <- jtrips$od_dist_ea[jtrips$stop_period<=5]
+jtrips$od_dist[jtrips$stop_period>=6 & jtrips$stop_period<=8] <- jtrips$od_dist_am[jtrips$stop_period>=6 & jtrips$stop_period<=8]
+jtrips$od_dist[jtrips$stop_period>=9 & jtrips$stop_period<=24] <- jtrips$od_dist_md[jtrips$stop_period>=9 & jtrips$stop_period<=24]
+jtrips$od_dist[jtrips$stop_period>=25 & jtrips$stop_period<=28] <- jtrips$od_dist_pm[jtrips$stop_period>=25 & jtrips$stop_period<=28]
+jtrips$od_dist[jtrips$stop_period>=29] <- jtrips$od_dist_ev[jtrips$stop_period>=29]
 
 jtrips$TOUROTAZ <- unique_joint_tours$OTAZ[match(jtrips$hh_id*1000+jtrips$tour_id, 
 										unique_joint_tours$hh_id*1000+unique_joint_tours$tour_id)]
@@ -2124,6 +2213,9 @@ total_jobs <- sum(xwalk$EMP_TOTAL)
 trips$num_travel[trips$TRIPMODE==1] <- 1
 trips$num_travel[trips$TRIPMODE==2] <- 2
 trips$num_travel[trips$TRIPMODE==3] <- 3.33
+#treat escort trips as fully joint
+trips$num_travel[trips$TRIPMODE %in% c(2,3) & 
+                   (trips$driver_pnum>0 & trips$dest_escortee_pnum!= trips$driver_pnum)] <- 1
 trips$num_travel[is.na(trips$num_travel)] <- 0
 
 # Edit by BMP [06/21/19]
@@ -2135,8 +2227,8 @@ jtrips$num_travel <- 1
 #jtrips$num_travel[jtrips$TRIPMODE==3] <- 3.33
 #jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
 
-total_vmt <- sum((trips$od_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIPMODE<=3]) + 
-  sum((jtrips$od_dist[jtrips$TRIPMODE<=3])/jtrips$num_travel[jtrips$TRIPMODE<=3])
+total_vmt <- sum((trips$od_dist[trips$TRIPMODE<=3 & (trips$OTAZ!=trips$DTAZ)])/trips$num_travel[trips$TRIPMODE<=3 & (trips$OTAZ!=trips$DTAZ)]) + 
+  sum((jtrips$od_dist[jtrips$TRIPMODE<=3 & (jtrips$OTAZ!=jtrips$DTAZ)])/jtrips$num_travel[jtrips$TRIPMODE<=3 & (jtrips$OTAZ!=jtrips$DTAZ)])
 
 totals_var <- c("total_population", "total_households", "total_tours", "total_trips", "total_stops", "total_vmt", "total_workers", "total_jobs")
 totals_val <- c(total_population,total_households, total_tours, total_trips, total_stops, total_vmt, total_workers, total_jobs)
