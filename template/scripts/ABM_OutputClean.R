@@ -2,6 +2,7 @@
 # 6-13-19
 # 2-5-20 - revised with review from Jin Ren and Alex Bettinardi
 # 3-5-20 - revised to remove all OMX files except for - taz_skim_sov_pm.omx - as that file is needed to re-run a specific period assignment (re-run CVM)
+# 9-2-20 - corrected oversight and script now removees "MU" CVM matrix csv files from outputs\other
 
 # Script to remove interim and duplicative files from the ABM run:
 
@@ -11,7 +12,7 @@ file.remove(paste("outputs/networks/Transit_Assignment_Results_",apply(expand.gr
 file.remove(paste("outputs/networks/",c("Bike_MAZ_Skim","Walk_MAZ_Skim","Highway_Skimming_Assignment","Transit_Skimming_Assignment","MAZ_Level_Processing"),"_Setup.ver",sep=""))
 
 # clean and simplify "other" folder
-file.remove(paste("outputs/other/",c("externalOD.omx",paste0(apply(expand.grid(c("CAR","SU"),c("AM","EA","EV1","EV2","MD","PM")),1,paste,collapse="_"),".csv")),sep=""))
+file.remove(paste("outputs/other/",c("externalOD.omx",paste0(apply(expand.grid(c("CAR","MU","SU"),c("AM","EA","EV1","EV2","MD","PM")),1,paste,collapse="_"),".csv")),sep=""))
 
 # find the latest iteration
 iters <- list.files(path="outputs/other/", pattern="householdData_")
