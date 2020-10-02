@@ -2,34 +2,26 @@
 #Ben Stabler, ben.stabler@rsginc.com, 04/06/15
 #Requires the OMX Import/Export Add-In to be installed
 
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py taz_initial
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py maz_initial
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py tap_initial
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py maz_skim
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py taz_skim_speed
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py tap_skim_speed
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py build_trip_matrices 1.0 1
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py taz_skim
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py tap_skim
-#"C:\Program Files\Python27\python.exe" scripts\SOABM.py generate_html_inputs
-
 ############################################################
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules/Lib/site-packages")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
 import win32com.client as com
-import VisumPy.helpers, omx, numpy
+import VisumPy.helpers
 import VisumPy.csvHelpers
 #import VisumPy.excel
 #import VisumPy.reports
 import traceback
 import pandas as pd
 sys.path.append("scripts")
-#sys.path.append("E:/projects/clients/odot/SouthernOregonABM/Contingency/TransitEverywhere/FinalTest/SOABM/template/scripts")
+#sys.path.append("E:/projects/clients/odot/SouthernOregonABM/Contingency525/Model/Python3Test/template/scripts")
 from Properties import Properties
 import warnings
 import tables
+
+import openmatrix as omx
+import numpy
 warnings.simplefilter('ignore', tables.NaturalNameWarning)
 
 ############################################################
@@ -50,8 +42,9 @@ def loadVersion(Visum, fileName):
     Visum.SetPath(pathNo[i], os.getcwd())
 
 def saveVersion(Visum, fileName):
-  print("save version file: " + os.getcwd() + "/" + fileName)
-  Visum.SaveVersion(os.getcwd() + "/" +fileName)
+  filePath = os.path.join(os.getcwd(), fileName)
+  print("save version file: " + filePath)
+  Visum.SaveVersion(filePath)
 
 def closeVisum(Visum):
   print("close Visum")
@@ -172,12 +165,12 @@ def codeTAZConnectors(Visum):
   print('delete connectors if too close to one another')
   for i in range(len(zoneIds)):
     zoneObj = Visum.Net.Zones.ItemByKey(zoneIds[i][1])
-    nodeNos = zoneObj.AttValue("Concatenate:OrigConnectors\Node\No")
-    nodeXs = zoneObj.AttValue("Concatenate:OrigConnectors\Node\XCoord")
-    nodeYs = zoneObj.AttValue("Concatenate:OrigConnectors\Node\YCoord")
-    nodeNos = map(int,nodeNos.split(","))
-    nodeXs = map(float,nodeXs.split(","))
-    nodeYs = map(float,nodeYs.split(","))
+    nodeNos = zoneObj.AttValue(r"Concatenate:OrigConnectors\Node\No")
+    nodeXs = zoneObj.AttValue(r"Concatenate:OrigConnectors\Node\XCoord")
+    nodeYs = zoneObj.AttValue(r"Concatenate:OrigConnectors\Node\YCoord")
+    nodeNos = list(map(int,nodeNos.split(",")))
+    nodeXs = list(map(float,nodeXs.split(",")))
+    nodeYs = list(map(float,nodeYs.split(",")))
     
     for j in range(len(nodeNos)):
       if j == 0:
@@ -341,7 +334,7 @@ def createMazToTap(Visum, mode, outFolder):
   filter.AddCondition("OP_NONE", False, "IsocTimePrT", "LessEqualVal", MaxTime)
   
   #create output file
-  f = open(outFolder + "/tap2maz_" + mode + ".csv", 'wb')
+  f = open(outFolder + "/tap2maz_" + mode + ".csv", 'w')
   f.write("TAP,MAZ,DISTMILES\n")
   
   #loop though nodes and run isochrones
@@ -379,7 +372,7 @@ def createNearbyMazsFile(Visum, mode, outFolder):
   Mazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "SEQMAZ") #seq maz
   
   #create output file
-  f = open(outFolder + "/maz2maz_" + mode + ".csv", 'wb')
+  f = open(outFolder + "/maz2maz_" + mode + ".csv", 'w')
   f.write("OMAZ,DMAZ,DISTMILES\n")
   for i in range(len(Mazs)):
     for j in range(len(Mazs)):
@@ -419,7 +412,7 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   
   #write TAP file
   print("write tap data file")
-  f = open(tapFileName, 'wb')
+  f = open(tapFileName, 'w')
   f.write("tap,taz,lotid,capacity\n")
   for j in range(len(tapIds)):
     tap = tapIds[j]
@@ -429,7 +422,7 @@ def tazsToTapsForDriveAccess(Visum, fileName, tapFileName):
   
   #write all near TAPs that CANPNR
   print("write all near TAPs for drive access")  
-  f = open(fileName, 'wb')
+  f = open(fileName, 'w')
   f.write("FTAZ,MODE,PERIOD,TTAP,TMAZ,TTAZ,DTIME,DDIST,DTOLL,WDIST\n")
   for i in range(len(zoneIds)):
     for j in range(len(tapIds)):
@@ -471,7 +464,7 @@ def saveLinkSpeeds(Visum, fileName):
   fn = VisumPy.helpers.GetMulti(Visum.Net.Links, "FROMNODENO")
   tn = VisumPy.helpers.GetMulti(Visum.Net.Links, "TONODENO")
   speed = VisumPy.helpers.GetMulti(Visum.Net.Links, speedField)
-  f = open(fileName, 'wb')
+  f = open(fileName, 'w')
   f.write("FROMNODE,TONODE,V0PRT\n")
   for i in range(len(fn)):
     f.write("%i,%i,%.2f\n" % (fn[i],tn[i],speed[i]))
@@ -486,7 +479,7 @@ def loadLinkSpeeds(Visum, fileName):
   #read speeds into network
   speeds = []
   i=0
-  with open(fileName, 'rb') as csvfile:
+  with open(fileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       if i >0:
@@ -505,10 +498,10 @@ def createAltFiles(Visum, outFolder):
   mazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "SEQMAZ") #seq maz
   
   #create output file
-  f_pl_a = open(outFolder + "/ParkLocationAlts.csv", 'wb') 
-  f_dc_a = open(outFolder + "/DestinationChoiceAlternatives.csv", 'wb') 
-  f_soa_a = open(outFolder + "/SoaTazDistAlternatives.csv", 'wb') 
-  f_psoa_a = open(outFolder + "/ParkLocationSampleAlts.csv", 'wb') 
+  f_pl_a = open(outFolder + "/ParkLocationAlts.csv", 'w') 
+  f_dc_a = open(outFolder + "/DestinationChoiceAlternatives.csv", 'w') 
+  f_soa_a = open(outFolder + "/SoaTazDistAlternatives.csv", 'w') 
+  f_psoa_a = open(outFolder + "/ParkLocationSampleAlts.csv", 'w') 
   
   f_pl_a.write("a,mgra,parkarea\n") #a,maz,parkarea
   f_dc_a.write("a,mgra,dest\n") #a,maz,taz
@@ -763,7 +756,7 @@ def writeMazDataFile(Visum, fileName):
             row[j] = row[j] + "," + str(uda[j])
   
   #create output file
-  f = open(fileName, 'wb') 
+  f = open(fileName, 'w') 
   f.write(header + "\n")
   for i in range(len(row)):
     f.write(row[i] + "\n")
@@ -796,7 +789,7 @@ def setLinkSpeedTODFactors(Visum, linkSpeedsFileName):
 
   print("read link speeds input file")
   speeds = []
-  with open(linkSpeedsFileName, 'rb') as csvfile:
+  with open(linkSpeedsFileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       speeds.append(row)
@@ -823,7 +816,7 @@ def createTapFareMatrix(Visum, faresFileName, fileName):
   
   print("read fare input file")
   odfare = []
-  with open(faresFileName, 'rb') as csvfile:
+  with open(faresFileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       odfare.append(row)
@@ -1097,7 +1090,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   
   print("read tap data file for tap to taz mapping for pnr trips")
   taptaz = []
-  with open(tapFileName, 'rb') as csvfile:
+  with open(tapFileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       taptaz.append(row)
@@ -1105,7 +1098,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   
   print("read individual trips")
   trips = []
-  with open(tripFileName, 'rb') as csvfile:
+  with open(tripFileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       trips.append(row)
@@ -1122,7 +1115,10 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   inbColNum = trips_col_names.index('inbound')
   setColNum = trips_col_names.index('set')
   dpnumColNum = trips_col_names.index('driver_pnum')
-  epnumColNum = trips_col_names.index('dest_escortee_pnum')
+  pnumColNum = trips_col_names.index('person_num')
+  oesctypColNum = trips_col_names.index('orig_escort_stoptype')
+  desctypColNum = trips_col_names.index('dest_escort_stoptype')
+  #epnumColNum = trips_col_names.index('dest_escortee_pnum')
   
   for i in range(len(trips)):
     if (i % 10000) == 0:
@@ -1168,14 +1164,19 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       d = tazIds[d]
       
       #escort trips
+      oEscStopType = int(trips[i][oesctypColNum])
+      dEscStopType = int(trips[i][desctypColNum])
       dpnum = int(trips[i][dpnumColNum])
-      epnum = int(trips[i][epnumColNum])
-      if dpnum==0:
-        tripsToAdd = expansionFactor / hov2occ
-      elif dpnum!=epnum:
-        tripsToAdd = expansionFactor
-      elif dpnum==epnum:
+      pnum = int(trips[i][pnumColNum])
+      if ((oEscStopType>0) or (dEscStopType>0)) and (dpnum!=pnum):
+        #ignore escortee trip
         tripsToAdd = 0
+      elif ((oEscStopType>0) or (dEscStopType>0)) and (dpnum==pnum):
+        #add chaueffeur trip, do not discount by occupancy
+        tripsToAdd = expansionFactor
+      else:
+        #add all other hov trips are usual
+        tripsToAdd = expansionFactor / hov2occ
         
       hov2[tod][o,d] = hov2[tod][o,d] + tripsToAdd
       
@@ -1193,14 +1194,19 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       d = tazIds[d]
       
       #escort trips
+      oEscStopType = int(trips[i][oesctypColNum])
+      dEscStopType = int(trips[i][desctypColNum])
       dpnum = int(trips[i][dpnumColNum])
-      epnum = int(trips[i][epnumColNum])
-      if dpnum==0:
-        tripsToAdd = expansionFactor / hov2occ
-      elif dpnum!=epnum:
-        tripsToAdd = expansionFactor
-      elif dpnum==epnum:
+      pnum = int(trips[i][pnumColNum])
+      if ((oEscStopType>0) or (dEscStopType>0)) and (dpnum!=pnum):
+        #ignore escortee trip
         tripsToAdd = 0
+      elif ((oEscStopType>0) or (dEscStopType>0)) and (dpnum==pnum):
+        #add chaueffeur trip, do not discount by occupancy
+        tripsToAdd = expansionFactor
+      else:
+        #add all other hov trips are usual
+        tripsToAdd = expansionFactor / hov2occ
         
       hov2toll[tod][o,d] = hov2toll[tod][o,d] + tripsToAdd
       
@@ -1218,14 +1224,19 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       d = tazIds[d]
       
       #escort trips
+      oEscStopType = int(trips[i][oesctypColNum])
+      dEscStopType = int(trips[i][desctypColNum])
       dpnum = int(trips[i][dpnumColNum])
-      epnum = int(trips[i][epnumColNum])
-      if dpnum==0:
-        tripsToAdd = expansionFactor / hov3occ
-      elif dpnum!=epnum:
-        tripsToAdd = expansionFactor
-      elif dpnum==epnum:
+      pnum = int(trips[i][pnumColNum])
+      if ((oEscStopType>0) or (dEscStopType>0)) and (dpnum!=pnum):
+        #ignore escortee trip
         tripsToAdd = 0
+      elif ((oEscStopType>0) or (dEscStopType>0)) and (dpnum==pnum):
+        #add chaueffeur trip, do not discount by occupancy
+        tripsToAdd = expansionFactor
+      else:
+        #add all other hov trips are usual
+        tripsToAdd = expansionFactor / hov3occ
         
       hov3[tod][o,d] = hov3[tod][o,d] + tripsToAdd
     
@@ -1243,14 +1254,19 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       d = tazIds[d]
       
       #escort trips
+      oEscStopType = int(trips[i][oesctypColNum])
+      dEscStopType = int(trips[i][desctypColNum])
       dpnum = int(trips[i][dpnumColNum])
-      epnum = int(trips[i][epnumColNum])
-      if dpnum==0:
-        tripsToAdd = expansionFactor / hov3occ
-      elif dpnum!=epnum:
-        tripsToAdd = expansionFactor
-      elif dpnum==epnum:
+      pnum = int(trips[i][pnumColNum])
+      if ((oEscStopType>0) or (dEscStopType>0)) and (dpnum!=pnum):
+        #ignore escortee trip
         tripsToAdd = 0
+      elif ((oEscStopType>0) or (dEscStopType>0)) and (dpnum==pnum):
+        #add chaueffeur trip, do not discount by occupancy
+        tripsToAdd = expansionFactor
+      else:
+        #add all other hov trips are usual
+        tripsToAdd = expansionFactor / hov3occ
         
       hov3toll[tod][o,d] = hov3toll[tod][o,d] + tripsToAdd
       
@@ -1339,7 +1355,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   
   print("read joint trips")
   jtrips = []
-  with open(jointTripFileName, 'rb') as csvfile:
+  with open(jointTripFileName, 'r') as csvfile:
     freader = csv.reader(csvfile, skipinitialspace=True)
     for row in freader:
       jtrips.append(row)
@@ -1570,7 +1586,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   omxFileTap.close()
   
   #write tap parking file
-  f = open(fileNamePark, 'wb')
+  f = open(fileNamePark, 'w')
   f.write("TAP,PNRPARKS\n")
   for i in range(len(tapIds)):
     tap = tapIds[i]
@@ -1581,6 +1597,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
 def prepVDFData(Visum, vdfLookupTableFileName):
 
   #link/intersection vdf lookup table
+  vdfLookupTableFileName="inputs/vdf_lookup_table.csv"
   #PLANNO,VALUE,1,3,4,5,6,7,30
   #1,gc4leg,0.35,0.39,0.5,0.56,0.56,0.63,0.47
   vdf_lookup_table = VisumPy.csvHelpers.readCSV(vdfLookupTableFileName)
@@ -1601,12 +1618,12 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   al = numpy.nan_to_num(numpy.array(VisumPy.helpers.GetMulti(Visum.Net.Links, "AUX_LANES"), dtype=float))
   m = VisumPy.helpers.GetMulti(Visum.Net.Links, "MEDIAN")
   
-  toMainNo = map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation"))
+  toMainNo = list(map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation")))
   
   mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ") #default to zero
   
   #regular node
-  rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\NumLegs")
+  rn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, r"ToNode\NumLegs")
   rn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\ControlType")
   rn_tnOrient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeOrientation")
   rn_tnMajFlw1 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNode\MajorFlowOri1")
@@ -1620,7 +1637,7 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   rn_tnode_laneturn_laneno = VisumPy.helpers.GetMulti(Visum.Net.Links, "Concatenate:OutTurns\Concatenate:LaneTurns\FromLaneNo")
   
   #main node
-  mn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\NumLegs")
+  mn_numlegs = VisumPy.helpers.GetMulti(Visum.Net.Links, r"ToMainNode\NumLegs")
   mn_cType = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\ControlType")
   mn_tnOrient = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToNodeOrientation") #Not main node since these don't always make sense
   mn_tnMajFlw1 = VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNode\MajorFlowOri1")
@@ -1656,19 +1673,19 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   int_cap = [0]*len(planNo) #intersection capacity
   
   #additional output fields
-  if "vdf_int_fc" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_int_fc" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_int_fc","vdf_int_fc","vdf_int_fc",2)
-  if "vdf_rl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_rl" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_rl","vdf_rl","vdf_rl",2)
-  if "vdf_tl" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_tl" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_tl","vdf_tl","vdf_tl",2)
-  if "vdf_ll" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_ll" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_ll","vdf_ll","vdf_ll",2)
-  if "vdf_mid_link_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_mid_link_cap" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_mid_link_cap","vdf_mid_link_cap","vdf_mid_link_cap",2)
-  if "vdf_unc_sig_delay" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_unc_sig_delay" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_unc_sig_delay","vdf_unc_sig_delay","vdf_unc_sig_delay",2)
-  if "vdf_int_cap" not in map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll):
+  if "vdf_int_cap" not in list(map(lambda x: x.Code,Visum.Net.Links.Attributes.GetAll)):
     Visum.Net.Links.AddUserDefinedAttribute("vdf_int_cap","vdf_int_cap","vdf_int_cap",2)
   
   print("loop through links")
@@ -1752,25 +1769,25 @@ def prepVDFData(Visum, vdfLookupTableFileName):
           #code intersecting fc
           if tnOrient[i] in [15,1,3,11,9,7]: #NW,N,NE,SW,S,SE
             west, east = 999,999
-            if tonode_lookup.has_key('ORIENTATIONWEST'):
+            if 'ORIENTATIONWEST' in tonode_lookup:
               west = int(tonode_lookup['ORIENTATIONWEST'])
-            if tonode_lookup.has_key('ORIENTATIONEAST'):
+            if 'ORIENTATIONEAST' in tonode_lookup:
               east = int(tonode_lookup['ORIENTATIONEAST'])
             int_fc[i] = min(west, east) #take higher order fc
 
           if tnOrient[i] in [5,13]: #E,W
             north, south = 999,999
-            if tonode_lookup.has_key('ORIENTATIONNORTH'):
+            if 'ORIENTATIONNORTH' in tonode_lookup:
               north = int(tonode_lookup['ORIENTATIONNORTH'])
-            if tonode_lookup.has_key('ORIENTATIONNORTHEAST'):
+            if 'ORIENTATIONNORTHEAST' in tonode_lookup:
               north = int(tonode_lookup['ORIENTATIONNORTHEAST'])
-            if tonode_lookup.has_key('ORIENTATIONNORTHWEST'):
+            if 'ORIENTATIONNORTHWEST' in tonode_lookup:
               north = int(tonode_lookup['ORIENTATIONNORTHWEST'])
-            if tonode_lookup.has_key('ORIENTATIONSOUTH'):
+            if 'ORIENTATIONSOUTH' in tonode_lookup:
               south = int(tonode_lookup['ORIENTATIONSOUTH'])
-            if tonode_lookup.has_key('ORIENTATIONSOUTHEAST'):
+            if 'ORIENTATIONSOUTHEAST' in tonode_lookup:
               south = int(tonode_lookup['ORIENTATIONSOUTHEAST'])
-            if tonode_lookup.has_key('ORIENTATIONSOUTHWEST'):
+            if 'ORIENTATIONSOUTHWEST' in tonode_lookup:
               south = int(tonode_lookup['ORIENTATIONSOUTHWEST'])
             int_fc[i] = min(north, south) #take higher order fc
 
@@ -1822,7 +1839,7 @@ def prepVDFData(Visum, vdfLookupTableFileName):
         #count up lanes by movement
         laneno_ltr = dict()
         for j in range(len(int_lturns_laneno)):
-          if laneno_ltr.has_key(int_lturns_laneno[j]):
+          if int_lturns_laneno[j] in laneno_ltr:
             laneno_ltr[int_lturns_laneno[j]] = laneno_ltr[int_lturns_laneno[j]] + "," + str(int_lturns_ltr[j])
           else:
             laneno_ltr[int_lturns_laneno[j]] = str(int_lturns_ltr[j])
@@ -1999,7 +2016,7 @@ def create_transit_everywhere_skims():
   #since no drive cinnections, this file must be empty
   columns = ['FTAZ','MODE','PERIOD','TTAP','TMAZ','TTAZ','DTIME','DDIST','DTOLL','WDIST']
   header = ",".join(columns)
-  f = open('outputs/skims/drive_taz_tap.csv', 'wb') 
+  f = open('outputs/skims/drive_taz_tap.csv', 'w') 
   f.write(header + "\n")
   f.close()
   
@@ -2014,7 +2031,7 @@ def create_transit_everywhere_skims():
   #dummy_fields = ['1', 'dummyLine']
   #header = ",".join(columns)
   #dummy_record = ",".join(dummy_fields)
-  #f = open('outputs/skims/tapLines.csv', 'wb') 
+  #f = open('outputs/skims/tapLines.csv', 'w') 
   #f.write(header + "\n")
   #f.write(dummy_record + "\n")
   #f.close()
@@ -2110,10 +2127,33 @@ if __name__== "__main__":
 #      print(e)
 #      sys.exit(1)
       
+  if runmode == 'clear_flow_bundle':
+      try:
+          #read properties file
+          properties = Properties()
+          properties.loadPropertyFile("config\orramp.properties")
+          inputVersionFile = properties['Input.Version.File']
+          
+          Visum = startVisum()
+          loadVersion(Visum, inputVersionFile)
+          # Clear flow bundles
+          Visum.Net.FlowBundle.Clear()
+          # Save version file
+          saveVersion(Visum, inputVersionFile)
+      except Exception as e:
+          print(runmode + " Failed")
+          print(e)
+          sys.exit(1)
+    
   if runmode == 'maz_initial':
     try:
+      #read properties file
+      properties = Properties()
+      properties.loadPropertyFile("config\orramp.properties")
+      inputVersionFile = properties['Input.Version.File']
+      
       Visum = startVisum()
-      loadVersion(Visum, "inputs/SOABM.ver")
+      loadVersion(Visum, inputVersionFile)
       assignStopAreasToAccessNodes(Visum)
       switchZoneSystem(Visum, "maz")
       updateMazTotals(Visum)
@@ -2135,6 +2175,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       Visum = startVisum()
       for mode in ["Walk","Bike"]:
@@ -2152,8 +2193,13 @@ if __name__== "__main__":
     
   if runmode == 'taz_initial':
     try:
+      #read properties file
+      properties = Properties()
+      properties.loadPropertyFile("config\orramp.properties")
+      inputVersionFile = properties['Input.Version.File']
+      
       Visum = startVisum()
-      loadVersion(Visum, "inputs/SOABM.ver")
+      loadVersion(Visum, inputVersionFile)
       #codeTAZConnectors(Visum) #TAZ connectors input in master version file
       saveVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver")
       closeVisum(Visum)
@@ -2169,6 +2215,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       Visum = startVisum()
       loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver")
@@ -2195,6 +2242,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       #iteration number
       iteration = int(sys.argv[2].lower())
@@ -2220,13 +2268,14 @@ if __name__== "__main__":
           properties = Properties()
           properties.loadPropertyFile("config\orramp.properties")
           Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+          inputVersionFile = properties['Input.Version.File']
       
           Visum = startVisum()
           print("create final assignment summary")
           
           # Start with PM period highway assignment results
           loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_pm.ver")
-          saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+          saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           
           if Transit_Everywhere_Switch=='false':
               #find number of line routes and stop points
@@ -2238,7 +2287,7 @@ if __name__== "__main__":
           
           #create attributes in the LineRoute and StopPoint objects if needed
           print("create output attributes..")
-          loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+          loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           
           if Transit_Everywhere_Switch=='false':
               udaNames = []
@@ -2270,7 +2319,7 @@ if __name__== "__main__":
               if out_field not in udaNames:
                   Visum.Net.MainZones.AddUserDefinedAttribute(out_field,out_field,out_field,2,3) #1=int, 2=float, 5=text
                   
-          saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+          saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           closeVisum(Visum)
           
           Visum = startVisum()
@@ -2282,9 +2331,9 @@ if __name__== "__main__":
               loadVersion(Visum, "outputs/networks/MAZ_Level_Processing_Setup.ver")
               maz_var = VisumPy.helpers.GetMulti(Visum.Net.Zones, out_field)
               #set attributes
-              loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+              loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
               VisumPy.helpers.SetMulti(Visum.Net.MainZones, out_field, maz_var)
-              saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+              saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           
           # Copy Transit Assignment Results
           if Transit_Everywhere_Switch=='false':
@@ -2298,12 +2347,12 @@ if __name__== "__main__":
                       line_utrips = VisumPy.helpers.GetMulti(Visum.Net.LineRoutes, "PTripsUnlinked(AP)")
                       set_total = [sum(x) for x in zip(set_total, line_utrips)]
                       #set attributes
-                      loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                      loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
                       VisumPy.helpers.SetMulti(Visum.Net.LineRoutes, out_field, line_utrips)
-                      saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                      saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
                   out_field = 'Daily_PTripsUnlinked_' + str(setid)
                   VisumPy.helpers.SetMulti(Visum.Net.LineRoutes, out_field, set_total)
-                  saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                  saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
               # StopPoint
               keys = ['_PassBoard_', '_PassAlight_','_PassOrigin_','_PassDestination_','_PassTransTotal_','_PassThroughStop_','_PassThroughNoStop_']
               values = ['PassBoard(AP)', 'PassAlight(AP)','PassOrigin(AP)','PassDestination(AP)','PassTransTotal(AP)','PassThroughStop(AP)','PassThroughNoStop(AP)']
@@ -2318,12 +2367,12 @@ if __name__== "__main__":
                           set_total = [sum(x) for x in zip(set_total, stop_var)]
                           #set attributes
                           out_field = tp + field + str(setid)
-                          loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                          loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
                           VisumPy.helpers.SetMulti(Visum.Net.StopPoints, out_field, stop_var)
-                          saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                          saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
                       out_field = 'Daily' + field + str(setid)
                       VisumPy.helpers.SetMulti(Visum.Net.StopPoints, out_field, set_total)
-                      saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+                      saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           print("export attributes..")
           #attributesZone = ["No","Name","XCOORD","YCOORD"]
           #zoneData = VisumPy.reports.networkObjectAttributeList(Visum.Net.Zones, attributesZone)
@@ -2332,7 +2381,7 @@ if __name__== "__main__":
           #VisumPy.excel.writeTablesToExcelFile(listOfTables, "report.xls")
           
           #create CSVs for highway and transit assignment outputs
-          loadVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+          loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           link_list = Visum.Lists.CreateLinkList
           link_field_list = ['No','FromNodeNo','ToNodeNo', 'FFSPEED', 'LENGTH', 'PLANNO','vdf_int_fc','vdf_ll',
                              'vdf_rl','vdf_tl','vdf_unc_sig_delay','TSYSSET','NUMLANES','CAPPRT','TOLL_PRTSYS(BIKE)','TOLL_PRTSYS(HOV2)',
@@ -2386,7 +2435,7 @@ if __name__== "__main__":
               sp_list.SaveToAttributeFile(proj_dir + "outputs//networks//TransitAssignment_Results_StopPoints.csv", 44)
           
           
-          saveVersion(Visum, "outputs/networks/_Final_SOABM_Assignment_Results.ver")
+          saveVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
           closeVisum(Visum)
                   
       except Exception as e:
@@ -2401,9 +2450,10 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
         
       Visum = startVisum()
-      loadVersion(Visum, "inputs/SOABM.ver")
+      loadVersion(Visum, inputVersionFile)
       dst_list = VisumPy.helpers.GetMulti(Visum.Net.Links, "Length")
       link_planno = VisumPy.helpers.GetMulti(Visum.Net.Links, "PLANNO")
       linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
@@ -2423,7 +2473,7 @@ if __name__== "__main__":
           numRoutes = len(lineRoutes) + 1
           #print("Number of Routes: " + str(numRoutes)
           lineUTrips = [[0]*numRoutes for i in range(6)]
-      f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'wb')
+      f = open("outputs/other/ABM_Summaries/countLocCounts.csv", 'w')
       f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
       for i in range(len(countLocs)):
           f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],am_count[i],md_count[i],pm_count[i],day_count[i]))
@@ -2525,17 +2575,17 @@ if __name__== "__main__":
       tcur_dict['trk'] = tcur_trk
       #tcur_dict['trkt'] = tcur_trkt
       tcur_dict['walk'] = tcur_walk
-      f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'wb')
+      f = open("outputs/other/ABM_Summaries/countLocVolumes.csv", 'w')
       f.write("id,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
       for i in range(len(countLocs)):
           f.write("%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (countLocs[i],planno[i],vol_list[1][i],vol_list[2][i],vol_list[3][i],vol_list[5][i]))
       f.close()
-      f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'wb')
+      f = open("outputs/other/ABM_Summaries/allLinkSummary.csv", 'w')
       f.write("id,From_Node,To_Node,FACTYPE,am_vol,md_vol,pm_vol,day_vol\n")
       for i in range(len(linkID)):
           f.write("%i,%i,%i,%i,%.3f,%.3f,%.3f,%.3f\n" % (linkID[i],fromNode[i],toNode[i],link_planno[i],all_vol_list[1][i],all_vol_list[2][i],all_vol_list[3][i],all_vol_list[5][i]))
       f.close()
-      f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'wb')
+      f = open("outputs/other/ABM_Summaries/vmtSummary.csv", 'w')
       f.write("TOD,SOV,HOV2,HOV3,Truck,Total\n")
       tod_cnt = 0
       for tp in ['EA','AM','MD','PM','EV','Daily']:
@@ -2544,7 +2594,7 @@ if __name__== "__main__":
       f.close()
       #create empy boardings summary file for transit everywhere
       if Transit_Everywhere_Switch=='false':
-          f = open("outputs/other/ABM_Summaries/transitBoardingSummary.csv", 'wb')
+          f = open("outputs/other/ABM_Summaries/transitBoardingSummary.csv", 'w')
           f.write("TOD,")
           for rt in range(numRoutes-1):
              f.write("%s," % (lineRoutes[rt]))
@@ -2688,12 +2738,13 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       #skip if Transit Everywhere scenario
       if Transit_Everywhere_Switch=='false':
           
           Visum = startVisum()
-          loadVersion(Visum, "inputs/SOABM.ver")
+          loadVersion(Visum, inputVersionFile)
           assignStopAreasToAccessNodes(Visum)
           switchZoneSystem(Visum, "tap")
           saveVersion(Visum, "outputs/networks/Transit_Skimming_Assignment_Setup.ver")
@@ -2712,6 +2763,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       #create dummy skims for Transit Everywhere scenario
       if Transit_Everywhere_Switch=='false':
@@ -2744,6 +2796,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       #create dummy skims for Transit Everywhere scenario
       if Transit_Everywhere_Switch=='false':
@@ -2773,6 +2826,7 @@ if __name__== "__main__":
       properties = Properties()
       properties.loadPropertyFile("config\orramp.properties")
       Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      inputVersionFile = properties['Input.Version.File']
       
       #get hh sample rate for matrix expansion and global iteration number
       hhsamplerate = float(sys.argv[2].lower())

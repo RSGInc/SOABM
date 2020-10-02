@@ -1,8 +1,8 @@
 
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-:: Run the complete SOABM travel model
+:: Run the complete Master_Runner travel model
 :: Ben Stabler, ben.stabler@rsginc.com, 081215
-:: Revised 05/22/17 ben.stabler@rsginc.com
+:: Revised 05/22/17 ben.stabler@rsginc.com, 09/30/20 bmp, br
 ::~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :: setup iteration sample rate
@@ -28,7 +28,7 @@ ECHO HOST_IP_ADDRESS: %HOST_IP_ADDRESS%
 SET JAVA_PATH=%~dp0..\dependencies\jdk1.8.0_111
 ECHO JAVA_PATH: %JAVA_PATH%
 
-SET PYTHON=%~dp0..\dependencies\Python27\python.exe
+SET PYTHON=%~dp0..\dependencies\Python37\python.exe
 ECHO PYTHON: %PYTHON%
 
 SET R_SCRIPT=%~dp0..\dependencies\R-3.4.1\bin\Rscript
@@ -76,28 +76,28 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 :: -------------------------------------------------------------------------------------------------
 
 rem # build taz-based skimming setup
-%PYTHON% scripts\SOABM.py taz_initial
+%PYTHON% scripts\Master_Runner.py taz_initial
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # build maz-based skimming setup
-%PYTHON% scripts\SOABM.py maz_initial
+%PYTHON% scripts\Master_Runner.py maz_initial
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # build tap-based skimming setup
-%PYTHON% scripts\SOABM.py tap_initial
+%PYTHON% scripts\Master_Runner.py tap_initial
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # generate taz skims using tomtom speeds
-%PYTHON% scripts\SOABM.py taz_skim_speed
+%PYTHON% scripts\Master_Runner.py taz_skim_speed
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # generate maz skims
-%PYTHON% scripts\SOABM.py maz_skim
+%PYTHON% scripts\Master_Runner.py maz_skim
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 rem # generate tap skims using tomtom speeds
 :RETRY
-%PYTHON% scripts\SOABM.py tap_skim_speed
+%PYTHON% scripts\Master_Runner.py tap_skim_speed
 IF %ERRORLEVEL% NEQ 0 GOTO RETRY
 
 :: -------------------------------------------------------------------------------------------------
@@ -154,13 +154,13 @@ CALL application\killjava
 :: Build, load, and assign trip matrices into VISUM
 :: -------------------------------------------------------------------------------------------------
 
-%PYTHON% scripts\SOABM.py build_trip_matrices %SAMPLERATE% %ITERATION%
+%PYTHON% scripts\Master_Runner.py build_trip_matrices %SAMPLERATE% %ITERATION%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-%PYTHON% scripts\SOABM.py taz_skim %ITERATION%
+%PYTHON% scripts\Master_Runner.py taz_skim %ITERATION%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
-
-%PYTHON% scripts\SOABM.py tap_skim
+:here
+%PYTHON% scripts\Master_Runner.py tap_skim
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
@@ -172,10 +172,10 @@ IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
 :: -------------------------------------------------------------------------------------------------
 :: Generate assignment summary file and inputs for HTML dashboard
 :: -------------------------------------------------------------------------------------------------
-%PYTHON% scripts\SOABM.py generate_html_inputs
+%PYTHON% scripts\Master_Runner.py generate_html_inputs
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
-%PYTHON% scripts\SOABM.py generate_final_summary %PROJECT_DIRECTORY%
+%PYTHON% scripts\Master_Runner.py generate_final_summary %PROJECT_DIRECTORY%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
@@ -216,5 +216,6 @@ GOTO END
 
 :MODEL_ERROR
 ECHO Model Failed
+PAUSE
 
 :END

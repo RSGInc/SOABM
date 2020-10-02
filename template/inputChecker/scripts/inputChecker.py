@@ -20,15 +20,16 @@ Feb 2018
 ########################################################################################################################
 
 import os, shutil, sys, time, csv, logging
-#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules")
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python27Modules/Lib/site-packages")
+#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules")
+sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
 import win32com.client as com
-import VisumPy.helpers, omx
+import VisumPy.helpers
 import numpy as np
 import pandas as pd
 import VisumPy.csvHelpers
 import traceback
 import datetime
+import openmatrix as omx
 
 ########################################################################################################################
 # DEFINE FUNCTIONS
@@ -97,7 +98,7 @@ def export_csv(Visum, visum_obj, fieldsToExport, csv_name):
                 
         
     #create output file
-    f = open(os.path.join(cwd,'inputs',csv_name + '.csv'), 'wb')
+    f = open(os.path.join(cwd,'inputs',csv_name + '.csv'), 'w', newline='\n')
     f.write(header + "\r\n")
     for i in range(len(row)):
         f.write(row[i] + "\r\n")
@@ -112,7 +113,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
     
     # Create log file
     now = datetime.datetime.now()
-    f = open(os.path.join(cwd,'logs', ('inputCheckerLog ' + now.strftime("[%Y-%m-%d]") + '.LOG')), 'wb')
+    f = open(os.path.join(cwd,'logs', ('inputCheckerLog ' + now.strftime("[%Y-%m-%d]") + '.LOG')), 'w')
     
     # Define re-usable elements
     seperator1 = '###########################################################'
@@ -300,7 +301,7 @@ def write_log(results, problem_ids, checks_list, inputs_list, result_list, setti
         
     f.close()
     # Write out a summary of results from input checker for main model
-    f = open(os.path.join(cwd,'logs', ('inputCheckerSummary' + '.txt')), 'wb')
+    f = open(os.path.join(cwd,'logs', ('inputCheckerSummary' + '.txt')), 'w')
     f.write('\r\n' + seperator2 + '\r\n')
     f.write('\t Summary of Input Checker Fails \r\n')
     f.write(seperator2 + '\r\n\r\n')
@@ -369,9 +370,9 @@ if __name__== "__main__":
         
         # Read settings file
         print("reading input checks list")
-        checks_list = pd.read_csv(os.path.join(cwd,'config','inputs_checks.csv'))
-        inputs_list = pd.read_csv(os.path.join(cwd,'config','inputs_list.csv'))
-        settings_df = pd.read_csv(os.path.join(cwd,'config','settings.csv'))
+        checks_list = pd.read_csv(os.path.join(cwd,'config','inputs_checks.csv'), encoding='cp1252')
+        inputs_list = pd.read_csv(os.path.join(cwd,'config','inputs_list.csv'), encoding='cp1252')
+        settings_df = pd.read_csv(os.path.join(cwd,'config','settings.csv'), encoding='cp1252')
         
         #get all settings
         settings = {}
@@ -391,7 +392,7 @@ if __name__== "__main__":
         for item, row in inputs_list.iterrows():
             
             #row = inputs_list.iloc[0]
-            print 'Adding ' + row['Input_Table']
+            print('Adding ' + row['Input_Table'])
             csv_name = row['Input_Filename']
             table_name = row['Input_Table']
             directory = row['Input_Directory']
@@ -468,7 +469,7 @@ if __name__== "__main__":
             stat_expr = row['Report_Statistic']
             
             if test_type == 'Test':
-                print 'Performing check: ' + row['Test']
+                print('Performing check: ' + row['Test'])
                 if (pd.isnull(row['Test_Vals'])):
                     
                     # perform test
@@ -521,26 +522,26 @@ if __name__== "__main__":
                 
             else:
                 # perform calculation
-                print 'Performing calculation: ' + row['Test']
+                print('Performing calculation: ' + row['Test'])
                 calc_expr = test + ' = ' + expr
                 exec(calc_expr)
             
         
         # Write out log file
-        print "\r\nWriting log file\r\n"
+        print("\r\nWriting log file\r\n")
         num_fatal = write_log(results, problem_ids, checks_list, inputs_list, result_list, settings, report_stat)
         
         # Return code to the main model based on input checks and results
         if num_fatal >0:
-            print "at least one fatal error in the inputs"
+            print("at least one fatal error in the inputs")
             sys.exit(2)
             
         
         
-        print "input checker finished at: " + time.ctime()
+        print("input checker finished at: " + time.ctime())
     
     except Exception as e:
-        print "Input Checker Failed" 
+        print("Input Checker Failed") 
         print(e)
         sys.exit(1)
 

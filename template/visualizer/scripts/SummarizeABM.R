@@ -43,6 +43,7 @@ wsLoc              <- fread(paste("wsLocResults_",MAX_ITER, ".csv", sep = ""))
 aoResults          <- fread("aoResults.csv")
 aoResults_Pre      <- fread("aoResults_Pre.csv")
 xwalk              <- fread(paste(geogXWalkDir, "maz_data_export.csv", sep = "/"), stringsAsFactors = F)
+tapData            <- fread(file.path(PROJECT_DIR, "outputs/skims/tap_data.csv"))
 
 ## skim
 skimMat3_ea <- read_omx(SkimFile_ea, "3", ,)
@@ -622,6 +623,31 @@ trips$stops[is.na(trips$stops)] <- 0
 trips$OTAZ <- xwalk$TAZ[match(trips$orig_maz, xwalk$MAZ)]
 trips$DTAZ <- xwalk$TAZ[match(trips$dest_maz, xwalk$MAZ)]
 
+trips$board_taz  <- tapData$taz[match(trips$trip_board_tap, tapData$tap)]
+trips$alight_taz <- tapData$taz[match(trips$trip_alight_tap, tapData$tap)]
+trips$board_taz[is.na(trips$board_taz)] <- 0
+trips$alight_taz[is.na(trips$alight_taz)] <- 0
+
+# set drive to transit board and alight tazs
+trips$drive_board_taz <- trips$board_taz
+trips$drive_alight_taz <- trips$alight_taz
+trips$drive_board_taz[!(trips$trip_mode %in% c(12,13))] <- 0
+trips$drive_alight_taz[!(trips$trip_mode %in% c(12,13))] <- 0
+
+# get drive access and egress distances
+trips$tripoindex<-match(trips$OTAZ, skimLookUp_ea$Lookup)
+trips$tripdindex<-match(trips$drive_board_taz, skimLookUp_ea$Lookup)
+trips$drive_access<-skimMat3_ea[cbind(trips$tripoindex, trips$tripdindex)]
+trips$drive_access[trips$inbound==1] <- 0
+trips$drive_access[is.na(trips$drive_access)] <- 0
+
+trips$tripoindex<-match(trips$drive_alight_taz, skimLookUp_ea$Lookup)
+trips$tripdindex<-match(trips$DTAZ, skimLookUp_ea$Lookup)
+trips$drive_egress<-skimMat3_ea[cbind(trips$tripoindex, trips$tripdindex)]
+trips$drive_egress[trips$inbound==0] <- 0
+trips$drive_egress[is.na(trips$drive_egress)] <- 0
+
+
 trips$TOUROTAZ <- tours$OTAZ[match(trips$hh_id*1000+trips$person_num*100+trips$TOURCAT*10+trips$tour_id, 
 										tours$hh_id*1000+tours$person_num*100+tours$TOURCAT*10+tours$tour_id)]
 trips$TOURDTAZ <- tours$DTAZ[match(trips$hh_id*1000+trips$person_num*100+trips$TOURCAT*10+trips$tour_id, 
@@ -750,6 +776,31 @@ jtrips$stops[is.na(jtrips$stops)] <- 0
 
 jtrips$OTAZ <- xwalk$TAZ[match(jtrips$orig_mgra, xwalk$MAZ)]
 jtrips$DTAZ <- xwalk$TAZ[match(jtrips$dest_mgra, xwalk$MAZ)]
+
+jtrips$board_taz  <- tapData$taz[match(jtrips$trip_board_tap, tapData$tap)]
+jtrips$alight_taz <- tapData$taz[match(jtrips$trip_alight_tap, tapData$tap)]
+jtrips$board_taz[is.na(jtrips$board_taz)] <- 0
+jtrips$alight_taz[is.na(jtrips$alight_taz)] <- 0
+
+# set drive to transit board and alight tazs
+jtrips$drive_board_taz <- jtrips$board_taz
+jtrips$drive_alight_taz <- jtrips$alight_taz
+jtrips$drive_board_taz[!(jtrips$trip_mode %in% c(12,13))] <- 0
+jtrips$drive_alight_taz[!(jtrips$trip_mode %in% c(12,13))] <- 0
+
+# get drive access and egress distances
+jtrips$tripoindex<-match(jtrips$OTAZ, skimLookUp_ea$Lookup)
+jtrips$tripdindex<-match(jtrips$drive_board_taz, skimLookUp_ea$Lookup)
+jtrips$drive_access<-skimMat3_ea[cbind(jtrips$tripoindex, jtrips$tripdindex)]
+jtrips$drive_access[jtrips$inbound==1] <- 0
+jtrips$drive_access[is.na(jtrips$drive_access)] <- 0
+
+jtrips$tripoindex<-match(jtrips$drive_alight_taz, skimLookUp_ea$Lookup)
+jtrips$tripdindex<-match(jtrips$DTAZ, skimLookUp_ea$Lookup)
+jtrips$drive_egress<-skimMat3_ea[cbind(jtrips$tripoindex, jtrips$tripdindex)]
+jtrips$drive_egress[jtrips$inbound==0] <- 0
+jtrips$drive_egress[is.na(jtrips$drive_egress)] <- 0
+
 
 # Edited BMP [06/21/19]
 # OD distnaces were not getting computed for joint trips
@@ -2210,13 +2261,18 @@ total_stops <- nrow(stops) + sum(jstops$num_participants)
 total_workers <- nrow(workersbyMAZ)
 total_jobs <- sum(xwalk$EMP_TOTAL)
 
+trips$vmt_dist <- trips$od_dist
+
+trips$num_travel <- 1
 trips$num_travel[trips$TRIPMODE==1] <- 1
 trips$num_travel[trips$TRIPMODE==2] <- 2
 trips$num_travel[trips$TRIPMODE==3] <- 3.33
-#treat escort trips as fully joint
-trips$num_travel[trips$TRIPMODE %in% c(2,3) & 
-                   (trips$driver_pnum>0 & trips$dest_escortee_pnum!= trips$driver_pnum)] <- 1
-trips$num_travel[is.na(trips$num_travel)] <- 0
+
+#For school escort trips, only chauffeur trips needs to be included with occupancy one
+trips$num_travel[((trips$orig_escort_stoptype>0) | (trips$dest_escort_stoptype>0)) & (trips$person_num==trips$driver_pnum)] <- 1
+
+# set distance for escortee trips to zero so they are not counted in VMT calculation
+trips$vmt_dist[((trips$orig_escort_stoptype>0) | (trips$dest_escort_stoptype>0)) & (trips$person_num!=trips$driver_pnum)] <- 0
 
 # Edit by BMP [06/21/19]
 # Only on record per trip for joint trips [household level model], therefore 
@@ -2227,8 +2283,15 @@ jtrips$num_travel <- 1
 #jtrips$num_travel[jtrips$TRIPMODE==3] <- 3.33
 #jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
 
-total_vmt <- sum((trips$od_dist[trips$TRIPMODE<=3 & (trips$OTAZ!=trips$DTAZ)])/trips$num_travel[trips$TRIPMODE<=3 & (trips$OTAZ!=trips$DTAZ)]) + 
-  sum((jtrips$od_dist[jtrips$TRIPMODE<=3 & (jtrips$OTAZ!=jtrips$DTAZ)])/jtrips$num_travel[jtrips$TRIPMODE<=3 & (jtrips$OTAZ!=jtrips$DTAZ)])
+total_vmt <- sum((trips$vmt_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIPMODE<=3]) + 
+  sum((jtrips$od_dist[jtrips$TRIPMODE<=3])/jtrips$num_travel[jtrips$TRIPMODE<=3])
+
+# compute transit drive access VMT
+# drive access distance is >0 only for drive transit trips in outbound
+# drive egress distance is >0 only for drive transit trips in inbound
+DT_vmt <- sum((trips$drive_access)/(trips$num_travel)) + sum((jtrips$drive_access)/(jtrips$num_travel))
+
+total_vmt <- total_vmt + DT_vmt
 
 totals_var <- c("total_population", "total_households", "total_tours", "total_trips", "total_stops", "total_vmt", "total_workers", "total_jobs")
 totals_val <- c(total_population,total_households, total_tours, total_trips, total_stops, total_vmt, total_workers, total_jobs)
