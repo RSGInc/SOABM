@@ -10,7 +10,7 @@
 SET WORKING_DIR=%~dp0
 ECHO WORKING_DIR: %WORKING_DIR%
 
-SET PYTHON=%WORKING_DIR%..\..\dependencies\Python27\python.exe
+SET PYTHON=%WORKING_DIR%..\..\dependencies\Python37\python.exe
 ECHO PYTHON: %PYTHON%
 
 
