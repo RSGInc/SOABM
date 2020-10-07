@@ -2549,6 +2549,8 @@ if __name__== "__main__":
         saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
         #get vc ratio after setting the CapPrt with mlc for the current period
         vc_ratio[tod_cnt] = VisumPy.helpers.GetMulti(Visum.Net.Links, "VOLCAPRATIOPRT(AP)")
+        
+        #compute VMT
         vmt_list[tod_cnt][0] = numpy.dot(dst_list, sov_list) + numpy.dot(dst_list, sovt_list)
         vmt_list[tod_cnt][1] = numpy.dot(dst_list, hv2_list)
         vmt_list[tod_cnt][2] = numpy.dot(dst_list, hv3_list)

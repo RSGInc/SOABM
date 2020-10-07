@@ -69,7 +69,7 @@ districtList         <- sort(unique(xwalk$DISTNAME))
 pertypeCodes <- data.frame(code = c(1,2,3,4,5,6,7,8,"All"), 
                            name = c("FT Worker", "PT Worker", "Univ Stud", "Non Worker", "Retiree", "Driv Stud", "NonDriv Stud", "Pre-School", "All"))
 
-## CVM and Ext trips
+## CVM trips and VMT
 cvm_mtx <- c("car_EV1", "car_EA", "car_AM", "car_MD", "car_PM", "car_EV2", 
              "su_EV1", "su_EA", "su_AM", "su_MD", "su_PM", "su_EV2",
              "mu_EV1", "mu_EA", "mu_AM", "mu_MD", "mu_PM", "mu_EV2")
@@ -121,7 +121,7 @@ cvm_vmt_df[is.na(cvm_vmt_df)] <- 0
 write.csv(cvm_vmt_df, paste(WD, "cvm_vmt_summary.csv", sep = "/"), row.names = F)
 
 
-## Ext trips
+## Ext trips and VMT
 ext_mtx <- c("EV1_hbw",    "EA_hbw",    "AM_hbw",    "MD_hbw",    "PM_hbw",    "EV2_hbw", 
              "EV1_hbcoll", "EA_hbcoll", "AM_hbcoll", "MD_hbcoll", "PM_hbcoll", "EV2_hbcoll",
              "EV1_hbsch",  "EA_hbsch",  "AM_hbsch",  "MD_hbsch",  "PM_hbsch",  "EV2_hbsch",
@@ -2261,6 +2261,7 @@ total_stops <- nrow(stops) + sum(jstops$num_participants)
 total_workers <- nrow(workersbyMAZ)
 total_jobs <- sum(xwalk$EMP_TOTAL)
 
+# Compute aggregate resident VMT
 trips$vmt_dist <- trips$od_dist
 
 trips$num_travel <- 1
@@ -2278,10 +2279,6 @@ trips$vmt_dist[((trips$orig_escort_stoptype>0) | (trips$dest_escort_stoptype>0))
 # Only on record per trip for joint trips [household level model], therefore 
 # no need to convert from person to vehicles
 jtrips$num_travel <- 1
-#jtrips$num_travel[jtrips$TRIPMODE==1] <- 1
-#jtrips$num_travel[jtrips$TRIPMODE==2] <- 2
-#jtrips$num_travel[jtrips$TRIPMODE==3] <- 3.33
-#jtrips$num_travel[is.na(jtrips$num_travel)] <- 0
 
 total_vmt <- sum((trips$vmt_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIPMODE<=3]) + 
   sum((jtrips$od_dist[jtrips$TRIPMODE<=3])/jtrips$num_travel[jtrips$TRIPMODE<=3])
