@@ -2265,6 +2265,7 @@ total_jobs <- sum(xwalk$EMP_TOTAL)
 trips$vmt_dist <- trips$od_dist
 
 trips$num_travel <- 1
+trips$num_travel[trips$TRIPMODE==8] <- 2 # KNR auto occupancy = 2
 trips$num_travel[trips$TRIPMODE==1] <- 1
 trips$num_travel[trips$TRIPMODE==2] <- 2
 trips$num_travel[trips$TRIPMODE==3] <- 3.33
@@ -2286,7 +2287,8 @@ total_vmt <- sum((trips$vmt_dist[trips$TRIPMODE<=3])/trips$num_travel[trips$TRIP
 # compute transit drive access VMT
 # drive access distance is >0 only for drive transit trips in outbound
 # drive egress distance is >0 only for drive transit trips in inbound
-DT_vmt <- sum((trips$drive_access)/(trips$num_travel)) + sum((jtrips$drive_access)/(jtrips$num_travel))
+DT_vmt <- sum((trips$drive_access)/(trips$num_travel)) + sum((jtrips$drive_access)/(jtrips$num_travel)) + 
+          sum((trips$drive_egress)/(trips$num_travel)) + sum((jtrips$drive_egress)/(jtrips$num_travel))
 
 total_vmt <- total_vmt + DT_vmt
 
