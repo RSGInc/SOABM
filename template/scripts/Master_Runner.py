@@ -1052,6 +1052,10 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   properties = Properties()
   properties.loadPropertyFile("config\orramp.properties")
   Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+  Transit_Everywhere_AutoFactor = float(properties['Transit.Everywhere.Auto.Factor'])
+  Transit_Everywhere_SOV = float(properties['Transit.Everywhere.SOV'])
+  Transit_Everywhere_HOV2 = float(properties['Transit.Everywhere.HOV2'])
+  Transit_Everywhere_HOV3 = float(properties['Transit.Everywhere.HOV3'])
   
   expansionFactor = 1 / expansionFactor 
   hov2occ = 2.0
@@ -1124,6 +1128,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     if (i % 10000) == 0:
       print("process individual trip record " + str(i))
     
+    
     mode = int(trips[i][modeColNum])
     
     if mode == 1: #sov
@@ -1138,6 +1143,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       d = tazIds[d]
       sov[tod][o,d] = sov[tod][o,d] + expansionFactor
       
+     
     if mode == 2: #sov toll
       dept = int(trips[i][deptColNum])
       tod = whichTimePeriod(dept, timePeriodStarts)
@@ -1273,6 +1279,8 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     elif mode == 11: #walk
       dept = int(trips[i][deptColNum])
       tod = whichTimePeriod(dept, timePeriodStarts)
+      omaz = int(trips[i][omazColNum])
+      dmaz = int(trips[i][dmazColNum])
       o = int(trips[i][otapColNum])
       d = int(trips[i][dtapColNum])
       o = tapIds.index(o)
@@ -1280,6 +1288,14 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       setid = int(trips[i][setColNum])
       if setid==0:
         set1[tod][o,d] = set1[tod][o,d] + expansionFactor
+        
+        if Transit_Everywhere_Switch=='true': #add transit everywhere demand to auto matrices
+          o = tazIds[omaz]
+          d = tazIds[dmaz]
+          sov[tod][o,d] = sov[tod][o,d] + expansionFactor * Transit_Everywhere_SOV * Transit_Everywhere_AutoFactor
+          hov2[tod][o,d] = hov2[tod][o,d] + (expansionFactor * Transit_Everywhere_HOV2 * Transit_Everywhere_AutoFactor) / hov2occ
+          hov3[tod][o,d] = hov3[tod][o,d] + (expansionFactor * Transit_Everywhere_HOV3 * Transit_Everywhere_AutoFactor) / hov3occ
+          
       if setid==1:
         set2[tod][o,d] = set2[tod][o,d] + expansionFactor
       if setid==2:
@@ -1454,6 +1470,8 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     elif mode == 11: #walk
       dept = int(jtrips[i][deptColNum])
       tod = whichTimePeriod(dept, timePeriodStarts)
+      omaz = int(jtrips[i][omazColNum])
+      dmaz = int(jtrips[i][dmazColNum])
       o = int(jtrips[i][otapColNum])
       d = int(jtrips[i][dtapColNum])
       num_participants = int(jtrips[i][numPartNum])
@@ -1462,6 +1480,15 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       setid = int(jtrips[i][setColNum])
       if setid==0:
         set1[tod][o,d] = set1[tod][o,d] + expansionFactor * num_participants
+        
+        if Transit_Everywhere_Switch=='true': #add transit everywhere demand to auto matrices
+          o = tazIds[omaz]
+          d = tazIds[dmaz]
+          #discounting by occupancy not required for joint trips
+          sov[tod][o,d] = sov[tod][o,d] + expansionFactor * Transit_Everywhere_SOV * Transit_Everywhere_AutoFactor
+          hov2[tod][o,d] = hov2[tod][o,d] + (expansionFactor * Transit_Everywhere_HOV2 * Transit_Everywhere_AutoFactor)
+          hov3[tod][o,d] = hov3[tod][o,d] + (expansionFactor * Transit_Everywhere_HOV3 * Transit_Everywhere_AutoFactor)
+          
       if setid==1:
         set2[tod][o,d] = set2[tod][o,d] + expansionFactor * num_participants
       if setid==2:
