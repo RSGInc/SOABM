@@ -68,7 +68,7 @@ DEL outputs\*.* /S /Q
 :: Run Input Checker
 :: -------------------------------------------------------------------------------------------------
 
-CALL %PROJECT_DIRECTORY%\inputChecker\RunInputChecker %PROJECT_DIRECTORY% 
+CALL %PROJECT_DIRECTORY%\inputChecker\RunInputChecker %PROJECT_DIRECTORY%
 IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
@@ -138,17 +138,17 @@ CALL application\runHhMgr %PROJECT_DRIVE% %PROJECT_DIRECTORY% %HOST_IP_ADDRESS% 
 
 rem # run OR RAMP model, but first set IP_ADDRESS dynamically
 ECHO # Properties File with IP Address Set by Model Runner > config\orramp_out.properties
-FOR /F "delims=*" %%i IN (config\orramp.properties) DO ( 
+FOR /F "delims=*" %%i IN (config\orramp.properties) DO (
     SET LINE=%%i
     SETLOCAL EnableDelayedExpansion
     SET LINE=!LINE:%%HOST_IP_ADDRESS%%=%HOST_IP_ADDRESS%!
     ECHO !LINE!>>config\orramp_out.properties
     ENDLOCAL
-) 
+)
 CALL application\runORRAMP %PROJECT_DRIVE% %PROJECT_DIRECTORY_FORWARD% %SAMPLERATE% %ITERATION% %JAVA_PATH%
 
 rem # shutdown matrix manager and hh manager
-CALL application\killjava 
+CALL application\killjava
 
 :: -------------------------------------------------------------------------------------------------
 :: Build, load, and assign trip matrices into VISUM
@@ -168,6 +168,13 @@ IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 :: -------------------------------------------------------------------------------------------------
 
 IF %ITERATION% LSS %MAX_ITER% GOTO ITER_START
+
+:: -------------------------------------------------------------------------------------------------
+:: Assign non-motorized matrices
+:: -------------------------------------------------------------------------------------------------
+
+%PYTHON% scripts\Master_Runner.py nm_assignment
+IF %ERRORLEVEL% NEQ 0 GOTO MODEL_ERROR
 
 :: -------------------------------------------------------------------------------------------------
 :: Generate assignment summary file and inputs for HTML dashboard
