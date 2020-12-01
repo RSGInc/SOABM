@@ -85,7 +85,6 @@ cvm_vmt   <- c()
 for(mtx in cvm_mtx){
   #cat(mtx,"\n")
   cvmTrips  <- read_omx(cvmFile, mtx, ,)
-  diag(cvmTrips) <- 0
   tod <- cvm_tod[match(mtx, cvm_mtx)]
   if(tod=="EV1" | tod=="EV2"){
     cvmVMT    <- cvmTrips * skimMat3_ev
@@ -155,7 +154,6 @@ ext_vmt   <- c()
 for(mtx in ext_mtx){
   #cat(mtx,"\n")
   extTrips  <- read_omx(extFile, mtx, ,)
-  diag(extTrips) <- 0
   tod <- ext_tod[match(mtx, ext_mtx)]
   if(tod=="EV1" | tod=="EV2"){
     extVMT    <- extTrips * skimMat3_ev

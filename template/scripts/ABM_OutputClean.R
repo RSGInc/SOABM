@@ -3,12 +3,15 @@
 # 2-5-20 - revised with review from Jin Ren and Alex Bettinardi
 # 3-5-20 - revised to remove all OMX files except for - taz_skim_sov_pm.omx - as that file is needed to re-run a specific period assignment (re-run CVM)
 # 9-2-20 - corrected oversight and script now removees "MU" CVM matrix csv files from outputs\other
+# 11-25-20  - updated to remove bike and walk period assignments
 
 # Script to remove interim and duplicative files from the ABM run:
 
 # clean all working version files under "networks"
 file.remove(paste("outputs/networks/Highway_Assignment_Results_",c("pm"),".ver",sep=""))  # just get rid of PM, because it's saved in the final copy, keep other periods, but get rid of skims
 file.remove(paste("outputs/networks/Transit_Assignment_Results_",apply(expand.grid(c("ea","am","md","pm","ev"),paste0("set",1:3)),1,paste,collapse="_"),".ver",sep=""))  
+file.remove(paste("outputs/networks/Bike_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
+file.remove(paste("outputs/networks/Walk_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
 file.remove(paste("outputs/networks/",c("Bike_MAZ_Skim","Walk_MAZ_Skim","Highway_Skimming_Assignment","Transit_Skimming_Assignment","MAZ_Level_Processing"),"_Setup.ver",sep=""))
 
 # clean and simplify "other" folder
@@ -53,4 +56,5 @@ file.remove(OMX_Files) # need to keep taz_skim_sov_pm.omx
 rm(OMX_Files)
 
 # remove largest trip matrix set (the Commercial Vehicle Result)
-file.remove("outputs/trips/cvmTrips.omx")
+# this is needed for VMT analysis - so this file is no longer deleted automatically
+#file.remove("outputs/trips/cvmTrips.omx")
