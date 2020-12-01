@@ -718,7 +718,7 @@ def writeMazDataFile(Visum, fileName):
   factor_vars = factor_vars.split(",")
   factors = factors.split(",")
 
-  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","DISTID","COUNTY","HH","POP","HHP",
+  fieldsToExport = ["SEQMAZ","NO","TAZ","DISTNAME","COUNTY","HH","POP","HHP",
     "EMP_CONSTR","EMP_WHOLE","EMP_RETAIL","EMP_SPORT","EMP_ACCFD","EMP_AGR",
     "EMP_MIN","EMP_UTIL","EMP_FOOD","EMP_WOOD","EMP_METAL","EMP_TRANS",
     "EMP_POSTAL","EMP_INFO","EMP_FINANC","EMP_REALES","EMP_PROF","EMP_MGMT",
