@@ -2073,6 +2073,7 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   except Exception as e:
       traceback.print_exc()
       print("link fn=" + str(int(fn[i])) + " tn=" + str(int(tn[i])))
+      sys.exit(1)
 
   #set results
   VisumPy.helpers.SetMulti(Visum.Net.Links, "vdf_int_fc", int_fc) #intersecting functional class
