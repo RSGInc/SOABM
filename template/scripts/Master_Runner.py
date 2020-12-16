@@ -1833,7 +1833,9 @@ def prepVDFData(Visum, vdfLookupTableFileName):
   al = numpy.nan_to_num(numpy.array(VisumPy.helpers.GetMulti(Visum.Net.Links, "AUX_LANES"), dtype=float))
   m = VisumPy.helpers.GetMulti(Visum.Net.Links, "MEDIAN")
 
-  toMainNo = list(map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation")))
+  #toMainNo = list(map(lambda x: x != 0 , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeOrientation")))
+  #Updated pointer to an internally calculated field to protect aganist hold overs from old network edits
+  toMainNo = list(map(lambda x: x != None , VisumPy.helpers.GetMulti(Visum.Net.Links, "ToMainNodeLeg\\Orientation")))
 
   mid_link_cap_adj = VisumPy.helpers.GetMulti(Visum.Net.Links, "MID_LINK_CAP_ADJ") #default to zero
 
