@@ -109,6 +109,7 @@ LINK_NonInterstate_MaxFFS,link_data,NO,Logical,Test,((link_data.PLANNO != 1) & (
 LINK_MidLinkCapAdj_LE500,link_data,NO,Warning,Test,link_data.MID_LINK_CAP_ADJ<=500,,,Mid link capacity adjustment should be less than 500
 LINK_ProgressionFactorRange_Check,link_data,NO,Warning,Test,(link_data.PROGRESSION_FACTOR>=0.5) & (link_data.PROGRESSION_FACTOR<=1.2),,,PROGRESSION_FACTOR is greater than 0.5 but less than 1.2
 TAP_FAREZONE_Check,tap_data,NO,Fatal,Test,tap_data.FAREZONE.apply(lambda x: True if x in set(fares.FROMFAREZONE) else False),,,Each TAP should have a valid FAREZONE
+TAP_Numbering,tap_data,NO,Warning,Test,(max(tap_data.NO) < (2*tap_data.NO.count())),,,Ensure TAP numbering is not greater than number of TAPs times 2
 #TAP_Line_Access_Check,tap_data,NO,Warning,Test,tap_data.LINES.fillna('').apply(lambda x: True if len(x)>0 else False),,,Check if each TAP is served by a transit line
 TSYS_Availability_Check,tystems,Code,Fatal,Test,"set(tsystems[tsystems.Type==""PUT""].Code) == {'Bus', 'ComRail', 'ExpBus', 'LightRail'}",,,Check if all Public Transport Systems are available
 LINE_Tsys_Coding_Check,line_data,NAME,Fatal,Test,"line_data.TSYSCODE.apply(lambda x: True if x in {'Bus', 'ComRail', 'ExpBus', 'LightRail'} else False)",,,"Check if all coded lines belong to one of the following Tsys {'Bus', 'ComRail', 'ExpBus', 'LightRail'}"
