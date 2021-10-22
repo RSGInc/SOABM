@@ -20,8 +20,8 @@ Feb 2018
 ########################################################################################################################
 
 import os, shutil, sys, time, csv, logging
-#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules")
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
+sys.path.append(os.path.dirname(os.getcwd())+"\\dependencies\\Python37\\packages")
+#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
 import win32com.client as com
 import VisumPy.helpers
 import numpy as np
@@ -37,7 +37,7 @@ import openmatrix as omx
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(20)
+  Visum = VisumPy.helpers.CreateVisum(22)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)): 
     Visum.SetPath(pathNo[i], os.getcwd())

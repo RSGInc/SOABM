@@ -6,7 +6,8 @@
 
 #import libraries
 import os, shutil, sys, time, csv
-sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
+sys.path.append(os.path.dirname(os.getcwd())+"\\dependencies\\Python37\\packages")
+#sys.path.append("C:/Program Files/PTV Vision/PTV Visum 2020/Exe/Python37Modules/Lib/site-packages")
 import win32com.client as com
 import VisumPy.helpers
 import VisumPy.csvHelpers
@@ -28,7 +29,7 @@ warnings.simplefilter('ignore', tables.NaturalNameWarning)
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(20)
+  Visum = VisumPy.helpers.CreateVisum(22)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)):
     Visum.SetPath(pathNo[i], os.getcwd())
