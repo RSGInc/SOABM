@@ -888,7 +888,7 @@ def reviseDuplicateSkims(Visum, omxFile1, omxFile2, omxFile3):
   omxFile2.close()
   omxFile3.close()
 
-def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
+def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1, pkHrFlag=False):
 
   print("load " + type + " trip matrices for " + timeperiod + ", set " + str(setid))
 
@@ -913,9 +913,14 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
     hov3toll = numpy.zeros((len(tazIds),len(tazIds)))
 
     #open matrices
-    cvmTrips = omx.open_file(outputsFolder + "\\cvmTrips.omx",'r')
-    externalTrips = omx.open_file(outputsFolder + "\\externalOD.omx",'r')
-    ctrampTazTrips = omx.open_file(outputsFolder + "\\ctrampTazTrips.omx",'r')
+    if pkHrFlag:
+      cvmTrips = omx.open_file(outputsFolder + "\\cvmTrips.omx",'r')
+      externalTrips = omx.open_file(outputsFolder + "\\externalOD.omx",'r')
+      ctrampTazTrips = omx.open_file(outputsFolder + "\\ctrampTazTrips_" + tp + ".omx",'r')    
+    else:
+      cvmTrips = omx.open_file(outputsFolder + "\\cvmTrips.omx",'r')
+      externalTrips = omx.open_file(outputsFolder + "\\externalOD.omx",'r')
+      ctrampTazTrips = omx.open_file(outputsFolder + "\\ctrampTazTrips.omx",'r')
 
     #add matrices together
     for aMatTP in matTP:
@@ -1019,7 +1024,10 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
     transit = numpy.zeros((len(tapIds),len(tapIds)))
 
     #open matrices
-    ctrampTapTrips = omx.open_file(outputsFolder + "\\ctrampTapTrips.omx",'r')
+    if pkHrFlag:
+      ctrampTapTrips = omx.open_file(outputsFolder + "\\ctrampTapTrips_" + tp + ".omx",'r')
+    else:
+      ctrampTapTrips = omx.open_file(outputsFolder + "\\ctrampTapTrips.omx",'r')
 
     #add matrices together
     for aMatTP in matTP:
@@ -1050,7 +1058,10 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
     bike = numpy.zeros((len(mazIds),len(mazIds)))
 
     #open matrices
-    ctrampNmTrips = omx.open_file(outputsFolder + "\\ctrampNmTrips.omx",'r')
+    if pkHrFlag:
+      ctrampNmTrips = omx.open_file(outputsFolder + "\\ctrampNmTrips_" + tp + ".omx",'r')
+    else:
+      ctrampNmTrips = omx.open_file(outputsFolder + "\\ctrampNmTrips.omx",'r')
 
     print('Non-motorized table names:', ctrampNmTrips.list_matrices()) # DEBUG
 
@@ -1096,7 +1107,7 @@ def loadTripMatrices(Visum, outputsFolder, timeperiod, type, setid=-1):
 def whichTimePeriod(deptTime, timePeriodStarts):
   return(len(timePeriodStarts[deptTime >= timePeriodStarts])-1)
 
-def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, tapFileName, fileNameTaz, fileNameTap, fileNamePark):
+def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, tapFileName, fileNameTaz, fileNameTap, fileNamePark, timePeriods=0, timePeriodStarts=0):
 
   print("build CT-RAMP trip matrices")
 
@@ -1125,9 +1136,14 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
   #keep track of pnr trips to TAPs
   tapParks = [0] * len(tapIds)
 
-  timePeriods =      ["EV1","EA","AM","MD","PM","EV2"]
-  timePeriodStarts = [0    ,1   ,6   ,9  ,25  ,29   ]
-  timePeriodStarts = numpy.array(timePeriodStarts)
+  if timePeriods==0:
+    timePeriods =      ["EV1","EA","AM","MD","PM","EV2"]
+    timePeriodStarts = [0    ,1   ,6   ,9  ,25  ,29   ]
+    timePeriodStarts = numpy.array(timePeriodStarts)
+  else:
+    timePeriods = ["EV1",timePeriods,"EV2"]
+    timePeriodStarts = numpy.append(0,timePeriodStarts)
+    timePeriodStarts = numpy.array(timePeriodStarts)
 
   #build taz lookup for quick access later
   tazIds = [-1]*(len(tazs)+1)
@@ -1683,7 +1699,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
     f.write("%i,%i\n" % (tap,parks))
   f.close()
 
-def buildNmTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, fileNameNm):
+def buildNmTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, fileNameNm, timePeriods=0, timePeriodStarts=0):
   print("build CT-RAMP non-motorized trip matrices")
 
   expansionFactor = 1 / expansionFactor
@@ -1691,9 +1707,14 @@ def buildNmTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor,
   uniqMazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "NO") # 10001   # Visum Zone #
   seqMazs = VisumPy.helpers.GetMulti(Visum.Net.Zones, "SEQMAZ")  # 1.00   #used by CT-RAMP
 
-  timePeriods =      ["EV1","EA","AM","MD","PM","EV2"]
-  timePeriodStarts = [0    ,1   ,6   ,9  ,25  ,29   ]
-  timePeriodStarts = numpy.array(timePeriodStarts)
+  if timePeriods==0:
+    timePeriods =      ["EV1","EA","AM","MD","PM","EV2"]
+    timePeriodStarts = [0    ,1   ,6   ,9  ,25  ,29   ]
+    timePeriodStarts = numpy.array(timePeriodStarts)
+  else:
+    timePeriods = ["EV1",timePeriods,"EV2"]
+    timePeriodStarts = numpy.append(0,timePeriodStarts)
+    timePeriodStarts = numpy.array(timePeriodStarts)
 
 
   #build taz lookup for quick access later
@@ -2500,6 +2521,37 @@ if __name__== "__main__":
       print(runmode + " Failed")
       print(e)
       sys.exit(1)
+      
+  if runmode == 'taz_skim_pkhr': #using modeled speeds and assign
+    try:
+      #read properties file
+      properties = Properties()
+      properties.loadPropertyFile("config\orramp.properties")
+      Transit_Everywhere_Switch = properties['Transit.Everywhere.Switch']
+      
+      #iteration number
+      tp = sys.argv[2]
+      
+      Visum = startVisum()
+      loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+      prepVDFData(Visum, "inputs/vdf_lookup_table.csv")
+      loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
+      linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
+      mlc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
+      inc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
+      min_cap = mlc
+      for i in range(len(linkID)):
+        if inc[i]==0:
+            min_cap[i] = mlc[i]
+        else:
+            min_cap[i] = min(mlc[i], inc[i])
+      VisumPy.helpers.SetMulti(Visum.Net.Links, "CapPrt", min_cap)
+      saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+      closeVisum(Visum)
+    except Exception as e:
+      print(runmode + " Failed")
+      print(e)
+      sys.exit(1)    
 
   if runmode == 'generate_final_summary': #BMP 12/10/2018 function to generate final assignment summary
       try:
@@ -3197,54 +3249,88 @@ if __name__== "__main__":
       #get hh sample rate for matrix expansion and global iteration number
       hhsamplerate = float(sys.argv[2].lower())
       iteration = int(sys.argv[3].lower())
-
-      #build ct-ramp trip matrices
-      tripFileName = "outputs/other/indivTripData_" + str(iteration) + ".csv"
-      jtripFileName = "outputs/other/jointTripData_" + str(iteration) + ".csv"
-
-      print("Build auto trip matrices") # DEBUG
-      Visum = startVisum()
-      loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_am.ver")
-      buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv",
-        "outputs/trips/ctrampTazTrips.omx", "outputs/trips/ctrampTapTrips.omx", "outputs/trips/tapParks.csv")
-      closeVisum(Visum)
-
-      print("Build non-motorized trip matrices") # DEBUG
-      Visum = startVisum()
-      # Debug loading matrices into highway version file
-      # loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver") # TODO switch to MAZ
-      loadVersion(Visum, "outputs/networks/Walk_MAZ_Skim_Setup.ver") # 2570 zones
-      buildNmTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/trips/ctrampNmTrips.omx")
-      closeVisum(Visum)
-
-      #load trip matrices
-      print("Load auto trip matrices") # DEBUG
-      for tp in ['ea','am','md','pm','ev']:
+      
+      if iteration == 0:      
+        tp = sys.argv[4]
+        tps = [int(sys.argv[5]), int(sys.argv[6])]
+        #build ct-ramp trip matrices
+        tripFileName = "outputs/other/indivTripData.csv"
+        jtripFileName = "outputs/other/jointTripData.csv"
+        
+        Visum = startVisum()
+        loadVersion(Visum, "outputs/networks/_Final_Assignment_Results.ver")
+        buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv", 
+          "outputs/trips/ctrampTazTrips_" + tp + ".omx", "outputs/trips/ctrampTapTrips_" + tp + ".omx", "outputs/trips/tapParks.csv", tp, tps)
+      
+        #load trip matrices
         #taz
-        loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
-        loadTripMatrices(Visum, "outputs/trips", tp, "taz")
-
-        saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
-
-        #tap set
-        # tap set is not created for transit everywhere scenario
-        if Transit_Everywhere_Switch=='false':
-            for setid in ['1','2','3']:
-              loadVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + setid + ".ver")
-              loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
-              saveVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + setid + ".ver")
-
-      # non-motorized
-      print("Load non-motorized trip matrices") # DEBUG
-      for tp in ['ea','am','md','pm','ev']:
+        loadTripMatrices(Visum, "outputs/trips", tp, "taz", pkHrFlag=True)
+        saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")        
+        closeVisum(Visum)
+        
+        print("Build non-motorized trip matrices") # DEBUG
+        Visum = startVisum()
+        # Debug loading matrices into highway version file
+        loadVersion(Visum, "outputs/networks/Walk_Assignment_Results_pm.ver") # 2570 zones
+        buildNmTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/trips/ctrampNmTrips_" + tp + ".omx", tp, tps)
+        closeVisum(Visum)
+        
         for mode in ['walk','bike']:
-            # Debug loading matrices into highway version file
-            # loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver") # TODO switch to MAZ
-            loadVersion(Visum, "outputs/networks/" + mode + "_MAZ_Skim_Setup.ver")
-            loadTripMatrices(Visum, "outputs/trips",tp,"nm")
-            saveVersion(Visum, "outputs/networks/" + mode + "_Assignment_Results_" + tp + ".ver")
+          # Debug loading matrices into highway version file
+          # loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver") # TODO switch to MAZ
+          loadVersion(Visum, "outputs/networks/" + mode + "_Assignment_Results_pm.ver")
+          loadTripMatrices(Visum, "outputs/trips",tp,"nm", pkHrFlag=True)
+          saveVersion(Visum, "outputs/networks/" + mode + "_Assignment_Results_" + tp + ".ver")
+          closeVisum(Visum)
+        
+      else:
+        #build ct-ramp trip matrices
+        tripFileName = "outputs/other/indivTripData_" + str(iteration) + ".csv"
+        jtripFileName = "outputs/other/jointTripData_" + str(iteration) + ".csv"
 
-      closeVisum(Visum)
+        print("Build auto trip matrices") # DEBUG
+        Visum = startVisum()
+        loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_am.ver")
+        buildTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/skims/tap_data.csv",
+          "outputs/trips/ctrampTazTrips.omx", "outputs/trips/ctrampTapTrips.omx", "outputs/trips/tapParks.csv")
+        closeVisum(Visum)
+
+        print("Build non-motorized trip matrices") # DEBUG
+        Visum = startVisum()
+        # Debug loading matrices into highway version file
+        # loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver") # TODO switch to MAZ
+        loadVersion(Visum, "outputs/networks/Walk_MAZ_Skim_Setup.ver") # 2570 zones
+        buildNmTripMatrices(Visum, tripFileName, jtripFileName, hhsamplerate, "outputs/trips/ctrampNmTrips.omx")
+        closeVisum(Visum)
+
+        #load trip matrices
+        print("Load auto trip matrices") # DEBUG
+        for tp in ['ea','am','md','pm','ev']:
+          #taz
+          loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+          loadTripMatrices(Visum, "outputs/trips", tp, "taz")
+
+          saveVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
+
+          #tap set
+          # tap set is not created for transit everywhere scenario
+          if Transit_Everywhere_Switch=='false':
+              for setid in ['1','2','3']:
+                loadVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + setid + ".ver")
+                loadTripMatrices(Visum, "outputs/trips", tp, "tap", setid)
+                saveVersion(Visum, "outputs/networks/Transit_Assignment_Results_" + tp + "_set" + setid + ".ver")
+
+        # non-motorized
+        print("Load non-motorized trip matrices") # DEBUG
+        for tp in ['ea','am','md','pm','ev']:
+          for mode in ['walk','bike']:
+              # Debug loading matrices into highway version file
+              # loadVersion(Visum, "outputs/networks/Highway_Skimming_Assignment_Setup.ver") # TODO switch to MAZ
+              loadVersion(Visum, "outputs/networks/" + mode + "_MAZ_Skim_Setup.ver")
+              loadTripMatrices(Visum, "outputs/trips",tp,"nm")
+              saveVersion(Visum, "outputs/networks/" + mode + "_Assignment_Results_" + tp + ".ver")
+
+        closeVisum(Visum)
     except Exception as e:
       print(runmode + " Failed")
       print(e)

@@ -4,4 +4,5 @@ EA,300,659,3am to 7am,4
 AM,700,829,7am to 8:30am,1.5
 MD,830,1629,8:30am to 4:30pm,8
 PM,1630,1829,4:30pm to 6:30pm,2
+PKHR,1630,1729,4:30pm to 5:30pm,1
 EV2,1830,2359,6:30pm to midnight,8.5

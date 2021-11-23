@@ -10,8 +10,8 @@
 # clean all working version files under "networks"
 file.remove(paste("outputs/networks/Highway_Assignment_Results_",c("pm"),".ver",sep=""))  # just get rid of PM, because it's saved in the final copy, keep other periods, but get rid of skims
 file.remove(paste("outputs/networks/Transit_Assignment_Results_",apply(expand.grid(c("ea","am","md","pm","ev"),paste0("set",1:3)),1,paste,collapse="_"),".ver",sep=""))  
-file.remove(paste("outputs/networks/Bike_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
-file.remove(paste("outputs/networks/Walk_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
+#file.remove(paste("outputs/networks/Bike_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
+#file.remove(paste("outputs/networks/Walk_Assignment_Results_",c("ea","am","md","pm","ev"),".ver",sep=""))
 file.remove(paste("outputs/networks/",c("Bike_MAZ_Skim","Walk_MAZ_Skim","Highway_Skimming_Assignment","Transit_Skimming_Assignment","MAZ_Level_Processing"),"_Setup.ver",sep=""))
 
 # clean and simplify "other" folder
