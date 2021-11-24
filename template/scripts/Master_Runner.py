@@ -2535,7 +2535,7 @@ if __name__== "__main__":
       Visum = startVisum()
       loadVersion(Visum, "outputs/networks/Highway_Assignment_Results_" + tp + ".ver")
       prepVDFData(Visum, "inputs/vdf_lookup_table.csv")
-      loadProcedure(Visum, "config/visum/taz_skim_" + tp + ".xml")
+      loadProcedure(Visum, "config/visum/taz_skim_pkhr.xml")
       linkID = VisumPy.helpers.GetMulti(Visum.Net.Links, "No")
       mlc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_mid_link_cap")
       inc = VisumPy.helpers.GetMulti(Visum.Net.Links, "vdf_int_cap")
