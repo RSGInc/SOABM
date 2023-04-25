@@ -57,8 +57,8 @@ ECHO VDF_BMP: %VDF_BMP%
 SET VDF_DLL=%~dp0\application
 ECHO VDF_DLL: %VDF_DLL%
 
-COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 2022\UserVDF-DLLs"
-COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 2022\UserVDF-DLLs"
+COPY %VDF_BMP%\VisumVDF_ODOTVDFx64.bmp "%AppData%\PTV Vision\PTV Visum 2023\UserVDF-DLLs"
+COPY %VDF_DLL%\VisumVDF_ODOTVDFx64.dll "%AppData%\PTV Vision\PTV Visum 2023\UserVDF-DLLs"
 
 :: empty outputs folder
 ECHO empty outputs folder

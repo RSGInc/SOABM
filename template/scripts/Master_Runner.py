@@ -29,7 +29,7 @@ warnings.simplefilter('ignore', tables.NaturalNameWarning)
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(22)
+  Visum = VisumPy.helpers.CreateVisum(23)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)):
     Visum.SetPath(pathNo[i], os.getcwd())
