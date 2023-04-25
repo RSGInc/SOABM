@@ -47,6 +47,7 @@
     # Line from 1-31-18:
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 1/31/18 - Corrected EI/IE Pct Output to properly tabulate trips by home zone. (updated a couple of comments that incorrectly focused on JEMnR as well - just comment updates, not code).
     # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 12/12/19 - Also had to correct logic from 1/31/18, in the case where more than one dataset is used the "Out" object needs to be averaged across the number of datasets                                                                   
+    # Alex Bettinardi     alexander.o.bettinardi@odot.state.or.us 4/25/23 - Corrected minor edge case related to zero employment zones
           
       ############################ CREATE EXTERNAL OD MATRICES ############################################      
       #create external PA matrices (for multiple SWIM select link output scenarios)
@@ -404,6 +405,7 @@
                                   auto$Weight <- auto$Pweight * auto$Aweight
                                   ProdCont <- ProdCont / tapply(auto$Weight, auto$HOME_ZONE, sum) 
                                   ProdCont[is.nan(ProdCont)] <- 0
+                                  ProdCont[is.infinite(ProdCont)] <- 0 # 4-25-23 AB - edge case issue where Pweight from the home zone is postive, but the Attraction weight from the destination is 0, creating an infinity
                                   auto$Weight <- as.vector(auto$Weight * ProdCont[as.character(auto$HOME_ZONE)])
                                   rm(ProdCont)
                               
