@@ -29,7 +29,7 @@ warnings.simplefilter('ignore', tables.NaturalNameWarning)
 
 def startVisum():
   print("start Visum")
-  Visum = VisumPy.helpers.CreateVisum(23)
+  Visum = VisumPy.helpers.CreateVisum(24)
   pathNo = [8,69,2,37,12]
   for i in range(0,len(pathNo)):
     Visum.SetPath(pathNo[i], os.getcwd())
@@ -1394,7 +1394,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if inbound:
         o = int(taptaz[tapIds.index(dtap)][1]) #tap,taz columns
         d = int(trips[i][dmazColNum])
-        o = tazIds[o]
+        o = uniqTazs.index(o)  # corrected 1-8-24 AB, issue #102
         d = tazIds[d]
         sov[tod][o,d] = sov[tod][o,d] + expansionFactor
 
@@ -1402,7 +1402,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(trips[i][omazColNum])
         o = tazIds[o]
-        d = tazIds[d]
+        d = uniqTazs.index(d)  # corrected 1-8-24 AB, issue #102
         sov[tod][o,d] = sov[tod][o,d] + expansionFactor
 
         #outbound trip parks at lot
@@ -1430,14 +1430,14 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if inbound:
         o = int(taptaz[tapIds.index(dtap)][1]) #tap,taz columns
         d = int(trips[i][dmazColNum])
-        o = tazIds[o]
+        o = uniqTazs.index(o)  # corrected 1-8-24 AB, issue #102
         d = tazIds[d]
         hov2[tod][o,d] = hov2[tod][o,d] + (expansionFactor / hov2occ)
       else:
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(trips[i][omazColNum])
         o = tazIds[o]
-        d = tazIds[d]
+        d = uniqTazs.index(d)  # corrected 1-8-24 AB, issue #102
         hov2[tod][o,d] = hov2[tod][o,d] + (expansionFactor / hov2occ)
 
   print("read joint trips") # TODO joint trips
@@ -1588,7 +1588,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if inbound:
         o = int(taptaz[tapIds.index(dtap)][1]) #tap,taz columns
         d = int(jtrips[i][dmazColNum])
-        o = tazIds[o]
+        o = uniqTazs.index(o)  # corrected 1-8-24 AB, issue #102
         d = tazIds[d]
         if num_participants == 2:
           hov2[tod][o,d] = hov2[tod][o,d] + expansionFactor
@@ -1599,7 +1599,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(jtrips[i][omazColNum])
         o = tazIds[o]
-        d = tazIds[d]
+        d = uniqTazs.index(d)  # corrected 1-8-24 AB, issue #102
         if num_participants == 2:
           hov2[tod][o,d] = hov2[tod][o,d] + expansionFactor
         else:
@@ -1631,7 +1631,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
       if inbound:
         o = int(taptaz[tapIds.index(dtap)][1]) #tap,taz columns
         d = int(jtrips[i][dmazColNum])
-        o = tazIds[o]
+        o = uniqTazs.index(o)  # corrected 1-8-24 AB, issue #102
         d = tazIds[d]
         if num_participants == 2:
           hov2[tod][o,d] = hov2[tod][o,d] + expansionFactor
@@ -1641,7 +1641,7 @@ def buildTripMatrices(Visum, tripFileName, jointTripFileName, expansionFactor, t
         d = int(taptaz[tapIds.index(otap)][1]) #tap,taz columns
         o = int(jtrips[i][omazColNum])
         o = tazIds[o]
-        d = tazIds[d]
+        d = uniqTazs.index(d)  # corrected 1-8-24 AB, issue #102
         if num_participants == 2:
           hov2[tod][o,d] = hov2[tod][o,d] + expansionFactor
         else:
